@@ -48,14 +48,14 @@ export function setStorage(key, data, time) {
     if (!localStorage) {
       return false
     }
-    if (!time || isNaN(time)) {
+    if (!time || Number.isNaN(Number(time))) {
       time = 30 * 60 // 默认半小时
     }
     const cacheExpireDate = new Date() - 1 + time * 1000
     const cacheVal = { val: data, exp: cacheExpireDate }
     localStorage.setItem(key, JSON.stringify(cacheVal)) // 存入缓存值
   }
-  catch (e) {}
+  catch (e) { }
 }
 
 // 获取localStorage(加上失效时间判断)
@@ -271,7 +271,7 @@ export function recover(target, source) {
     const nextKey = keysArray[nextIndex]
     const desc = Object.getOwnPropertyDescriptor(target, nextKey)
     if (desc !== undefined && desc.enumerable) {
-      if (to.hasOwnProperty(nextKey)) {
+      if (Object.hasOwn(to, nextKey)) {
         if (Array.isArray(to[nextKey])) {
           to[nextKey] = source[nextKey]
         }
@@ -308,7 +308,7 @@ export function removeEmptyField(obj = {}) {
     for (const attr in obj) {
       // 属性值不为'',null,undefined才加入新对象里面(去掉'',null,undefined)
       if (
-        obj?.hasOwnProperty(attr)
+        Object.hasOwn(obj, attr)
         && obj[attr] !== ''
         && obj[attr] !== null
         && obj[attr] !== undefined

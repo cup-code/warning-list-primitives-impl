@@ -12,6 +12,7 @@ import {
   setPermissionTreeData,
   setStorage,
 } from '@/utils'
+import { clearProjectStorage, clearSession } from '@/utils/storage-namespace'
 import ChangePasswordDialog from './changePasswordDialog'
 
 export default {
@@ -57,9 +58,9 @@ export default {
     if (this.urlParams.tenantCode && this.urlParams.userToken) {
       this.loading = true
       // 先清空local等内容
-      sessionStorage.clear()
+      clearSession()
       const globalData = localStorage.getItem('globalData')
-      localStorage.clear()
+      clearProjectStorage()
       localStorage.setItem('globalData', globalData)
       this.$store.dispatch('user/logout') // 清空全局状态
       loginByOa(this.urlParams)
@@ -92,9 +93,9 @@ export default {
           this.loading = true
           const form = this.form
           // 1、先清空local等内容
-          sessionStorage.clear()
+          clearSession()
           const globalData = localStorage.getItem('globalData')
-          localStorage.clear()
+          clearProjectStorage()
           localStorage.setItem('globalData', globalData)
           this.$store.dispatch('user/logout') // 清空全局状态
           // 2、再登录

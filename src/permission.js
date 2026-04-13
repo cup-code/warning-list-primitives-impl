@@ -53,7 +53,7 @@ router.beforeEach((to, from, next) => {
     && to.name !== 'bigscreenViewer'
     && to.name !== 'kyReport'
 
-  if (sessionStorage.user && !store.state.user.user) {
+  if (sessionStorage.getItem('user') && !store.state.user.user) {
     // 刷新
     // session中取到权限数据
     const user = JSON.parse(sessionStorage.getItem('user'))
@@ -98,7 +98,7 @@ router.beforeEach((to, from, next) => {
     // localStorage设置的半小时失效, 重新到登录页
     next({ name: 'login' })
   }
-  else if (!sessionStorage.user && checkFlag) {
+  else if (!sessionStorage.getItem('user') && checkFlag) {
     // session失效, 重新到登录页
     next({ name: 'login' })
   }

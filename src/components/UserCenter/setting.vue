@@ -5,6 +5,7 @@ import {
   editUserPhone,
   editUserPw,
 } from '@/http/manage-api'
+import { clearProjectStorage, clearSession } from '@/utils/storage-namespace'
 import { $checkPhone } from '@/utils/validate'
 
 export default {
@@ -193,8 +194,8 @@ export default {
     // 清空所有，重新登录
     restartFn() {
       // 清空storage
-      sessionStorage.clear()
-      localStorage.clear()
+      clearSession()
+      clearProjectStorage()
 
       // 清空全局状态
       this.$store.dispatch('user/logout')

@@ -11,6 +11,7 @@ import {
   setPermissionTreeData,
   setStorage,
 } from '@/utils'
+import { clearProjectStorage, clearSession } from '@/utils/storage-namespace'
 
 export default {
   components: {
@@ -68,10 +69,10 @@ export default {
       const token = btoa(`${form.username}:${form.password}`)
 
       // 1、先清空local等内容
-      sessionStorage.clear()
+      clearSession()
       const comInfo = localStorage.getItem('comInfo')
       const globalData = localStorage.getItem('globalData')
-      localStorage.clear()
+      clearProjectStorage()
       localStorage.setItem('comInfo', comInfo)
       localStorage.setItem('globalData', globalData)
       this.$store.dispatch('user/logout') // 清空全局状态

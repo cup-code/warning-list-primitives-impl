@@ -2,6 +2,7 @@
 import { mapState } from 'vuex'
 import setting from '@/components/UserCenter/setting'
 import { editUser } from '@/http/manage-api'
+import { clearProjectStorage, clearSession } from '@/utils/storage-namespace'
 
 export default {
   components: {
@@ -88,8 +89,8 @@ export default {
     // 清空所有，重新登录
     restartFn() {
       // 清空storage
-      sessionStorage.clear()
-      localStorage.clear()
+      clearSession()
+      clearProjectStorage()
 
       // 清空全局状态
       this.$store.dispatch('user/logout')

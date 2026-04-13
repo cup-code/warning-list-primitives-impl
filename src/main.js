@@ -1,4 +1,7 @@
+/* eslint-disable perfectionist/sort-imports */
+import '@/utils/storage-namespace'
 import router from '@router'
+/* eslint-enable perfectionist/sort-imports */
 import { VueQueryPlugin } from '@tanstack/vue-query'
 
 // 引入animate.css样式库

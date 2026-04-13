@@ -7,6 +7,7 @@ import MessageTip from "@/components/MessageTip";
 import { getSpecifiedModule } from "@/http/companyConfig/companyConfig-api.js";
 import { getServiceConfiguration } from "@/http/manage-api.js";
 import { logout } from "@/http/user-api";
+import { clearProjectStorage, clearSession } from "@/utils/storage-namespace";
 
 export default {
   components: {
@@ -45,8 +46,8 @@ export default {
         if (data.success) {
           const saveSet = localStorage.getItem("setting");
           // 清空storage
-          sessionStorage.clear();
-          localStorage.clear();
+          clearSession();
+          clearProjectStorage();
           // 清空全局状态
           this.$store.dispatch("user/logout");
           localStorage.setItem("setting", saveSet);

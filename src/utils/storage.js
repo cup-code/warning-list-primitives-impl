@@ -1,4 +1,5 @@
 import Cookies from 'js-cookie'
+import { clearProjectStorage, clearSession } from '@/utils/storage-namespace'
 
 export function setCookie(k, v) {
   if (typeof v == 'undefined' || v == null) {
@@ -52,3 +53,5 @@ export function getStorageItem(k) {
 export function delStorageItem(k) {
   localStorage.removeItem(k)
 }
+
+export { clearProjectStorage, clearSession }
