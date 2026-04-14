@@ -163,7 +163,7 @@ export default {
             // 根据时间类型设置开始时间
             const timeTypeMap = {
               0: now.clone().startOf("date"),
-              1: now.clone().startOf("week").add(1, "day"),
+              1: now.clone().startOf("week"),
               2: now.clone().startOf("month"),
             };
 

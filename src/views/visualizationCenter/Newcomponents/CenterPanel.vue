@@ -1,6 +1,6 @@
 <script>
-import { getScreenDatas } from './common'
-import Panel from './Panel.vue'
+import { getScreenDatas } from "./common";
+import Panel from "./Panel.vue";
 
 export default {
   components: {
@@ -20,44 +20,42 @@ export default {
     },
     defaultPeriod: {
       type: Object,
-      default: {},
+      default: () => ({}),
     },
     departmentIds: {
       type: Array,
-      default: [],
+      default: () => [],
     },
   },
   data() {
     return {
-      alarmLevel: ['', '一级', '二级', '三级', '四级'],
+      alarmLevel: ["", "一级", "二级", "三级", "四级"],
       videoAlarmList: [],
       alarmStatusLive: null,
       alarmLevelLive: null,
       activeIndex: 0,
       periods: [
         {
-          value: '0',
-          label: '日',
+          value: "0",
+          label: "日",
         },
         {
-          value: '1',
-          label: '周',
+          value: "1",
+          label: "周",
         },
         {
-          value: '2',
-          label: '月',
+          value: "2",
+          label: "月",
         },
       ],
       visibleEvents: [],
-      selectedTrendPeriod: '1', // 默认选中的趋势按钮
-      selectedRankingPeriod: '1', // 默认选中的排名按钮
+      selectedTrendPeriod: "1", // 默认选中的趋势按钮
+      selectedRankingPeriod: "1", // 默认选中的排名按钮
       scrollTime: null,
-      alarmLevelLive: {},
-      alarmStatusLive: {},
       defaultCircle: {
-        type: 'pie',
-        center: ['26%', '50%'],
-        radius: ['45%', '65%'],
+        type: "pie",
+        center: ["26%", "50%"],
+        radius: ["45%", "65%"],
         silent: true,
         z: 1,
         label: { show: false },
@@ -65,138 +63,136 @@ export default {
         data: [
           {
             value: 1,
-            name: 'empty',
-            itemStyle: { color: 'lightgray', opacity: 1 },
+            name: "empty",
+            itemStyle: { color: "lightgray", opacity: 1 },
           },
         ],
         tooltip: { show: false },
         animation: false,
       },
-    }
+    };
   },
   computed: {
     currentEvent() {
-      return this.videoAlarmList[this.activeIndex]
+      return this.videoAlarmList[this.activeIndex];
     },
   },
   watch: {
-    'defaultPeriod': {
+    defaultPeriod: {
       handler(val) {
-        const { handlePeriod, levelPeriod } = { ...val }
-        this.selectedTrendPeriod = handlePeriod || '1'
-        this.selectedRankingPeriod = levelPeriod || '1'
+        const { handlePeriod, levelPeriod } = { ...val };
+        this.selectedTrendPeriod = handlePeriod || "1";
+        this.selectedRankingPeriod = levelPeriod || "1";
         this.getHandlingData({
           type: 4,
           timeType: this.selectedTrendPeriod,
-        })
+        });
         this.getLevelData({
           type: 5,
           timeType: this.selectedRankingPeriod,
-        })
+        });
       },
       immediate: true,
     },
-    'screenData.videoAlarmList': {
+    "screenData.videoAlarmList": {
       handler(val) {
-        this.videoAlarmList = val
+        this.videoAlarmList = val;
         setTimeout(() => {
-          this.visibleEvents = this.videoAlarmList
-        }, 800)
+          this.visibleEvents = this.videoAlarmList;
+        }, 800);
 
         this.$nextTick(() => {
-          this.initPoint()
-        })
+          this.initPoint();
+        });
       },
       deep: true,
     },
   },
   created() {
-    this.getPrefix()
+    this.getPrefix();
   },
   mounted() {
     // 添加resize监听器
-    window.addEventListener('resize', this.handleResize)
+    window.addEventListener("resize", this.handleResize);
 
     // 初始化画布内容
     this.$nextTick(() => {
       // 延迟执行resize以确保图表正确渲染
       setTimeout(() => {
-        this.handleResize()
-      }, 1000)
-    })
+        this.handleResize();
+      }, 1000);
+    });
   },
   beforeDestroy() {
     // 移除resize监听器
-    window.removeEventListener('resize', this.handleResize)
+    window.removeEventListener("resize", this.handleResize);
   },
 
   methods: {
     async getHandlingData(form) {
-      const data = await getScreenDatas(form, 'alarmStatusLive', this.departmentIds)
-      const { digital, total } = data
-      this.alarmStatusLive = digital
+      const data = await getScreenDatas(form, "alarmStatusLive", this.departmentIds);
+      const { digital, total } = data;
+      this.alarmStatusLive = digital;
       this.$nextTick(() => {
-        this.initHandlingChart(digital, total)
-      })
+        this.initHandlingChart(digital, total);
+      });
     },
     async getLevelData(form) {
-      const data = await getScreenDatas(form, 'alarmLevelLive', this.departmentIds)
-      const { digital, total } = data
-      this.alarmLevelLive = digital
+      const data = await getScreenDatas(form, "alarmLevelLive", this.departmentIds);
+      const { digital, total } = data;
+      this.alarmLevelLive = digital;
       this.$nextTick(() => {
-        this.initLevelChart(digital, total)
-      })
+        this.initLevelChart(digital, total);
+      });
     },
     initPoint() {
-      this.drawImageWithBoxes(this.currentEvent)
+      this.drawImageWithBoxes(this.currentEvent);
     },
     drawImageWithBoxes(info) {
-      const canvasEl = this.$refs.canvasImage
-      if (!canvasEl)
-        return
+      const canvasEl = this.$refs.canvasImage;
+      if (!canvasEl) return;
 
-      const annotations = info && info.annotations ? JSON.parse(info.annotations) : []
+      const annotations = info && info.annotations ? JSON.parse(info.annotations) : [];
 
-      const ctx = canvasEl.getContext('2d')
-      const container = this.$refs.imageContainer
-      if (!container)
-        return
+      const ctx = canvasEl.getContext("2d");
+      const container = this.$refs.imageContainer;
+      if (!container) return;
 
       // 获取canvas显示尺寸
-      const displayWidth = canvasEl.clientWidth
-      const displayHeight = canvasEl.clientHeight
+      const displayWidth = canvasEl.clientWidth;
+      const displayHeight = canvasEl.clientHeight;
 
       // 设置canvas实际渲染分辨率
-      const devicePixelRatio = window.devicePixelRatio || 1
-      canvasEl.width = displayWidth * devicePixelRatio
-      canvasEl.height = displayHeight * devicePixelRatio
+      const devicePixelRatio = window.devicePixelRatio || 1;
+      canvasEl.width = displayWidth * devicePixelRatio;
+      canvasEl.height = displayHeight * devicePixelRatio;
 
       // 高分辨率调整
-      ctx.scale(devicePixelRatio, devicePixelRatio)
+      ctx.scale(devicePixelRatio, devicePixelRatio);
 
       // 添加白色背景
-      ctx.fillStyle = '#ffffff'
-      ctx.fillRect(0, 0, displayWidth, displayHeight)
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, displayWidth, displayHeight);
 
-      const img = new Image()
-      img.crossOrigin = 'Anonymous'
-      img.src = info && info.alarmPic ? this.filePrefix + info.alarmPic : ''
-      img.style.objectFit = 'contain' // 改为contain以保持图片比例
+      const img = new Image();
+      img.crossOrigin = "Anonymous";
+      img.src = info && info.alarmPic ? this.filePrefix + info.alarmPic : "";
+      img.style.objectFit = "contain"; // 改为contain以保持图片比例
 
       // 检查组件是否已销毁，避免生命周期问题
       if (this._isDestroyed || this._isBeingDestroyed) {
-        return
+        return;
       }
 
       img.onload = () => {
-        const originalWidth = img.width
-        const originalHeight = img.height
+        const originalWidth = img.width;
+        const originalHeight = img.height;
 
-        ctx.clearRect(0, 0, displayWidth, displayHeight)
+        ctx.clearRect(0, 0, displayWidth, displayHeight);
 
         // 重新绘制白色背景
-        ctx.fillStyle = '#ffffff'
-        ctx.fillRect(0, 0, displayWidth, displayHeight)
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, displayWidth, displayHeight);
 
         // 直接使用canvas尺寸绘制图片，不考虑原始比例
         ctx.drawImage(
@@ -208,143 +204,143 @@ export default {
           0,
           0,
           displayWidth,
-          displayHeight,
-        )
+          displayHeight
+        );
 
         // 画标注框（如果有）
         if (annotations && annotations.length > 0) {
-          ctx.strokeStyle = 'red'
-          ctx.lineWidth = 2
+          ctx.strokeStyle = "red";
+          ctx.lineWidth = 2;
           annotations.forEach((item) => {
-            const [x, y, width, height] = item.bbox
+            const [x, y, width, height] = item.bbox;
             // 根据canvas尺寸计算新的标注框位置和大小
-            const boxX = (x / originalWidth) * displayWidth
-            const boxY = (y / originalHeight) * displayHeight
-            const boxWidth = (width / originalWidth) * displayWidth
-            const boxHeight = (height / originalHeight) * displayHeight
-            ctx.strokeRect(boxX, boxY, boxWidth, boxHeight)
-          })
+            const boxX = (x / originalWidth) * displayWidth;
+            const boxY = (y / originalHeight) * displayHeight;
+            const boxWidth = (width / originalWidth) * displayWidth;
+            const boxHeight = (height / originalHeight) * displayHeight;
+            ctx.strokeRect(boxX, boxY, boxWidth, boxHeight);
+          });
         }
-      }
+      };
 
       img.onerror = () => {
-        ctx.fillStyle = '#ffffff'
-        ctx.fillRect(0, 0, displayWidth, displayHeight)
-        ctx.fillStyle = '#f00'
-        ctx.font = '14px Arial'
-        ctx.textAlign = 'center'
-        ctx.fillText('图片加载失败', displayWidth / 2, displayHeight / 2)
-      }
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, displayWidth, displayHeight);
+        ctx.fillStyle = "#f00";
+        ctx.font = "14px Arial";
+        ctx.textAlign = "center";
+        ctx.fillText("图片加载失败", displayWidth / 2, displayHeight / 2);
+      };
     },
 
     // 初始化 visibleEvents，使其默认显示前五张
     updateVisibleEvents() {
-      this.visibleEvents = this.videoAlarmList
+      this.visibleEvents = this.videoAlarmList;
     },
 
     prevEvent() {
-      this.activeIndex
-        = (this.activeIndex - 1 + this.videoAlarmList.length) % this.videoAlarmList.length
-      this.updateVisibleEvents()
-      this.initPoint()
+      this.activeIndex =
+        (this.activeIndex - 1 + this.videoAlarmList.length) % this.videoAlarmList.length;
+      this.updateVisibleEvents();
+      this.initPoint();
     },
     nextEvent() {
-      this.activeIndex = (this.activeIndex + 1) % this.videoAlarmList.length
-      this.updateVisibleEvents()
-      this.initPoint()
+      this.activeIndex = (this.activeIndex + 1) % this.videoAlarmList.length;
+      this.updateVisibleEvents();
+      this.initPoint();
     },
     selectEvent(index) {
-      this.activeIndex = index
-      this.initPoint()
+      this.activeIndex = index;
+      this.initPoint();
     },
     initHandlingChart(digital, total) {
       // 误报不参与计算
-      const currentTotal = digital['误报'] ? total - digital['误报'] : total
+      const currentTotal = digital["误报"] ? total - digital["误报"] : total;
 
       try {
-        const live = digital
+        const live = digital;
         let data = [
-          { name: '待加急处理', num: 0, value: 0 },
-          { name: '待处理', num: 0, value: 0 },
-          { name: '有效', num: 0, value: 0 },
-        ]
+          { name: "待加急处理", num: 0, value: 0 },
+          { name: "待处理", num: 0, value: 0 },
+          { name: "有效", num: 0, value: 0 },
+        ];
 
-        data = data.map(item => ({
+        data = data.map((item) => ({
           name: item.name,
           num: live[item.name],
           value: ((live[item.name] / currentTotal) * 100).toFixed(2),
-        }))
+        }));
 
         // 判断数据是否为空或所有项为0
-        const isEmpty
-          = !Object.keys(live).length || Object.keys(live).every(item => !item)
+        const isEmpty =
+          !Object.keys(live).length || Object.keys(live).every((item) => !item);
 
-        const chartDom = document.getElementById('handlingChart')
+        const chartDom = document.getElementById("handlingChart");
         if (!chartDom) {
-          console.error('未找到图表容器')
-          return
+          console.error("未找到图表容器");
+          return;
         }
 
-        const existingChart = this.$echarts.getInstanceByDom(chartDom)
+        const existingChart = this.$echarts.getInstanceByDom(chartDom);
         if (existingChart) {
-          existingChart.dispose()
+          existingChart.dispose();
         }
 
-        const chart = this.$echarts.init(chartDom, null, { renderer: 'canvas' })
+        const chart = this.$echarts.init(chartDom, null, { renderer: "canvas" });
 
         // 正常色彩
-        const color = ['#0CD2E6', '#3751E6', '#FFC722']
+        const color = ["#0CD2E6", "#3751E6", "#FFC722"];
         // 置灰色彩
-        const grayColor = ['#d3d3d3', '#d3d3d3', '#d3d3d3']
-        const useGray = isEmpty
+        const grayColor = ["#d3d3d3", "#d3d3d3", "#d3d3d3"];
+        const useGray = isEmpty;
 
-        const baseFontSize = window.innerWidth / 100
-        const labelFontSize = Number(baseFontSize * 0.8).toFixed(0)
+        const baseFontSize = window.innerWidth / 100;
+        const labelFontSize = Number(baseFontSize * 0.8).toFixed(0);
 
         // 由于当前 ECharts 版本 showEmptyCircle 不生效，手动添加一个灰色的底层环形 series 实现同样效果
         const option = {
-          backgroundColor: '#050e31',
+          backgroundColor: "#050e31",
           color: useGray ? grayColor : color,
           grid: {
-            top: '10%',
-            left: '2%',
-            right: '1%',
-            bottom: '1%',
+            top: "10%",
+            left: "2%",
+            right: "1%",
+            bottom: "1%",
           },
           tooltip: {
-            trigger: 'item',
+            trigger: "item",
           },
           legend: {
-            orient: 'vertical',
-            top: 'center',
-            selectedMode: 'multiple',
+            orient: "vertical",
+            top: "center",
+            selectedMode: "multiple",
             right: 0,
             itemWidth: 15,
             textStyle: {
-              align: 'left',
-              verticalAlign: 'middle',
+              align: "left",
+              verticalAlign: "middle",
               rich: {
                 name: {
-                  color: 'rgba(255,255,255,0.5)',
+                  color: "rgba(255,255,255,0.5)",
                   fontSize: labelFontSize,
                 },
                 value: {
-                  color: 'rgba(255,255,255,0.5)',
+                  color: "rgba(255,255,255,0.5)",
                   fontSize: labelFontSize,
                 },
                 rate: {
-                  color: 'rgba(255,255,255,0.9)',
+                  color: "rgba(255,255,255,0.9)",
                   fontSize: labelFontSize,
                 },
               },
             },
-            data: data.map(item => item.name),
+            data: data.map((item) => item.name),
             formatter: (name) => {
-              const item = data.find(item => item.name === name)
+              const item = data.find((item) => item.name === name);
               // 空数据时显示0%
               return `{name|${name}}{value| ${Number(item.value) || 0}%} {rate| ${
                 item.num || 0
-              }个}`
+              }个}`;
             },
           },
           series: useGray
@@ -355,13 +351,13 @@ export default {
                 },
                 // 顶层置灰数据环形
                 {
-                  type: 'pie',
-                  center: ['26%', '50%'],
-                  radius: ['45%', '65%'],
+                  type: "pie",
+                  center: ["26%", "50%"],
+                  radius: ["45%", "65%"],
                   z: 2,
                   label: {
                     show: false,
-                    position: 'center',
+                    position: "center",
                   },
                   avoidLabelOverlap: false,
                   emphasis: {
@@ -377,12 +373,12 @@ export default {
                   },
                   legendHoverLink: true,
                   data: [
-                    { value: 1, name: '待加急处理' },
-                    { value: 0, name: '待处理' },
-                    { value: 0, name: '有效' },
+                    { value: 1, name: "待加急处理" },
+                    { value: 0, name: "待处理" },
+                    { value: 0, name: "有效" },
                   ],
                   itemStyle: {
-                    color: '#d3d3d3',
+                    color: "#d3d3d3",
                   },
                   tooltip: { show: false },
                   animation: false,
@@ -391,19 +387,19 @@ export default {
             : [
                 { ...this.defaultCircle },
                 {
-                  type: 'pie',
-                  center: ['26%', '50%'],
-                  radius: ['45%', '65%'],
+                  type: "pie",
+                  center: ["26%", "50%"],
+                  radius: ["45%", "65%"],
                   label: {
                     show: false,
-                    position: 'center',
+                    position: "center",
                   },
                   avoidLabelOverlap: false,
                   emphasis: {
                     label: {
                       show: true,
                       formatter: (params) => {
-                        return params.value > 0 ? `${params.name} ` : ''
+                        return params.value > 0 ? `${params.name} ` : "";
                       },
                       fontSize: labelFontSize,
                     },
@@ -415,124 +411,122 @@ export default {
                   },
                   legendHoverLink: true,
                   data: data.map((item) => {
-                    return { value: item.value, name: item.name }
+                    return { value: item.value, name: item.name };
                   }),
                 },
               ],
-        }
+        };
 
-        chart.setOption(option)
+        chart.setOption(option);
 
         // 添加响应式调整
         const resizeChart = () => {
           if (chart && !chart.isDisposed()) {
-            chart.resize()
+            chart.resize();
           }
-        }
+        };
 
-        window.addEventListener('resize', resizeChart)
+        window.addEventListener("resize", resizeChart);
 
         // 在组件销毁时移除事件监听器
-        this.$once('hook:beforeDestroy', () => {
-          window.removeEventListener('resize', resizeChart)
+        this.$once("hook:beforeDestroy", () => {
+          window.removeEventListener("resize", resizeChart);
           if (chart && !chart.isDisposed()) {
-            chart.dispose()
+            chart.dispose();
           }
-        })
+        });
 
         // 监听图例点击事件
-        chart.on('legendselectchanged', (params) => {})
+        chart.on("legendselectchanged", (params) => {});
 
         // 监听数据项点击事件
-        chart.on('click', (params) => {
+        chart.on("click", (params) => {
           // 空数据时不跳转
-          if (isEmpty)
-            return
+          if (isEmpty) return;
           this.$router.push({
-            path: '/videoOperation/ForeWarningManagement/clientWarningInfoList',
+            path: "/videoOperation/ForeWarningManagement/clientWarningInfoList",
             query: {
-              customerStatus: this.$dictUtils.getDictList('CustomerStatus').find((s) => {
-                return s.dictName === params.name
+              customerStatus: this.$dictUtils.getDictList("CustomerStatus").find((s) => {
+                return s.dictName === params.name;
               })?.dictCode,
               timeType: this.selectedTrendPeriod,
             },
-          })
-        })
-      }
-      catch (error) {
-        console.error('初始化处理情况图表失败:', error)
+          });
+        });
+      } catch (error) {
+        console.error("初始化处理情况图表失败:", error);
       }
     },
     initLevelChart(digital, total) {
       try {
-        const live = digital
+        const live = digital;
         let data = [
-          { name: '一级预警', num: 0, value: 0, id: 1 },
-          { name: '二级预警', num: 0, value: 0, id: 2 },
-          { name: '三级预警', num: 0, value: 0, id: 3 },
-          { name: '四级预警', num: 0, value: 0, id: 4 },
-        ]
+          { name: "一级预警", num: 0, value: 0, id: 1 },
+          { name: "二级预警", num: 0, value: 0, id: 2 },
+          { name: "三级预警", num: 0, value: 0, id: 3 },
+          { name: "四级预警", num: 0, value: 0, id: 4 },
+        ];
 
-        data = data.map(item => ({
+        data = data.map((item) => ({
           name: item.name,
           num: live[item.id],
           value: ((live[item.id] / total) * 100).toFixed(2),
-        }))
+        }));
 
-        const isEmpty
-          = !Object.keys(live).length || Object.keys(live).every(item => !item)
+        const isEmpty =
+          !Object.keys(live).length || Object.keys(live).every((item) => !item);
 
-        const chartDom = document.getElementById('levelChart')
+        const chartDom = document.getElementById("levelChart");
         if (!chartDom) {
-          console.error('未找到图表容器')
-          return
+          console.error("未找到图表容器");
+          return;
         }
 
-        const existingChart = this.$echarts.getInstanceByDom(chartDom)
+        const existingChart = this.$echarts.getInstanceByDom(chartDom);
         if (existingChart) {
-          existingChart.dispose()
+          existingChart.dispose();
         }
 
-        const chart = this.$echarts.init(chartDom, null, { renderer: 'canvas' })
+        const chart = this.$echarts.init(chartDom, null, { renderer: "canvas" });
 
-        const color = ['red', 'orange', 'yellow', '#3751E6']
-        const grayColor = ['#d3d3d3', '#d3d3d3', '#d3d3d3', '#d3d3d3']
-        const useGray = isEmpty
-        const baseFontSize = window.innerWidth / 100
-        const labelFontSize = Number(baseFontSize * 0.8).toFixed(0)
+        const color = ["red", "orange", "yellow", "#3751E6"];
+        const grayColor = ["#d3d3d3", "#d3d3d3", "#d3d3d3", "#d3d3d3"];
+        const useGray = isEmpty;
+        const baseFontSize = window.innerWidth / 100;
+        const labelFontSize = Number(baseFontSize * 0.8).toFixed(0);
         const option = {
-          backgroundColor: '#050e31',
+          backgroundColor: "#050e31",
           color: useGray ? grayColor : color,
           grid: {
-            top: '10%',
-            left: '2%',
-            right: '5%',
-            bottom: '1%',
+            top: "10%",
+            left: "2%",
+            right: "5%",
+            bottom: "1%",
             containLabel: true,
           },
           tooltip: {
-            trigger: 'item',
+            trigger: "item",
             hideDelay: 500,
           },
           legend: {
-            orient: 'vertical',
-            top: 'center',
+            orient: "vertical",
+            top: "center",
             right: 0,
             itemWidth: 15,
             textStyle: {
-              align: 'left',
-              verticalAlign: 'middle',
+              align: "left",
+              verticalAlign: "middle",
               rich: {
                 name: {
-                  color: 'rgba(255,255,255,0.5)',
+                  color: "rgba(255,255,255,0.5)",
                   fontSize: labelFontSize,
                 },
                 value: {
-                  color: 'rgba(255,255,255,0.5)',
+                  color: "rgba(255,255,255,0.5)",
                   fontSize: labelFontSize,
                 },
                 rate: {
-                  color: 'rgba(255,255,255,0.9)',
+                  color: "rgba(255,255,255,0.9)",
                   fontSize: labelFontSize,
                 },
               },
@@ -540,10 +534,10 @@ export default {
             data,
             formatter: (name) => {
               if (data.length) {
-                const item = data.find(item => item.name === name)
+                const item = data.find((item) => item.name === name);
                 return `{name|${name}}{value| ${Number(item.value) || 0}%} {rate| ${
                   item.num || 0
-                }个}`
+                }个}`;
               }
             },
           },
@@ -551,12 +545,12 @@ export default {
             ? [
                 { ...this.defaultCircle },
                 {
-                  type: 'pie',
-                  center: ['26%', '50%'],
-                  radius: ['45%', '65%'],
+                  type: "pie",
+                  center: ["26%", "50%"],
+                  radius: ["45%", "65%"],
                   label: {
                     show: false,
-                    position: 'center',
+                    position: "center",
                   },
                   avoidLabelOverlap: false,
                   emphasis: {
@@ -564,8 +558,8 @@ export default {
                     scale: false,
                     itemStyle: {
                       // 禁用高亮色
-                      color: '#d3d3d3',
-                      borderColor: '#d3d3d3',
+                      color: "#d3d3d3",
+                      borderColor: "#d3d3d3",
                       borderWidth: 0,
                       shadowBlur: 0,
                     },
@@ -579,7 +573,7 @@ export default {
                   legendHoverLink: false,
                   data,
                   itemStyle: {
-                    color: '#d3d3d3',
+                    color: "#d3d3d3",
                   },
                   tooltip: { show: false },
                   animation: false,
@@ -590,19 +584,19 @@ export default {
             : [
                 { ...this.defaultCircle },
                 {
-                  type: 'pie',
-                  center: ['26%', '50%'],
-                  radius: ['45%', '65%'],
+                  type: "pie",
+                  center: ["26%", "50%"],
+                  radius: ["45%", "65%"],
                   label: {
                     show: false,
-                    position: 'center',
+                    position: "center",
                   },
                   avoidLabelOverlap: false,
                   emphasis: {
                     label: {
                       show: true,
                       formatter: (params) => {
-                        return params.value > 0 ? `${params.name} ` : ''
+                        return params.value > 0 ? `${params.name} ` : "";
                       },
                       fontSize: labelFontSize,
                     },
@@ -614,81 +608,79 @@ export default {
                   },
                   legendHoverLink: true,
                   data: data.map((item) => {
-                    return { value: item.num, name: item.name }
+                    return { value: item.num, name: item.name };
                   }),
                 },
               ],
-        }
+        };
 
-        chart.setOption(option)
+        chart.setOption(option);
 
         // 添加响应式调整
         const resizeChart = () => {
           if (chart && !chart.isDisposed()) {
-            chart.resize()
+            chart.resize();
           }
-        }
+        };
 
-        window.addEventListener('resize', resizeChart)
+        window.addEventListener("resize", resizeChart);
 
         // 在组件销毁时移除事件监听器
-        this.$once('hook:beforeDestroy', () => {
-          window.removeEventListener('resize', resizeChart)
+        this.$once("hook:beforeDestroy", () => {
+          window.removeEventListener("resize", resizeChart);
           if (chart && !chart.isDisposed()) {
-            chart.dispose()
+            chart.dispose();
           }
-        })
+        });
 
         // 监听图例点击事件
-        chart.on('legendselectchanged', (params) => {})
+        chart.on("legendselectchanged", (params) => {});
 
         // 监听数据项点击事件
-        chart.on('click', (params) => {
+        chart.on("click", (params) => {
           const alarmLevel = {
             一级预警: 1,
             二级预警: 2,
             三级预警: 3,
             四级预警: 4,
-          }
+          };
 
-          if (isEmpty)
-            return
+          if (isEmpty) return;
           this.$router.push({
-            path: '/videoOperation/ForeWarningManagement/clientWarningInfoList',
+            path: "/videoOperation/ForeWarningManagement/clientWarningInfoList",
             query: {
               alarmLevel: alarmLevel[params.name],
               timeType: this.selectedRankingPeriod,
             },
-          })
-        })
-      }
-      catch (error) {
-        console.error('初始化等级占比图表失败:', error)
+          });
+        });
+      } catch (error) {
+        console.error("初始化等级占比图表失败:", error);
       }
     },
     async handleHandlingButtonClick(period) {
-      this.selectedTrendPeriod = period
+      this.selectedTrendPeriod = period;
       this.getHandlingData({
         type: 4,
         timeType: this.selectedTrendPeriod,
-      })
+      });
     },
     async handleLevelButtonClick(period) {
-      this.selectedRankingPeriod = period
+      this.selectedRankingPeriod = period;
       this.getLevelData({
         type: 5,
         timeType: this.selectedRankingPeriod,
-      })
+      });
     },
     // 刷新预警事件
     async refreshEvents() {
       // alert('刷新预警事件成功');
       // 模拟获取新数据
-      this.$emit('getScreenData', {
+      this.$emit("getScreenData", {
         type: 6,
         timeType: 0,
-      })
-      this.updateVisibleEvents()
+      });
+      this.updateVisibleEvents();
     },
     // 刷新预警处理情况
     async refreshHandling() {
@@ -696,7 +688,7 @@ export default {
       this.getHandlingData({
         type: 4,
         timeType: this.selectedTrendPeriod,
-      })
+      });
     },
     // 刷新预警等级占比
     async refreshLevel() {
@@ -704,37 +696,37 @@ export default {
       this.getLevelData({
         type: 5,
         timeType: this.selectedRankingPeriod,
-      })
+      });
     },
     onMore() {
-      this.$router.push('/videoOperation/ForeWarningManagement/clientWarningInfoList')
+      this.$router.push("/videoOperation/ForeWarningManagement/clientWarningInfoList");
     },
 
     // 处理窗口大小变化，重绘图表
     handleResize() {
       // 重新初始化图表大小
       const handlingChart = this.$echarts.getInstanceByDom(
-        document.getElementById('handlingChart'),
-      )
+        document.getElementById("handlingChart")
+      );
       const levelChart = this.$echarts.getInstanceByDom(
-        document.getElementById('levelChart'),
-      )
+        document.getElementById("levelChart")
+      );
 
       if (handlingChart) {
-        handlingChart.resize()
+        handlingChart.resize();
       }
 
       if (levelChart) {
-        levelChart.resize()
+        levelChart.resize();
       }
 
       // 重新绘制当前图像
       this.$nextTick(() => {
-        this.drawImageWithBoxes(this.currentEvent)
-      })
+        this.drawImageWithBoxes(this.currentEvent);
+      });
     },
   },
-}
+};
 </script>
 
 <template>
@@ -783,7 +775,7 @@ export default {
                 :alt="event.cameraName"
                 :class="{ active: videoAlarmList.indexOf(event) === activeIndex }"
                 @click="selectEvent(videoAlarmList.indexOf(event))"
-              >
+              />
             </div>
             <button class="carousel-btn next-btn" @click="nextEvent">
               <svg
