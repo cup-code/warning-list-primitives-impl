@@ -1,0 +1,35 @@
+{
+  // 继承 .vscode/settings.json 的设置
+  // 这里可以添加 Cursor 特定的配置
+
+  // 确保保存时自动格式化
+  "editor.formatOnSave": false,
+  "editor.formatOnPaste": false,
+
+  // 保存时自动修复 ESLint 错误
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit",
+    "source.organizeImports": "never"
+  },
+
+  // ESLint 配置
+  "eslint.enable": true,
+  "eslint.runtime": "node",
+
+  // 为各种文件类型指定 ESLint 为默认格式化工具
+  "[javascript]": {
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+  },
+  "[vue]": {
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+  }
+}

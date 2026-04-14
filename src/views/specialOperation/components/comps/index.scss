@@ -1,0 +1,31 @@
+.table-box {
+  .table-item {
+    padding: 5px;
+    border-right: 1px solid lightgray;
+    border-bottom: 1px solid lightgray;
+    min-height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .item-title {
+    font-weight: bold;
+  }
+  .column-box {
+    display: flex;
+    flex-direction: column;
+  }
+  .sign-box {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .des-box {
+    margin: 0 0 10px 0;
+  }
+  .sign-img {
+    margin: 0 10px 0 0;
+    width: 80px;
+    height: 50px;
+  }
+}

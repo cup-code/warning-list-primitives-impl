@@ -1,0 +1,245 @@
+[{
+  "id": "4l1ho3fa23o",
+  "dataType": "record",
+  "name": "民用工厂",
+  "area": "3d-magic",
+  "icon": "info",
+  "desc": "",
+  "position": "72.02,21,-130.13",
+  "otherData": {},
+  "dataInfo": {
+    "recordData": [{
+      "name": "建筑面积",
+      "value": "10922㎡"
+    }, {
+      "name": "建筑高度",
+      "value": "11.2m"
+    }, {
+      "name": "结构体系",
+      "value": "轻钢结构"
+    }],
+    "alertData": [],
+    "measureData": []
+  }
+}, {
+  "id": "661vhdhwqp4",
+  "dataType": "record",
+  "name": "人工湖",
+  "area": "3d-dev",
+  "icon": "info",
+  "desc": "",
+  "position": "52.98,-1.5,157.65",
+  "otherData": {},
+  "dataInfo": {
+    "recordData": [{
+      "name": "湖水面积",
+      "value": "13000㎡"
+    }, {
+      "name": "湖深度",
+      "value": "3米"
+    }],
+    "alertData": [],
+    "measureData": []
+  }
+}, {
+  "id": "ait1kerounc",
+  "dataType": "record",
+  "name": "食堂",
+  "area": "3d-magic",
+  "icon": "info",
+  "desc": "",
+  "position": "120.65,8.7,107.12",
+  "otherData": {},
+  "dataInfo": {
+    "recordData": [{
+      "name": "建筑面积",
+      "value": "1266㎡"
+    }, {
+      "name": "建筑层数",
+      "value": "主体2层"
+    }, {
+      "name": "建筑高度",
+      "value": "8.1米"
+    }, {
+      "name": "结构体系",
+      "value": "框架结构"
+    }],
+    "alertData": [],
+    "measureData": []
+  }
+}, {
+  "id": "hdczdlu1rmw",
+  "dataType": "record",
+  "name": "研发楼",
+  "area": "3d-magic",
+  "icon": "info",
+  "desc": "",
+  "position": "-154.47,28.5,-117.3",
+  "otherData": {},
+  "dataInfo": {
+    "recordData": [{
+      "name": "建筑面积",
+      "value": "21659㎡"
+    }, {
+      "name": "建筑层数",
+      "value": "5层"
+    }, {
+      "name": "建筑高度",
+      "value": "23.55m"
+    }, {
+      "name": "结构体系",
+      "value": "框架结构"
+    }],
+    "alertData": [],
+    "measureData": []
+  }
+}, {
+  "id": "n3g1qv9gobk",
+  "dataType": "record",
+  "name": "2号高级宿舍楼",
+  "area": "3d-magic",
+  "icon": "info",
+  "desc": "",
+  "position": "81.37,14,54.73",
+  "otherData": {},
+  "dataInfo": {
+    "recordData": [{
+      "name": "建筑面积",
+      "value": "2291㎡"
+    }, {
+      "name": "建筑层数",
+      "value": "5层、共98个床位"
+    }, {
+      "name": "建筑高度",
+      "value": "15.45m"
+    }, {
+      "name": "结构体系",
+      "value": "框架结构"
+    }],
+    "alertData": [],
+    "measureData": []
+  }
+}, {
+  "id": "cyu0bpnqaso",
+  "dataType": "dialog",
+  "name": "北门房",
+  "area": "3d-magic",
+  "icon": "info",
+  "desc": "",
+  "position": "-134.36,6,-167.07"
+}, {
+  "id": "es45bny7bjc",
+  "dataType": "record",
+  "name": "冷却塔",
+  "area": "3d-magic",
+  "icon": "info",
+  "desc": "",
+  "position": "-157.39,9,22.66",
+  "otherData": {},
+  "dataInfo": {
+    "recordData": [{
+      "name": "厂商",
+      "value": "港康明"
+    }, {
+      "name": "安装时间",
+      "value": "2018/11"
+    }],
+    "alertData": [],
+    "measureData": []
+  }
+}, {
+  "id": "7chn41h09b8",
+  "dataType": "dialog",
+  "name": "西门房",
+  "area": "3d-dev",
+  "icon": "info",
+  "desc": "",
+  "position": "-181.59,6,-7.71"
+}, {
+  "id": "mazmn731vds",
+  "dataType": "record",
+  "name": "1号高级宿舍楼",
+  "area": "3d-magic",
+  "icon": "info",
+  "desc": "",
+  "position": "89.78,10,84.65",
+  "otherData": {},
+  "dataInfo": {
+    "recordData": [{
+      "name": "建筑面积",
+      "value": "2291㎡"
+    }, {
+      "name": "建筑层数",
+      "value": "3层、共28个床位"
+    }, {
+      "name": "建筑高度",
+      "value": "9.45m"
+    }, {
+      "name": "结构体系",
+      "value": "框架结构"
+    }],
+    "alertData": [],
+    "measureData": []
+  }
+}, {
+  "id": "lc19bplc374",
+  "dataType": "record",
+  "name": "军用工厂",
+  "area": "3d-magic",
+  "icon": "info",
+  "desc": "",
+  "position": "-102.95,16.5,16.08",
+  "otherData": {},
+  "dataInfo": {
+    "recordData": [{
+      "name": "建筑面积",
+      "value": "10895㎡"
+    }, {
+      "name": "建筑高度",
+      "value": "11.2m"
+    }, {
+      "name": "结构体系",
+      "value": "轻钢结构"
+    }],
+    "alertData": [],
+    "measureData": []
+  }
+}, {
+  "id": "k8gad7enrcg",
+  "dataType": "record",
+  "name": "培训中心",
+  "area": "3d-magic",
+  "icon": "info",
+  "desc": "",
+  "position": "16.07,18,98.98",
+  "otherData": {},
+  "dataInfo": {
+    "recordData": [{
+      "name": "建筑面积",
+      "value": "多层公共建筑6597㎡"
+    }, {
+      "name": "建筑层数",
+      "value": "主楼4层，局部2层"
+    }, {
+      "name": "建筑高度",
+      "value": "20.5m"
+    }, {
+      "name": "结构体系",
+      "value": "钢框架结构"
+    }, {
+      "name": "地下室",
+      "value": "无"
+    }, {
+      "name": "中央空调",
+      "value": "2020/11/16日安装"
+    }, {
+      "name": "容量",
+      "value": "200人"
+    }, {
+      "name": "多媒体会议室",
+      "value": "3层和4层，培训中心"
+    }],
+    "alertData": [],
+    "measureData": []
+  }
+}]

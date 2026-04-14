@@ -1,0 +1,240 @@
+[
+  {
+    "label": "时间",
+    "prop": "eventDate"
+  },
+  {
+    "label": "pH值",
+    "prop": "phzhi",
+    "his": [
+      { "label": "最大值", "prop": "phzhimax" },
+      { "label": "最小值", "prop": "phzhimin" },
+      { "label": "平均值", "prop": "phzhiavg" }
+    ],
+    "det": [
+      { "label": "", "prop": "phzhiavg" }
+    ]
+  },
+  {
+    "label": "COD",
+    "prop": "cod",
+    "unit": "mg/L",
+    "his": [
+      { "label": "最大值", "prop": "codmax" },
+      { "label": "最小值", "prop": "codmin" },
+      { "label": "平均值", "prop": "codavg" },
+      { "label": "累计值", "prop": "codcou" }
+    ],
+    "det": [
+      { "label": "浓度", "prop": "codavg" },
+      { "label": "排放量", "prop": "codcou" }
+    ]
+  },
+  {
+    "label": "氨氮",
+    "prop": "andan",
+    "unit": "mg/L",
+    "his": [
+      { "label": "最大值", "prop": "andanmax" },
+      { "label": "最小值", "prop": "andanmin" },
+      { "label": "平均值", "prop": "andanavg" },
+      { "label": "累计值", "prop": "andancou" }
+    ],
+    "det": [
+      { "label": "浓度", "prop": "andanavg" },
+      { "label": "排放量", "prop": "andancou" }
+    ]
+  },
+  {
+    "label": "污水瞬时流量",
+    "prop": "wushuishunshi",
+    "unit": "L/s"
+  },
+  {
+    "label": "污水流量",
+    "prop": "wushuileiji",
+    "unit": "吨",
+    "his": [
+      { "label": "累计值", "prop": "wushuileiji" }
+    ],
+    "det": [
+      { "label": "", "prop": "wushuileiji" }
+    ]
+  },
+  {
+    "label": "总氮",
+    "prop": "zongdan",
+    "unit": "mg/L",
+    "his": [
+      { "label": "最大值", "prop": "zongdanmax" },
+      { "label": "最小值", "prop": "zongdanmin" },
+      { "label": "平均值", "prop": "zongdanavg" }
+    ],
+    "det": [
+      { "label": "浓度", "prop": "zongdanavg" }
+    ]
+  },
+  {
+    "label": "总磷",
+    "prop": "zonglin",
+    "unit": "mg/L",
+    "his": [
+      { "label": "最大值", "prop": "zonglinmax" },
+      { "label": "最小值", "prop": "zonglinmin" },
+      { "label": "平均值", "prop": "zonglinavg" }
+    ],
+    "det": [
+      { "label": "浓度", "prop": "zonglinavg" }
+    ]
+  },
+  {
+    "label": "氟化物",
+    "prop": "fuhuawu",
+    "unit": "mg/L",
+    "his": [
+      { "label": "最大值", "prop": "fuhuawumax" },
+      { "label": "最小值", "prop": "fuhuawumin" },
+      { "label": "平均值", "prop": "fuhuawuavg" }
+    ],
+    "det": [
+      { "label": "浓度", "prop": "fuhuawuavg" }
+    ]
+  },
+  {
+    "label": "悬浮物",
+    "prop": "xuanfuwu",
+    "unit": "mg/L",
+    "his": [
+      { "label": "最大值", "prop": "xuanfuwumax" },
+      { "label": "最小值", "prop": "xuanfuwumin" },
+      { "label": "平均值", "prop": "xuanfuwuavg" }
+    ],
+    "det": [
+      { "label": "浓度", "prop": "xuanfuwuavg" }
+    ]
+  },
+
+  {
+    "label": "烟尘",
+    "prop": "yanchen",
+    "unit": "mg/m³",
+    "his": [
+      { "label": "最大值", "prop": "yanchenmax" },
+      { "label": "最小值", "prop": "yanchenmin" },
+      { "label": "平均值", "prop": "yanchenavg" },
+      { "label": "折算最大值", "prop": "yanchenzsmax" },
+      { "label": "折算最小值", "prop": "yanchenzsmin" },
+      { "label": "折算平均值", "prop": "yanchenzsavg" },
+      { "label": "累计值", "prop": "yanchencou" }
+    ],
+    "det": [
+      { "label": "浓度", "prop": "yanchenavg" },
+      { "label": "折算", "prop": "yanchenzsavg" },
+      { "label": "排放量", "prop": "yanchencou" }
+    ]
+  },
+  {
+    "label": "二氧化硫",
+    "prop": "eryanghualiu",
+    "unit": "mg/m³",
+    "his": [
+      { "label": "最大值", "prop": "eryanghualiumax" },
+      { "label": "最小值", "prop": "eryanghualiumin" },
+      { "label": "平均值", "prop": "eryanghualiuavg" },
+      { "label": "折算最大值", "prop": "eryanghualiuzsmax" },
+      { "label": "折算最小值", "prop": "eryanghualiuzsmin" },
+      { "label": "折算平均值", "prop": "eryanghualiuzsavg" },
+      { "label": "累计值", "prop": "eryanghualiucou" }
+    ],
+    "det": [
+      { "label": "浓度", "prop": "eryanghualiuavg" },
+      { "label": "折算", "prop": "eryanghualiuzsavg" },
+      { "label": "排放量", "prop": "eryanghualiucou" }
+    ]
+  },
+  {
+    "label": "氮氧化物",
+    "prop": "danyanghuawu",
+    "unit": "mg/m³",
+    "his": [
+      { "label": "最大值", "prop": "danyanghuawumax" },
+      { "label": "最小值", "prop": "danyanghuawumin" },
+      { "label": "平均值", "prop": "danyanghuawuavg" },
+      { "label": "折算最大值", "prop": "danyanghuawuzsmax" },
+      { "label": "折算最小值", "prop": "danyanghuawuzsmin" },
+      { "label": "折算平均值", "prop": "danyanghuawuzsavg" },
+      { "label": "累计值", "prop": "danyanghuawucou" }
+    ],
+    "det": [
+      { "label": "浓度", "prop": "danyanghuawuavg" },
+      { "label": "折算", "prop": "danyanghuawuzsavg" },
+      { "label": "排放量", "prop": "danyanghuawucou" }
+    ]
+  },
+  {
+    "label": "废气瞬时流量",
+    "prop": "feiqishunshi",
+    "unit": "m³/S",
+    "his": [
+      { "label": "最大值", "prop": "yanchenmax" },
+      { "label": "最小值", "prop": "yanchenmin" },
+      { "label": "平均值", "prop": "yanchenavg" },
+      { "label": "折算最大值", "prop": "yanchenzsmax" },
+      { "label": "折算最小值", "prop": "yanchenzsmin" },
+      { "label": "折算平均值", "prop": "yanchenzsavg" }
+    ]
+  },
+  {
+    "label": "氧气含量",
+    "prop": "yangqihanliang",
+    "unit": "%",
+    "his": [
+      { "label": "最大值", "prop": "yangqihanliangmax" },
+      { "label": "最小值", "prop": "yangqihanliangmin" },
+      { "label": "平均值", "prop": "yangqihanliangavg" }
+    ],
+    "det": [
+      { "label": "", "prop": "yangqihanliangavg" }
+    ]
+  },
+  {
+    "label": "烟气流速",
+    "prop": "yanqiliusu",
+    "unit": "m/S",
+    "his": [
+      { "label": "最大值", "prop": "yanqiliusumax" },
+      { "label": "最小值", "prop": "yanqiliusumin" },
+      { "label": "平均值", "prop": "yanqiliusuavg" }
+    ],
+    "det": [
+      { "label": "", "prop": "yanqiliusuavg" }
+    ]
+  },
+  {
+    "label": "烟气温度",
+    "prop": "yanqiwendu",
+    "unit": "℃",
+    "his": [
+      { "label": "最大值", "prop": "yanqiwendumax" },
+      { "label": "最小值", "prop": "yanqiwendumin" },
+      { "label": "平均值", "prop": "yanqiwenduavg" }
+    ],
+    "det": [
+      { "label": "", "prop": "yanqiwenduavg" }
+    ]
+  },
+  {
+    "label": "烟气静压",
+    "prop": "yanqijingya",
+    "unit": "Pa",
+    "his": [
+      { "label": "最大值", "prop": "yanqijingyamax" },
+      { "label": "最小值", "prop": "yanqijingyamin" },
+      { "label": "平均值", "prop": "yanqijingyaavg" }
+    ],
+    "det": [
+      { "label": "", "prop": "yanqijingyaavg" }
+    ]
+  }
+
+]

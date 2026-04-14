@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <link rel="icon" />
+  <title></title>
+  <script type="text/javascript" src="./config.js"></script>
+  <script src="<%= assetPrefix %>js/liveplayer-lib.min.js"></script>
+</head>
+
+<body>
+  <noscript>
+    <strong>We're sorry but ahm doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
+  </noscript>
+  <div id="app"></div>
+
+  <!--高德地图 begin-->
+  <!-- 安全密钥配置（必须在地图脚本加载前） -->
+  <script type="text/javascript">
+    window._AMapSecurityConfig = {
+      securityJsCode: '5524277ee269afe849b86338ba3e2182',
+    }
+  </script>
+  <!-- 高德地图 JSAPI v2.0 -->
+  <script type="text/javascript" src="https://webapi.amap.com/maps?v=2.0&key=6f712f17ebdfec518597d738e8ad3efd"></script>
+  <!--高德地图 end-->
+</body>
+
+</html>

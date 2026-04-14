@@ -1,0 +1,48 @@
+/*.my-table内的标签*/
+/* 表格模板 */
+#my-table {
+  visibility: hidden;
+  position: absolute;
+  background-color: #0495d6;
+  width: 320px;
+  border-radius: 6px;
+  margin: auto;
+  top: 9px;
+  left: 0;
+  right: 0;
+}
+#my-table table {
+  border-collapse: collapse;
+  /*样式重置*/
+}
+
+#my-table th,
+#my-table td {
+  padding: 0;
+  /*样式重置*/
+}
+
+#my-table table {
+  width: 320px;
+  margin: 0 auto;
+  /*居中显示*/
+}
+
+#my-table th,
+#my-table td {
+  border: 1px solid #99b0da;
+  text-align: center;
+}
+
+/*表头*/
+#my-table th {
+  font: 14px/30px '微软雅黑';
+  color: #ffffff;
+  /*  background:#dbe3fa; */
+}
+
+#my-table td {
+  font: 12px/28px '微软雅黑';
+  color: #ffffff;
+  /* background:#fff; */
+}

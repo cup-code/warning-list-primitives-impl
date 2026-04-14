@@ -1,0 +1,20 @@
+{
+  "name": "marker",
+  "version": "1.0",
+  "updateTime": "2021/03/18",
+  "markerData": [{
+    "name": "yichang",
+    "marker": [116.18763922070121, 39.938093849230086],
+    "center": [111.20436161756516, 30.683816839977467],
+    "modelPath": "model.json",
+    "geojson": "dongtu_path",
+    "zoom2d": 2.5
+  }, {
+    "name": "xishanhui",
+    "marker": [116.18644751608372, 39.938159041549504],
+    "center": [116.18644751608372, 39.938159041549504],
+    "modelPath": null,
+    "geojson": "xishanhui",
+    "zoom2d": 5.1
+  }]
+}

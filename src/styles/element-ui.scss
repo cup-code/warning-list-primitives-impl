@@ -1,0 +1,238 @@
+// cover some element-ui styles
+
+// 添加Element UI图标字体规则
+@font-face {
+  font-family: 'element-icons';
+  src:
+    url('~element-ui/lib/theme-chalk/fonts/element-icons.woff') format('woff'),
+    url('~element-ui/lib/theme-chalk/fonts/element-icons.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+.el-breadcrumb__inner,
+.el-breadcrumb__inner a {
+  font-weight: 400 !important;
+}
+
+.el-upload {
+  input[type='file'] {
+    display: none !important;
+  }
+}
+
+.el-upload__input {
+  display: none;
+}
+
+// to fixed https://github.com/ElemeFE/element/issues/2461
+.el-dialog {
+  transform: none;
+  left: 0;
+  position: relative;
+  margin: 0 auto;
+}
+
+// refine element ui upload
+.upload-container {
+  .el-upload {
+    width: 100%;
+
+    .el-upload-dragger {
+      width: 100%;
+      height: 200px;
+    }
+  }
+}
+
+// dropdown
+.el-dropdown-menu {
+  a {
+    display: block;
+  }
+}
+
+// to fix el-date-picker css style
+.el-range-separator {
+  box-sizing: content-box;
+}
+
+.el-form {
+  .el-form-item {
+    margin-bottom: 10px !important;
+  }
+  .el-form-item__label {
+    font-size: 12px !important;
+    font-weight: normal;
+    color: #444444;
+  }
+  .el-form-item__content {
+    font-size: 12px !important;
+    .el-radio + .el-radio {
+      margin-left: 0;
+    }
+    .el-radio__input {
+      .el-radio__inner {
+        width: 12px;
+        height: 12px;
+      }
+    }
+    .el-radio__label {
+      font-size: 12px;
+    }
+  }
+}
+
+.el-drawer__wrapper {
+  .el-drawer__container {
+    .el-drawer {
+      .el-drawer__body {
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        .drawer-title {
+          font-size: 14px;
+          font-weight: bold;
+          padding: 10px;
+        }
+
+        .el-divider {
+          margin: 0;
+        }
+
+        .drawer-con {
+          flex: 1;
+          overflow: auto;
+          padding: 10px;
+          .el-form {
+            .el-form-item {
+              .el-form-item__content {
+                .el-radio + .el-radio {
+                  margin-left: 0;
+                }
+                .el-radio__input {
+                  .el-radio__inner {
+                    width: 12px;
+                    height: 12px;
+                  }
+                }
+                .el-radio__label {
+                  font-size: 12px;
+                }
+              }
+            }
+          }
+          .drawer-con-btns {
+            margin-top: 30px;
+            text-align: center;
+            button {
+              width: 50%;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+.el-select-dropdown {
+  .el-select-dropdown__wrap {
+    .el-select-dropdown__list {
+      .el-select-dropdown__item {
+        font-size: 12px;
+      }
+    }
+  }
+}
+
+.el-tree {
+  color: #444 !important;
+
+  .el-tree-node.is-current > .el-tree-node__content {
+    color: var(--ky-primary) !important;
+    border-radius: 6px !important;
+  }
+  .el-tree-node {
+    .el-tree-node__content {
+      &:hover {
+        border-radius: 6px !important;
+      }
+    }
+    .el-checkbox {
+      padding-right: 6px;
+    }
+    .el-tree-node__label {
+      font-size: 12px;
+    }
+  }
+}
+
+.el-dropdown-menu {
+  .el-dropdown-menu__item {
+    font-size: 12px !important;
+  }
+}
+// 表格样式
+.is-scrolling-none .el-table__cell {
+  border-right: none !important;
+}
+
+.el-table {
+  // border: 1px solid var(--ky-border-color) !important;
+  border-radius: 6px;
+  // border-bottom: none !important;
+}
+
+/* // 去掉表格单元格边框 */
+.customer-table th {
+  border: none !important;
+}
+.customer-table td,
+.customer-table th.is-leaf {
+  border: none !important;
+}
+/* //显示每行的下边框 */
+.el-table td.el-table__cell,
+.el-table th.el-table__cell.is-leaf {
+  border-bottom: 1px solid var(--ky-border-color) !important;
+  color: #222222;
+}
+/* // 表格最外边框 */
+.el-table--border,
+.el-table--group {
+  border: none !important;
+}
+/* // 头部边框 */
+.customer-table thead tr th.is-leaf {
+  border: 1px solid var(--ky-border-color) !important;
+  border-right: none !important;
+}
+.customer-table thead tr th:nth-last-of-type(2) {
+  border-right: 1px solid var(--ky-border-color) !important;
+}
+
+/* // 表格最外层边框-底部边框 */
+.el-table--border::after,
+.el-table--group::after {
+  width: 0 !important;
+}
+.customer-table::before {
+  width: 0 !important;
+}
+.customer-table .el-table__fixed-right::before,
+.el-table__fixed::before {
+  width: 0 !important;
+}
+
+.el-table__fixed-right::before {
+  display: none;
+}
+/* // 表格有滚动时表格头边框 */
+.el-table--border th.gutter:last-of-type {
+  border-left: none !important;
+}
+/* // 去除边框线 */
+.el-table::before {
+  background-color: #ffffff !important;
+  height: 0 !important;
+}
