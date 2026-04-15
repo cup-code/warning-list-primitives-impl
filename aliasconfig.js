@@ -8,13 +8,17 @@ export function getPkgAlias() {
     '@systemReview': 'link-angel-system-review',
     '@specialOperation': 'link-angel-special-operation',
     '@groupReport': 'link-angel-group-report',
-    '@linkEditor': 'link-angel-editor'
+    '@linkEditor': 'link-angel-editor',
+    'link-shared': 'link-shared' // 共享模块别名
   }
   let alias = {}
   Object.keys(PKGALIAS).forEach((item) => {
     const linkPath = path.join(process.cwd(), './node_modules/', PKGALIAS[item], '/src')
     const localPath = linkPath || path.join(process.cwd(), './src/views/', item.split('@')[1])
-    if (lifecycle == 'linkserve' || lifecycle == 'linkserve:lite') {
+    // link-shared 特殊处理 - 直接指向上级目录
+    if (item === 'link-shared') {
+      alias[item] = path.join(process.cwd(), '../link-shared/src')
+    } else if (lifecycle == 'linkserve' || lifecycle == 'linkserve:lite') {
       alias[item] = fs.existsSync(linkPath) ? linkPath : localPath
     } else if (lifecycle == 'serve') {
       alias[item] = localPath
