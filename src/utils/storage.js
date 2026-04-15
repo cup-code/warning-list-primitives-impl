@@ -1,5 +1,4 @@
 import Cookies from 'js-cookie'
-import { clearProjectStorage, clearSession } from '@/utils/storage-namespace'
 
 export function setCookie(k, v) {
   if (typeof v == 'undefined' || v == null) {
@@ -11,7 +10,6 @@ export function setCookie(k, v) {
     val = JSON.stringify(v)
   }
   Cookies.set(k, val)
-  Cookies.get(k, val)
 }
 
 export function getCookie(k) {
@@ -54,4 +52,20 @@ export function delStorageItem(k) {
   localStorage.removeItem(k)
 }
 
-export { clearProjectStorage, clearSession }
+// 安全版本的 localStorage 操作，捕获异常并静默降级
+export function safeSetStorageItem(k, v) {
+  try {
+    setStorageItem(k, v)
+    return true
+  } catch (e) {
+    return false
+  }
+}
+
+export function safeGetStorageItem(k) {
+  try {
+    return getStorageItem(k)
+  } catch (e) {
+    return null
+  }
+}
