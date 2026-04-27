@@ -403,6 +403,26 @@ export default {
         return;
       }
 
+      // 已有标注图片时，直接用已有图片绘制 canvas，跳过上传
+      const detailForms = vm.$store.state.detailInfo.detailForms;
+      if (detailForms?.alarmPicAnnotation) {
+        img.src = annotationPic.value;
+        img.onload = () => {
+          ctx.clearRect(0, 0, canvasEl.width, canvasEl.height);
+          ctx.drawImage(img, 0, 0, canvasEl.width, canvasEl.height);
+          url.value = annotationPic.value;
+        };
+        img.onerror = () => {
+          ctx.fillStyle = "#f5f5f5";
+          ctx.fillRect(0, 0, canvasEl.width, canvasEl.height);
+          ctx.fillStyle = "#f00";
+          ctx.font = "24px Arial";
+          ctx.textAlign = "center";
+          ctx.fillText("标注图片加载失败", canvasEl.width / 2, canvasEl.height / 2);
+        };
+        return;
+      }
+
       img.src = picture.value;
 
       img.onload = () => {
