@@ -475,7 +475,7 @@ git commit -m "chore: import current application snapshots"
     "build:warning": "pnpm --filter @link/link-warning build",
     "build": "pnpm run build:front && pnpm run build:warning",
     "lint": "pnpm --filter './apps/*' lint",
-    "test:migration": "node --test scripts/migration/*.test.mjs scripts/audit/*.test.mjs",
+    "test:migration": "node --test scripts/migration/*.test.mjs",
     "audit:shared": "node scripts/audit/shared-source-audit.mjs apps/link-warning/src apps/link-front/src docs/migration/shared-source-audit.json",
     "verify:sources": "node scripts/migration/compare-manifests.mjs docs/migration/source-before.json docs/migration/source-after.json"
   },
@@ -895,6 +895,12 @@ pnpm audit:shared
 ```
 
 预期：测试通过；审计结果的 `common` 大于 0，`different` 大于 0。
+
+随后把根 `package.json` 的测试命令扩展为：
+
+```json
+"test:migration": "node --test scripts/migration/*.test.mjs scripts/audit/*.test.mjs"
+```
 
 - [ ] **步骤 5：验证双应用构建和来源不变**
 
