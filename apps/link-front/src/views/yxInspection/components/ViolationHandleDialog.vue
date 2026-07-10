@@ -40,6 +40,34 @@ export default {
       return type || "-";
     });
 
+    // 时间范围格式化函数
+    const formatTimeRange = (startTime, endTime) => {
+      if (!startTime && !endTime) return "-";
+      const format = (time) => {
+        if (!time) return "-";
+        const str = String(time).trim().replace(/-/g, "/");
+        const match = str.match(/^(\d{4}\/\d{1,2}\/\d{1,2})\s*(\d{1,2}:\d{2})/);
+        return match ? `${match[1]} ${match[2]}` : time;
+      };
+      return `${format(startTime)} - ${format(endTime)}`;
+    };
+
+    // 排班时间范围
+    const scheduleTimeRange = computed(() => {
+      return formatTimeRange(
+        detailData.value.scheduleStartTime,
+        detailData.value.scheduleEndTime
+      );
+    });
+
+    // 执行时间范围
+    const executeTimeRange = computed(() => {
+      return formatTimeRange(
+        detailData.value.executeStartTime,
+        detailData.value.executeEndTime
+      );
+    });
+
     // 弹窗标题
     const dialogTitle = computed(() => {
       return props.info.dialogType === "handle" ? "审核巡检违规审核" : "违规记录详情";
@@ -159,6 +187,8 @@ export default {
       dialogTitle,
       isReadonly,
       violationTypeText,
+      scheduleTimeRange,
+      executeTimeRange,
       rules,
       handleClose,
       handleConfirm,
@@ -179,30 +209,61 @@ export default {
       <el-row :gutter="20">
         <el-col :span="12">
           <div class="info-item">
-            <span class="info-label">巡检计划</span>
+            <span class="info-label">巡检计划：</span>
             <span class="info-value">{{ detailData.planName || "-" }}</span>
           </div>
+        </el-col>
+        <el-col :span="12">
           <div class="info-item">
-            <span class="info-label">人员</span>
+            <span class="info-label">巡检岗位：</span>
+            <span class="info-value">{{ detailData.postName || "-" }}</span>
+          </div>
+        </el-col>
+      </el-row>
+      <el-row :gutter="20">
+        <el-col :span="12">
+          <div class="info-item">
+            <span class="info-label">人员：</span>
             <span class="info-value">{{ detailData.violationUserName || "-" }}</span>
           </div>
+        </el-col>
+        <el-col :span="12">
           <div class="info-item">
-            <span class="info-label">违规类型</span>
+            <span class="info-label">违规类型：</span>
             <span class="info-value">{{ violationTypeText }}</span>
           </div>
+        </el-col>
+      </el-row>
+
+      <el-row :gutter="20">
+        <el-col :span="12">
+          <div class="info-item">
+            <span class="info-label">违规时间：</span>
+            <span class="info-value">{{ detailData.violationTime || "-" }}</span>
+          </div>
+        </el-col>
+      </el-row>
+      <!-- <el-row :gutter="20">
+        <el-col :span="24">
           <div class="info-item">
             <span class="info-label">违规原因</span>
             <span class="info-value">{{ detailData.violationReasons || "-" }}</span>
           </div>
         </el-col>
-        <el-col :span="12">
+      </el-row> -->
+      <el-row :gutter="20">
+        <el-col :span="24">
           <div class="info-item">
-            <span class="info-label">巡检岗位</span>
-            <span class="info-value">{{ detailData.postName || "-" }}</span>
+            <span class="info-label">排班时间：</span>
+            <span class="info-value">{{ scheduleTimeRange }}</span>
           </div>
+        </el-col>
+      </el-row>
+      <el-row :gutter="20">
+        <el-col :span="24">
           <div class="info-item">
-            <span class="info-label">违规时间</span>
-            <span class="info-value">{{ detailData.violationTime || "-" }}</span>
+            <span class="info-label">执行时间：</span>
+            <span class="info-value">{{ executeTimeRange }}</span>
           </div>
         </el-col>
       </el-row>
@@ -214,7 +275,7 @@ export default {
       :rules="rules"
       label-width="90px"
       size="small"
-      class="mt-4"
+      class="mt-4 violation-handle-form"
       :disabled="isReadonly"
     >
       <el-form-item label="审核结果" prop="handleResult" required>
@@ -260,16 +321,17 @@ export default {
 
 <style lang="scss" scoped>
 .info-block {
-  padding: 12px 16px;
-  background: #f5f7fa;
+  padding: 16px 20px;
   border-radius: 4px;
+  background-color: #f5f7fa;
 }
 
 .info-item {
   display: flex;
-  align-items: center;
-  margin-bottom: 12px;
+  align-items: flex-start;
+  margin-bottom: 16px;
   font-size: 14px;
+  line-height: 32px;
 
   &:last-child {
     margin-bottom: 0;
@@ -278,8 +340,9 @@ export default {
 
 .info-label {
   flex-shrink: 0;
-  width: 80px;
-  color: #909399;
+  width: 70px;
+  color: #606266;
+  font-weight: bold;
 }
 
 .info-value {
@@ -297,5 +360,12 @@ export default {
 .dialog-footer {
   display: flex;
   justify-content: flex-end;
+}
+
+/* 标签与表单项内容顶部对齐（避免多行输入时标签垂直居中） */
+.violation-handle-form {
+  ::v-deep .el-form-item {
+    align-items: flex-start;
+  }
 }
 </style>

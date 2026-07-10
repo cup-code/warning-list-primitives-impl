@@ -2094,6 +2094,16 @@ export const menuOptions = [
     describe: '视频运营：一体机列表',
   },
   {
+    value: 'views/ForewarningManagement/SkillConfigurationGlobal',
+    label: '大模型复判技能配置(全局)',
+    describe: '视频运营：大模型复判技能配置(全局)',
+  },
+  {
+    value: 'views/ForewarningManagement/SkillConfiguration',
+    label: '大模型复判技能配置',
+    describe: '视频运营：大模型复判技能配置',
+  },
+  {
     value: 'views/videoAi/HKmanagement/hkAiBox',
     label: '海康盒子配置',
     describe: 'AI智能视屏分析：海康盒子配置',
@@ -3947,6 +3957,18 @@ export const menuOptions = [
     ],
   },
   {
+    value: 'views/yxInspection/UrgentRecord',
+    label: '紧急记录',
+    describe: '智能巡检V0.3：紧急记录查看',
+    children: [
+      {
+        value: 'yx_urgent_record_view',
+        label: '查看',
+        describe: '紧急记录：查看详情',
+      },
+    ],
+  },
+  {
     value: 'views/yxInspection/KnowledgeBase',
     label: '知识库',
     describe: '智能巡检V0.3：巡检知识库管理',
@@ -4018,8 +4040,52 @@ export const menuOptions = [
     describe: '智能巡检V0.3：巡检报告',
   },
   {
+    value: 'views/yxInspection/ReportArchive',
+    label: '报告归档',
+    describe: '智能巡检V0.3：报告归档',
+    children: [
+      { value: 'yx_report_archive_view', label: '查看' },
+    ],
+  },
+  {
     value: 'views/yxInspection/InspectionOverview',
     label: '巡检总览',
     describe: '智能巡检V0.3：巡检总览',
+  },
+  {
+    value: 'views/yxInspection/TerminalList',
+    label: '终端列表',
+    describe: '智能巡检：终端设备管理',
+    children: [
+      { value: 'yx_terminal_add', label: '新增' },
+      { value: 'yx_terminal_edit', label: '编辑' },
+      { value: 'yx_terminal_delete', label: '删除' },
+      { value: 'yx_terminal_view', label: '查看' },
+    ],
+  },
+  {
+    value: 'views/yxInspection/InspectionMeeting',
+    label: '远程指导',
+    describe: '智能巡检：远程指导',
+  },
+  {
+    value: 'views/yjInspection/TrainingSetData',
+    label: '训练集数据',
+    describe: '两山易检：训练集数据',
+  },
+  {
+    value: 'views/yjInspection/TianjianData',
+    label: '天健mqtt数据',
+    describe: '两山易检：天健mqtt数据',
+  },
+  {
+    value: 'views/yjInspection/TianjianInstallationRecord',
+    label: '天健安装记录',
+    describe: '两山易检：天健安装记录',
+  },
+  {
+    value: 'views/yjInspection/PositionCode',
+    label: '点位编码',
+    describe: '两山易检：点位编码',
   },
 ]

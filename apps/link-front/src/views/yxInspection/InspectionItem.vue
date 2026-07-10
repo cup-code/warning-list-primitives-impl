@@ -1,13 +1,16 @@
 <script>
 import { useMutation, useQuery } from "@tanstack/vue-query";
-import { getCurrentInstance, reactive, ref } from "vue";
+import { getCurrentInstance, onMounted, reactive, ref } from "vue";
 import { InspectionItemTableConfig } from "./config";
 import InspectionItemDialog from "./components/InspectionItemDialog.vue";
 import CategoryTree from "./components/CategoryTree.vue";
+import EImportFile from "@/components/EComponents/EImportFile/index.vue";
 import {
   getPageContent,
   deleteYxInspectionContent,
   saveYxInspectionContent,
+  getContentTemplate,
+  importContent,
 } from "@/http/inspection/yx-inspection-api";
 
 export default {
@@ -15,6 +18,7 @@ export default {
   components: {
     CategoryTree,
     InspectionItemDialog,
+    EImportFile,
   },
   setup() {
     const { proxy } = getCurrentInstance();
@@ -131,6 +135,52 @@ export default {
       dialogVisible.value = true;
     };
 
+    // 下载模板
+    const downloading = ref(false);
+    const handleDownloadTemplate = () => {
+      downloading.value = true;
+      getContentTemplate()
+        .then((res) => {
+          const blob = new Blob([res.data], {
+            type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+          });
+          const url = window.URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.href = url;
+          link.download = `巡检项导入模板_${new Date().getTime()}.xlsx`;
+          link.click();
+          window.URL.revokeObjectURL(url);
+          proxy.$message.success("下载成功");
+        })
+        .catch(() => {
+          proxy.$message.error("下载失败，请重试");
+        })
+        .finally(() => {
+          downloading.value = false;
+        });
+    };
+
+    // 批量导入
+    const importing = ref(false);
+    const handleImportContent = (uploadObj) => {
+      importing.value = true;
+      importContent(uploadObj.file)
+        .then((res) => {
+          if (res.data.success) {
+            proxy.$message.success("导入成功");
+            refetch();
+          } else {
+            proxy.$message.error(res.data.message || "导入失败");
+          }
+        })
+        .catch(() => {
+          proxy.$message.error("导入失败，请重试");
+        })
+        .finally(() => {
+          importing.value = false;
+        });
+    };
+
     // 编辑
     const handleEdit = (row) => {
       dialogType.value = "edit";
@@ -184,6 +234,11 @@ export default {
       refetch();
     };
 
+    // 初始化加载
+    onMounted(() => {
+      refetch();
+    });
+
     return {
       searchForm,
       tableData,
@@ -194,10 +249,14 @@ export default {
       dialogType,
       currentRow,
       isSaving,
+      downloading,
+      importing,
       treeNodeTap,
       searchFn,
       resetFn,
       handleAdd,
+      handleDownloadTemplate,
+      handleImportContent,
       handleEdit,
       handleView,
       handleDelete,
@@ -251,6 +310,20 @@ export default {
         <EButton type="primary" btnIcon="el-icon-plus" class="mr-2" @click="handleAdd">
           新增
         </EButton>
+        <EButton
+          plain
+          btnIcon="el-icon-download"
+          class="mr-2"
+          :loading="downloading"
+          @click="handleDownloadTemplate"
+        >
+          下载模板
+        </EButton>
+        <EImportFile @excelImport="handleImportContent">
+          <EButton plain btnIcon="el-icon-upload2" :loading="importing">
+            批量导入
+          </EButton>
+        </EImportFile>
       </div>
 
       <CTable :tableData="tableData" :loading="loading" :list="tableConfig" height="92%">

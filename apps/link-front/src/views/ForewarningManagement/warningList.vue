@@ -1,32 +1,24 @@
 <script>
-import { useInfiniteQuery, useQuery } from '@tanstack/vue-query'
-import {
-  computed,
-  getCurrentInstance,
-  ref,
-  watch,
-} from 'vue'
-import { getDepartListSimple } from '@/http/safe-production/depart-manage-api'
-import { getUserListByRoleFn } from '@/http/safe-production/user-manage-api'
+import { useInfiniteQuery, useQuery } from "@tanstack/vue-query";
+import { computed, getCurrentInstance, ref, watch } from "vue";
+import { getDepartListSimple } from "@/http/safe-production/depart-manage-api";
+import { getUserListByRoleFn } from "@/http/safe-production/user-manage-api";
 import {
   getWarningTypeList,
   maintenanceWarningList,
-} from '@/http/videoWarning/warning-api'
-import {
-  delStorageItem,
-  getStorageItem,
-  setStorageItem,
-} from '@/utils/storage'
-import BatchDeal from './components/batchDeal.vue'
-import CheckGroup from './components/checkGroup.vue'
-import List from './components/list.vue'
-import SelectMachine from './components/selectMachine.vue'
-import WarningInfo from './components/warningInfo.vue'
-import { WarningListConfig } from './config'
-import batchInfo from './store/batchInfo'
+} from "@/http/videoWarning/warning-api";
+import { getStorage, setStorage } from "@/utils";
+import { delStorageItem } from "@/utils/storage";
+import BatchDeal from "./components/batchDeal.vue";
+import CheckGroup from "./components/checkGroup.vue";
+import List from "./components/list.vue";
+import SelectMachine from "./components/selectMachine.vue";
+import WarningInfo from "./components/warningInfo.vue";
+import { WarningListConfig } from "./config";
+import batchInfo from "./store/batchInfo";
 
 export default {
-  name: 'warningList',
+  name: "warningList",
   components: {
     WarningInfo,
     SelectMachine,
@@ -37,40 +29,40 @@ export default {
   mixins: [batchInfo],
 
   setup(_props) {
-    const { proxy } = getCurrentInstance()
-    const CACHE_KEY = 'warningFilter'
+    const { proxy } = getCurrentInstance();
+    const CACHE_KEY = "warningFilter";
 
     // Try to get cached filter from localStorage
-    const cachedFilter = getStorageItem(CACHE_KEY)
+    const cachedFilter = getStorage(CACHE_KEY);
     const form = ref(
       cachedFilter || {
         pageNum: 1,
         pageSize: 12,
-        internalStatus: ['0'],
-      },
-    )
-    const showMore = ref(false)
-    const total = ref(0)
-    const tableData = ref([])
-    const showDetail = ref(false)
-    const detailInfo = ref({})
+        internalStatus: ["0"],
+      }
+    );
+    const showMore = ref(false);
+    const total = ref(0);
+    const tableData = ref([]);
+    const showDetail = ref(false);
+    const detailInfo = ref({});
     // Set initial value from cache if available
     const alarmDate = ref(
       cachedFilter && cachedFilter.alarmDateStart && cachedFilter.alarmDateEnd
         ? [new Date(cachedFilter.alarmDateStart), new Date(cachedFilter.alarmDateEnd)]
-        : [],
-    )
-    const statusList = ref([{ name: '待审核' }, { name: '误报' }, { name: '真实' }])
+        : []
+    );
+    const statusList = ref([{ name: "待审核" }, { name: "误报" }, { name: "真实" }]);
     const alarmLevelList = ref([
-      { name: '一级', value: '1' },
-      { name: '二级', value: '2' },
-      { name: '三级', value: '3' },
-      { name: '四级', value: '4' },
-    ])
+      { name: "一级", value: "1" },
+      { name: "二级", value: "2" },
+      { name: "三级", value: "3" },
+      { name: "四级", value: "4" },
+    ]);
 
     const internalDisposeUserName = ref(
-      (cachedFilter && cachedFilter.internalDisposeUserName) || '',
-    )
+      (cachedFilter && cachedFilter.internalDisposeUserName) || ""
+    );
     const getPeopleList = async ({ pageParam = 1 }) => {
       const res = await getUserListByRoleFn({
         pageNum: pageParam,
@@ -78,9 +70,9 @@ export default {
         withoutChildrenDepartment: true,
         userStatusList: 1,
         withMyDepartmentTypeParent: false,
-      })
-      return res
-    }
+      });
+      return res;
+    };
 
     watch(
       form,
@@ -88,67 +80,58 @@ export default {
         const cacheData = {
           ...newValue,
           internalDisposeUserName: internalDisposeUserName.value,
-        }
-        setStorageItem(CACHE_KEY, cacheData)
+        };
+        setStorage(CACHE_KEY, cacheData, 30 * 60);
       },
-      { deep: true },
-    )
+      { deep: true }
+    );
 
-    const layout = ref('card')
+    const layout = ref("card");
 
-    const warningTypeList = ref([])
+    const warningTypeList = ref([]);
     const warningTypeListQuery = useQuery({
-      queryKey: ['warningTypeList'],
+      queryKey: ["warningTypeList"],
       queryFn: () => getWarningTypeList(),
       onSuccess: ({ data }) => {
         if (data.success) {
-          warningTypeList.value = data.result || []
+          warningTypeList.value = data.result || [];
         }
       },
-    })
+    });
 
-    const {
-      data,
-      fetchNextPage,
-      isFetchingNextPage,
-      hasNextPage,
-    } = useInfiniteQuery({
-      queryKey: ['peopleList'],
+    const { data, fetchNextPage, isFetchingNextPage, hasNextPage } = useInfiniteQuery({
+      queryKey: ["peopleList"],
       queryFn: getPeopleList,
       getNextPageParam: (lastPage) => {
-        const { result } = lastPage.data || {}
-        return result.pages > result.pageNum ? result.nextPage : null
+        const { result } = lastPage.data || {};
+        return result.pages > result.pageNum ? result.nextPage : null;
       },
       initialPageParam: 1,
-    })
+    });
 
     const handleScroll = (event) => {
-      const {
-        scrollTop,
-        scrollHeight,
-        clientHeight,
-      } = event.target
-      const isBottom = scrollHeight - scrollTop - clientHeight < 1
+      const { scrollTop, scrollHeight, clientHeight } = event.target;
+      const isBottom = scrollHeight - scrollTop - clientHeight < 1;
       if (isBottom && hasNextPage.value && !isFetchingNextPage.value) {
-        fetchNextPage()
+        fetchNextPage();
       }
-    }
+    };
 
     // 合并所有分页数据
     const peopleData = computed(() => {
       return (
         data.value?.pages.flatMap(({ data }) => {
-          return data.result.list
+          return data.result.list;
         }) || []
-      )
-    })
+      );
+    });
 
     const { refetch, isPending } = useQuery({
-      queryKey: ['maintenanceWarningList', form.value],
+      queryKey: ["maintenanceWarningList", form.value],
       queryFn: () => maintenanceWarningList(form.value),
       keepPreviousData: true,
       onSuccess: ({ data }) => {
-        const { result } = data || {}
+        const { result } = data || {};
         if (data?.success) {
           tableData.value = result.list.map((item) => {
             return {
@@ -156,69 +139,65 @@ export default {
               auditStatus: item.internalStatus,
               auditUser: item.internalDisposeUserName,
               auditTime: item.internalDisposeTime,
-            }
-          })
-          total.value = result.total
+            };
+          });
+          total.value = result.total;
         }
       },
       cacheTime: 24 * 60 * 60 * 1000, // 缓存 24 小时
-    })
+    });
 
-    const departmentList = ref([])
+    const departmentList = ref([]);
     const departmentListQuery = useQuery({
-      queryKey: ['departmentList'],
+      queryKey: ["departmentList"],
       queryFn: () => getDepartListSimple(),
       onSuccess: ({ data }) => {
         if (data.success) {
-          departmentList.value = data.result.filter(item => !item.onlyTreeUse) || []
+          departmentList.value = data.result.filter((item) => !item.onlyTreeUse) || [];
         }
       },
-    })
+    });
 
     const onChange = (key, value) => {
       if (value) {
-        if (key === 'alarmDate') {
-          form.value.alarmDateStart = value ? proxy.$formatDate(value[0]) : ''
-          form.value.alarmDateEnd = value ? proxy.$formatDate(value[1]) : ''
+        if (key === "alarmDate") {
+          form.value.alarmDateStart = value ? proxy.$formatDate(value[0]) : "";
+          form.value.alarmDateEnd = value ? proxy.$formatDate(value[1]) : "";
+        } else if (key === "internalDisposeUserId") {
+          internalDisposeUserName.value = value.fullName || "";
+          form.value.internalDisposeUserId = value.id || "";
+        } else if (key === "machineId") {
+          form.value.machineId = value.id;
+        } else {
+          form.value[key] = value;
         }
-        else if (key === 'internalDisposeUserId') {
-          internalDisposeUserName.value = value.fullName || ''
-          form.value.internalDisposeUserId = value.id || ''
+      } else {
+        if (key === "internalDisposeUserId") {
+          internalDisposeUserName.value = "";
         }
-        else if (key === 'machineId') {
-          form.value.machineId = value.id
-        }
-        else {
-          form.value[key] = value
-        }
-      }
-      else {
-        if (key === 'internalDisposeUserId') {
-          internalDisposeUserName.value = ''
-        }
-        delete form.value[key]
+        delete form.value[key];
       }
 
-      searchFn()
-    }
+      searchFn();
+    };
 
     const searchFn = () => {
-      refetch()
-    }
+      refetch();
+    };
 
     const resetFn = () => {
       form.value = {
         pageNum: 1,
         pageSize: 12,
-        internalStatus: ['0'],
-      }
-      internalDisposeUserName.value = ''
-      alarmDate.value = []
+        internalStatus: ["0"],
+      };
+      internalDisposeUserName.value = "";
+      alarmDate.value = [];
 
-      delStorageItem(CACHE_KEY)
+      delStorageItem(CACHE_KEY);
 
-      refetch()
-    }
+      refetch();
+    };
 
     const checkItem = (item) => {
       proxy.$router.push({
@@ -226,19 +205,19 @@ export default {
         query: {
           data: JSON.stringify(item),
         },
-      })
-    }
+      });
+    };
 
     const toggleMore = () => {
-      showMore.value = !showMore.value
+      showMore.value = !showMore.value;
       setTimeout(() => {
-        proxy.$refs.treeTable.setTableHeight()
-      }, 200)
-    }
+        proxy.$refs.treeTable.setTableHeight();
+      }, 200);
+    };
 
     const onCheck = (info) => {
-      console.log(info)
-    }
+      console.log(info);
+    };
 
     return {
       form,
@@ -267,15 +246,15 @@ export default {
       onCheck,
       refetch,
       checkItem,
-    }
+    };
   },
   watch: {
     layout: {
       handler(newVal) {
-        if (newVal === 'table') {
+        if (newVal === "table") {
           this.$nextTick(() => {
-            this.$refs.tableRef.setSelections(this.selected)
-          })
+            this.$refs.tableRef.setSelections(this.selected);
+          });
         }
       },
       immediate: true,
@@ -283,12 +262,12 @@ export default {
     tableData: {
       handler(newVal) {
         if (this.isBatch && this.checkboxGroup.length > 0) {
-          this.handleChecked(this.checkboxGroup, newVal)
+          this.handleChecked(this.checkboxGroup, newVal);
         }
 
-        if (this.isBatch && this.checkboxGroup.length > 0 && this.layout === 'table') {
-          this.onSelected(this.selected, newVal)
-          this.$refs.tableRef.setSelections(this.selected)
+        if (this.isBatch && this.checkboxGroup.length > 0 && this.layout === "table") {
+          this.onSelected(this.selected, newVal);
+          this.$refs.tableRef.setSelections(this.selected);
         }
       },
       immediate: true,
@@ -298,54 +277,42 @@ export default {
     handleBatchProcess() {
       // 从store中获取当前批量处理状态
       // 切换批量处理状态
-      this.isBatch = !this.isBatch
+      this.isBatch = !this.isBatch;
       if (!this.isBatch) {
         // 如果关闭批量处理，清空选择
-        this.cancelBatch()
-        this.$refs.tableRef.setSelections([])
+        this.cancelBatch();
+        this.$refs.tableRef.setSelections([]);
       }
     },
     handleSuccess() {
-      this.isBatch = !this.isBatch
-      this.cancelBatch()
-      this.refetch()
+      this.isBatch = !this.isBatch;
+      this.cancelBatch();
+      this.refetch();
     },
 
     pageSizeFn(size) {
-      this.form.pageSize = size
-      this.searchFn()
+      this.form.pageSize = size;
+      this.searchFn();
     },
 
     pageCurFn(num) {
-      this.form.pageNum = num
-      this.cancelBatch()
-      this.searchFn()
+      this.form.pageNum = num;
+      this.cancelBatch();
+      this.searchFn();
     },
   },
-}
+};
 </script>
 
 <template>
   <KyTreeTable ref="treeTable" :isShowLeft="false">
     <!-- 查询条件 -->
-    <ECard
-      slot="search"
-      noneBottom
-      type="search"
-    >
-      <el-form
-        :model="form"
-        size="mini"
-        inline
-      >
+    <ECard slot="search" noneBottom type="search">
+      <el-form :model="form" size="mini" inline>
         <el-form-item label="布局方式:">
           <el-radio-group v-model="layout" size="mini">
-            <el-radio-button label="table">
-              表格
-            </el-radio-button>
-            <el-radio-button label="card">
-              卡片
-            </el-radio-button>
+            <el-radio-button label="table"> 表格 </el-radio-button>
+            <el-radio-button label="card"> 卡片 </el-radio-button>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="预警日期：">
@@ -525,37 +492,21 @@ export default {
         </el-form-item>
 
         <el-form-item>
-          <el-button
-            type="primary"
-            size="mini"
-            @click="handleBatchProcess"
-          >
+          <el-button type="primary" size="mini" @click="handleBatchProcess">
             {{ isBatch ? "取消批量处理" : "批量处理" }}
           </el-button>
         </el-form-item>
 
         <!-- 按钮 -->
         <el-form-item>
-          <el-button
-            type="primary"
-            icon="el-icon-search"
-            @click="searchFn"
-          >
+          <el-button type="primary" icon="el-icon-search" @click="searchFn">
             查询
           </el-button>
-          <el-button
-            icon="el-icon-refresh-right"
-            class="ml-2"
-            @click="resetFn"
-          >
+          <el-button icon="el-icon-refresh-right" class="ml-2" @click="resetFn">
             重置
           </el-button>
-          <el-button
-            type="text"
-            style="margin-left: 8px"
-            @click="toggleMore"
-          >
-            {{ showMore == true ? "收起" : "高级筛选" }}
+          <el-button type="text" style="margin-left: 8px" @click="toggleMore">
+            {{ showMore === true ? "收起" : "高级筛选" }}
             <i :class="showMore ? 'el-icon-arrow-up' : 'el-icon-arrow-down'" />
           </el-button>
         </el-form-item>

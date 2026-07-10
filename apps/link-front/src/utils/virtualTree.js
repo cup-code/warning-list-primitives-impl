@@ -1,3 +1,5 @@
+const MAX_CACHE_SIZE = 50
+
 export class VirtualTree {
   constructor(pageSize = 20) {
     this.pageSize = pageSize
@@ -115,6 +117,9 @@ export class VirtualTree {
       !node.parentId || !matchedNodes.has(node.parentId),
     )
 
+    if (this.searchCache.size >= MAX_CACHE_SIZE) {
+      this.searchCache.clear()
+    }
     this.searchCache.set(cacheKey, searchResult)
     return searchResult
   }

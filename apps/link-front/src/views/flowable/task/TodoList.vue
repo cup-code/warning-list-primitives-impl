@@ -201,8 +201,8 @@ export default {
 </script>
 
 <template>
-  <div class="page-container">
-    <ECard type="search">
+  <KyTreeTable ref="treeTable" :isShowLeft="false">
+    <ECard slot="search" type="search" noneBottom>
       <el-form
         ref="searchForm"
         size="small"
@@ -250,7 +250,7 @@ export default {
       </el-form>
     </ECard>
 
-    <ECard>
+    <ECard slot="table">
       <div class="card-cell">
         <el-button-group class="pull-right">
           <el-tooltip
@@ -365,7 +365,7 @@ export default {
       </el-table>
     </ECard>
 
-    <ECard type="footer">
+    <ECard slot="page" type="footer">
       <el-pagination
         style="text-align: right"
         :current-page="pageNo"
@@ -379,7 +379,7 @@ export default {
       />
     </ECard>
 
-    <el-dialog
+    <el-dialog slot="dialog"
       class="dialog-todoList-task-flowable"
       title="查看进度"
       :close-on-click-modal="true"
@@ -394,12 +394,12 @@ export default {
       />
     </el-dialog>
 
-    <user-select
+    <user-select slot="dialog"
       ref="userSelect"
       :limit="1"
       @doSubmit="selectUsersToTransferTask"
     />
-  </div>
+  </KyTreeTable>
 </template>
 
 <style lang="scss" scoped>

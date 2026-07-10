@@ -26,7 +26,7 @@ export default {
   },
   mounted() {
     this.$nextTick(() => {
-      this.form = this.recover(this.form, JSON.parse(localStorage.getItem('globalData')))
+      this.form = this.recover(this.form, JSON.parse(localStorage.getItem('globalData')) || {})
     })
   },
   methods: {

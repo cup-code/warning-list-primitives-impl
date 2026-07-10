@@ -43,7 +43,7 @@ export default {
           this.total = data.page.count
         }
         else {
-          this.$message.error(data.msg)
+          this.$message.error(data.message)
         }
         this.loading = false
       })
@@ -112,11 +112,11 @@ export default {
         delShowTypeFn(ids).then(({ data }) => {
           this.loading = false
           if (data && data.success) {
-            this.$message.success(data.msg)
+            this.$message.success(data.message)
             this.refreshList()
           }
           else {
-            this.$message.error(data.msg)
+            this.$message.error(data.message)
           }
         })
       })
@@ -130,8 +130,8 @@ export default {
 </script>
 
 <template>
-  <div class="page">
-    <ECard type="search">
+  <KyTreeTable ref="treeTable" :isShowLeft="false">
+    <ECard slot="search" type="search" noneBottom>
       <el-form
         ref="searchForm"
         inline
@@ -171,7 +171,7 @@ export default {
       </el-form>
     </ECard>
 
-    <ECard>
+    <ECard slot="table">
       <div type="card-cell">
         <el-button
           type="primary"
@@ -306,7 +306,7 @@ export default {
         </el-table-column>
       </el-table>
     </ECard>
-    <ECard type="footer">
+    <ECard slot="page" type="footer">
       <el-pagination
         style="text-align: right"
         :current-page="pageNo"
@@ -318,11 +318,11 @@ export default {
         @current-change="currentChangeHandle"
       />
     </ECard>
-    <gen-show-type-form
+    <gen-show-type-form slot="dialog"
       ref="genShowTypeForm"
       @refreshDataList="refreshList"
     />
-  </div>
+  </KyTreeTable>
 </template>
 
 <style lang="scss" scoped>

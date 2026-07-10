@@ -67,9 +67,9 @@ export default {
     const form = reactive({
       id: "",
       title: "",
-      category: "PDF",
+      category: "",
+      resourceType: "",
       enable: true,
-      type: "PDF",
       file: "",
       fileName: "",
       description: "",
@@ -91,15 +91,13 @@ export default {
     // 类型选项
     const typeOptions = [
       { label: "PDF", value: "PDF" },
-      { label: "文档", value: "文档" },
-      { label: "视频", value: "视频" },
+      { label: "视频", value: "video" },
     ];
 
-    // 知识分类选项
     const categoryOptions = [
-      { label: "PDF", value: "PDF" },
-      { label: "文档", value: "文档" },
-      { label: "视频", value: "视频" },
+      { label: "手册", value: "手册" },
+      { label: "培训", value: "培训" },
+      { label: "进阶", value: "进阶" },
     ];
 
     // 表单校验规则
@@ -126,9 +124,9 @@ export default {
         Object.assign(form, {
           id: "",
           title: "",
-          category: "PDF",
+          category: "",
+          resourceType: "",
           enable: true,
-          type: "PDF",
           file: "",
           fileName: "",
           description: "",
@@ -137,9 +135,9 @@ export default {
         const info = props.info || {};
         form.id = info.id || "";
         form.title = info.resourceName || "";
-        form.category = info.resourceType || "PDF";
+        form.category = info.category || "";
+        form.resourceType = info.resourceType || "";
         form.enable = info.enable === true || info.enable === "是";
-        form.type = info.type || info.resourceType || "PDF";
         form.description = info.description || "";
         // 文件回显：从详情/列表接口获取的文件路径（接口常不返回 fileName，需从路径解析）
         const filePath = info.fileUrl || info.file || "";
@@ -190,9 +188,9 @@ export default {
       Object.assign(form, {
         id: "",
         title: "",
-        category: "PDF",
+        category: "",
         enable: true,
-        type: "PDF",
+        resourceType: "",
         file: "",
         fileName: "",
         description: "",
@@ -215,9 +213,9 @@ export default {
           const submitData = {
             id: form.id || undefined,
             resourceName: form.title,
-            resourceType: form.category,
+            resourceType: form.resourceType,
+            category: form.category,
             enable: form.enable,
-            type: form.type,
             description: form.description,
             file: form.file,
             fileName: form.fileName,
@@ -294,8 +292,23 @@ export default {
         <el-switch v-model="form.enable" />
       </el-form-item>
 
-      <el-form-item label="类型">
-        <el-select v-model="form.type" placeholder="请选择类型" style="width: 100%">
+      <el-form-item label="类别">
+        <el-select v-model="form.category" placeholder="请选择类别" style="width: 100%">
+          <el-option
+            v-for="item in categoryOptions"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          />
+        </el-select>
+      </el-form-item>
+
+      <el-form-item label="格式">
+        <el-select
+          v-model="form.resourceType"
+          placeholder="请选择格式"
+          style="width: 100%"
+        >
           <el-option
             v-for="item in typeOptions"
             :key="item.value"

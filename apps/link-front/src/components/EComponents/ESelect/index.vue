@@ -350,17 +350,15 @@ export default {
   margin-top: 8px !important;
 }
 
-::v-deep {
-  .el-input--small .el-input__inner {
-    border: none !important;
-  }
+::v-deep .el-input--small .el-input__inner {
+  border: none !important;
+}
 
-  .el-tree .el-tree-node .el-tree-node__content:hover {
-    border-radius: 0 !important;
-  }
+::v-deep .el-tree .el-tree-node .el-tree-node__content:hover {
+  border-radius: 0 !important;
+}
 
-  .el-tree .el-tree-node.is-current > .el-tree-node__content {
-    border-radius: 0 !important;
-  }
+::v-deep .el-tree .el-tree-node.is-current > .el-tree-node__content {
+  border-radius: 0 !important;
 }
 </style>

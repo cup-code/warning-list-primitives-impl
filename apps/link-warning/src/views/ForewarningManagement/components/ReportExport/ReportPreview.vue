@@ -17,6 +17,10 @@ export default {
       type: String,
       default: "",
     },
+    defaultReportTitle: {
+      type: String,
+      default: "视频智能运营平台管理周报",
+    },
     reportSummary: {
       type: String,
       default: "",
@@ -93,6 +97,10 @@ export default {
       type: String,
       required: true,
     },
+    timeTitle: {
+      type: String,
+      required: true,
+    },
   },
   data() {
     return {};
@@ -161,10 +169,14 @@ export default {
         padding: 0 20px;
       "
     >
-      <div ref="reportHeader" class="report-header" v-if="headerLogo || headerText">
-        <div class="header-text">{{ headerLogo || " " }}</div>
+      <div v-if="headerLogo || headerText" ref="reportHeader" class="report-header">
+        <div class="header-text">
+          {{ headerLogo || " " }}
+        </div>
         <div>
-          <div class="header-text">{{ headerText || " " }}</div>
+          <div class="header-text">
+            {{ headerText || " " }}
+          </div>
         </div>
       </div>
       <div id="printBox" ref="printBox" class="pdf-export-content">
@@ -178,7 +190,7 @@ export default {
               font-family: 'Microsoft YaHei', '微软雅黑', Arial, sans-serif;
             "
           >
-            {{ reportTitle || "视频智能运营平台管理周报" }}
+            {{ reportTitle || defaultReportTitle }}
           </h1>
           <div
             class="mb-2 text-base text-black"
@@ -190,7 +202,7 @@ export default {
 
         <!-- 报告主体内容 -->
         <div class="p-2 px-4 mb-4 mx-4 bg-white rounded-lg border border-gray-200">
-          <div class="text-lg font-semibold">本周小结：</div>
+          <div class="text-lg font-semibold">{{ timeTitle }}小结：</div>
           <div class="text-base leading-relaxed pb-1" style="text-indent: 2em">
             {{ reportSummary || " " }}
           </div>
@@ -211,12 +223,14 @@ export default {
         </div>
 
         <div class="mb-8 mx-4">
-          <h3 class="mb-4 text-xl font-semibold">二、本周预警智能运营报告</h3>
-          <StatGrid :actual-list="actualList" />
+          <h3 class="mb-4 text-xl font-semibold">二、{{ timeTitle }}预警智能运营报告</h3>
+          <StatGrid :actual-list="actualList" :time-title="timeTitle" />
 
           <!-- 预警趋势 -->
           <div class="table-container">
-            <div class="mb-4 py-2 box-border text-lg font-semibold">本周预警趋势</div>
+            <div class="mb-4 py-2 box-border text-lg font-semibold">
+              {{ timeTitle }}预警趋势
+            </div>
             <div
               class="py-2 flex flex-col items-center justify-center w-full bg-white rounded-md"
             >
@@ -229,7 +243,7 @@ export default {
 
               <ReportTable
                 :show-table="showTable"
-                title="视频智能运营平台管理-本周预警趋势"
+                :title="`视频智能运营平台管理-${timeTitle}预警趋势`"
                 :subtitle="weekDateStr"
                 width="620px"
                 :columns="trendColumns"
@@ -241,7 +255,7 @@ export default {
           <!-- 预警类型排名 -->
           <div class="table-container">
             <div class="mb-4 py-2 box-border text-lg font-semibold">
-              本周预警类型排名TOP10
+              {{ timeTitle }}预警类型排名TOP10
             </div>
 
             <div
@@ -256,7 +270,7 @@ export default {
 
               <ReportTable
                 :show-table="showTable"
-                title="视频智能运营平台管理-本周预警类型排名TOP10"
+                :title="`视频智能运营平台管理-${timeTitle}预警类型排名TOP10`"
                 :subtitle="weekDateStr"
                 width="620px"
                 :columns="typeRankColumns"
@@ -268,7 +282,7 @@ export default {
           <!-- 设备预警排名 -->
           <div class="table-container">
             <div class="mb-4 py-2 box-border text-lg font-semibold">
-              本周设备预警排名TOP10
+              {{ timeTitle }}设备预警排名TOP10
             </div>
             <div
               class="py-2 flex flex-col items-center justify-center w-full bg-white rounded-md"
@@ -282,7 +296,7 @@ export default {
 
               <ReportTable
                 :show-table="showTable"
-                title="视频智能运营平台管理-本周设备预警排名TOP10"
+                :title="`视频智能运营平台管理-${timeTitle}设备预警排名TOP10`"
                 :subtitle="weekDateStr"
                 width="620px"
                 :columns="deviceRankColumns"
@@ -294,7 +308,9 @@ export default {
 
           <!-- 预警等级占比 -->
           <div class="table-container">
-            <div class="mb-4 py-2 box-border text-lg font-semibold">本周预警等级占比</div>
+            <div class="mb-4 py-2 box-border text-lg font-semibold">
+              {{ timeTitle }}预警等级占比
+            </div>
             <div
               class="py-2 flex flex-col items-center justify-center w-full bg-white rounded-md"
             >
@@ -307,7 +323,7 @@ export default {
 
               <ReportTable
                 :show-table="showTable"
-                title="视频智能运营平台管理-本周预警等级占比"
+                :title="`视频智能运营平台管理-${timeTitle}预警等级占比`"
                 width="620px"
                 :subtitle="weekDateStr"
                 :columns="levelRankColumns"

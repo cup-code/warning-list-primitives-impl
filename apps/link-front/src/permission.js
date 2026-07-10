@@ -40,6 +40,13 @@ function fixComInfo() {
       const res = data.result || {}
       // 修改左上角标题和logo
       changeCom(res)
+      // 同步回写 localStorage，确保组件直接读 globalData 时能拿到最新值
+      try {
+        const prev = JSON.parse(localStorage.getItem('globalData')) || {}
+        const merged = { ...prev, ...res }
+        localStorage.setItem('globalData', JSON.stringify(merged))
+      }
+      catch (e) { /* ignore */ }
     }
   })
 }

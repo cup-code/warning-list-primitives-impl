@@ -1,5 +1,6 @@
 <script>
 import imageMaker from "@/assets/site1.png";
+import { parseGeoPayload } from "@/utils/parseGeoInfo";
 
 export default {
   name: "InlineMapSelection",
@@ -12,6 +13,16 @@ export default {
       type: Boolean,
       default: false,
     },
+    mapHeight: {
+      type: [Number, String],
+      default: 400,
+    },
+    // 参照点列表（其它已标注巡检点，只读叠加显示）
+    // 元素结构: { id, name, lng, lat }
+    referencePoints: {
+      type: Array,
+      default: () => [],
+    },
   },
   data() {
     return {
@@ -19,13 +30,16 @@ export default {
         cityName: "",
         longitude: "",
         latitude: "",
+        zoom: 15,
       },
       map: null,
       marker: null,
       placeSearch: null,
-      mapId: "inlineMapContainer-" + Date.now(),
+      mapId: `inlineMapContainer-${Date.now()}`,
       searchKeyword: "",
       searchResults: [],
+      referenceMarkers: [],
+      hasFitView: false,
     };
   },
   watch: {
@@ -53,6 +67,15 @@ export default {
       },
       immediate: false,
     },
+    // 父弹窗异步拉取参照点后重新渲染（只读，不影响当前点）
+    referencePoints: {
+      handler() {
+        if (this.map) {
+          this.renderReferenceMarkers();
+        }
+      },
+      deep: true,
+    },
   },
   mounted() {
     // 弹窗打开后组件挂载，直接初始化地图
@@ -75,35 +98,6 @@ export default {
         doubleClickZoom: true,
         keyboardEnable: true,
       });
-    },
-
-    parseGeoPayload(raw) {
-      if (raw == null || raw === "") return null;
-      let data = raw;
-      try {
-        if (typeof raw === "string" && raw.trim()) {
-          data = JSON.parse(raw);
-        }
-      } catch (e) {
-        console.error("[InlineMapSelection] geoInfo JSON 解析失败:", e);
-        return null;
-      }
-      if (Array.isArray(data) && data.length) {
-        data = data[0];
-      }
-      if (!data || typeof data !== "object") return null;
-      const inner = data.info && typeof data.info === "object" ? data.info : data;
-      const lngRaw = inner.longitude ?? inner.lng ?? inner.x;
-      const latRaw = inner.latitude ?? inner.lat ?? inner.y;
-      if (lngRaw == null || latRaw == null || lngRaw === "" || latRaw === "") return null;
-      const lng = Number(lngRaw);
-      const lat = Number(latRaw);
-      if (!Number.isFinite(lng) || !Number.isFinite(lat)) return null;
-      return {
-        lng,
-        lat,
-        cityName: inner.cityName || inner.address || data.cityName || data.address || "",
-      };
     },
 
     // 初始化地图
@@ -132,16 +126,17 @@ export default {
         let initialCenter = [116.397026, 39.918058]; // 默认北京坐标
         let initialZoom = 11;
 
-        const parsedCenter = this.parseGeoPayload(this.geoInfo);
+        const parsedCenter = parseGeoPayload(this.geoInfo);
         if (parsedCenter) {
           initialCenter = [parsedCenter.lng, parsedCenter.lat];
-          initialZoom = 15;
+          initialZoom = parsedCenter.zoom || 15;
         }
 
         this.map = new window.AMap.Map(this.mapId, {
           zoom: initialZoom,
           center: initialCenter,
-          viewMode: "2D",
+          viewMode: "3D",
+          terrain: true,
           scrollWheel: true,
           dragEnable: true,
           zoomEnable: true,
@@ -151,6 +146,8 @@ export default {
 
         // 放大缩小工具条插件
         window.AMap.plugin(["AMap.ToolBar", "AMap.PlaceSearch"], () => {
+          // 插件异步加载完成时地图可能已被销毁(弹窗关闭/重挂)，守卫避免 addControl/PlaceSearch 读到 null
+          if (!this.map) return;
           const toolbar = new window.AMap.ToolBar({
             position: "RB",
             liteStyle: true,
@@ -180,6 +177,8 @@ export default {
 
         // 如果有传入的geoInfo，则显示标记
         this.initFromGeoInfo();
+        // 渲染只读参照点（其它已标注巡检点）
+        this.renderReferenceMarkers();
         console.log("[InlineMapSelection] map initialized successfully");
       } catch (e) {
         console.error("[InlineMapSelection] map creation failed:", e);
@@ -194,21 +193,24 @@ export default {
         this.marker = null;
       }
 
-      const parsed = this.parseGeoPayload(this.geoInfo);
+      const parsed = parseGeoPayload(this.geoInfo);
       if (parsed) {
         this.$set(this.form, "longitude", parsed.lng);
         this.$set(this.form, "latitude", parsed.lat);
         this.$set(this.form, "cityName", parsed.cityName || "");
+        this.$set(this.form, "zoom", parsed.zoom || 15);
         this.genMarker(parsed.lng, parsed.lat);
       } else {
         this.$set(this.form, "longitude", "");
         this.$set(this.form, "latitude", "");
         this.$set(this.form, "cityName", "");
+        this.$set(this.form, "zoom", 15);
       }
     },
 
     // 销毁地图
     destroyMap() {
+      this.clearReferenceMarkers();
       if (this.marker) {
         this.marker.setMap(null);
         this.marker = null;
@@ -220,9 +222,59 @@ export default {
       }
     },
 
+    // 渲染只读参照点（其它已标注巡检点）
+    renderReferenceMarkers() {
+      if (!this.map) return;
+      this.clearReferenceMarkers();
+      this.referencePoints.forEach((point) => {
+        if (
+          point.lng == null ||
+          point.lat == null ||
+          Number.isNaN(Number(point.lng)) ||
+          Number.isNaN(Number(point.lat))
+        ) {
+          return;
+        }
+        const content = document.createElement("div");
+        content.className = "reference-marker";
+        content.innerHTML = '<div class="reference-marker__dot"></div>';
+        const label = document.createElement("span");
+        label.className = "reference-marker__label";
+        label.textContent = point.name || "";
+        content.appendChild(label);
+        const marker = new window.AMap.Marker({
+          map: this.map,
+          position: [point.lng, point.lat],
+          content,
+          offset: new window.AMap.Pixel(-6, -6),
+          draggable: false,
+          zIndex: 100,
+        });
+        this.referenceMarkers.push(marker);
+      });
+      // 新增点（无坐标）且有参照点时，初始视野适配到参照点范围（只执行一次）
+      if (
+        !this.hasFitView &&
+        !parseGeoPayload(this.geoInfo) &&
+        this.referenceMarkers.length
+      ) {
+        this.map.setFitView(this.referenceMarkers, false, [50, 50, 50, 50]);
+        this.hasFitView = true;
+      }
+    },
+
+    // 清除所有参照 marker
+    clearReferenceMarkers() {
+      if (this.referenceMarkers.length) {
+        this.referenceMarkers.forEach((m) => m.setMap(null));
+        this.referenceMarkers = [];
+      }
+    },
+
     // 地图的点击事件
     mapClickFn(e) {
       if (this.disabled) return;
+      console.log("mapClickFn", e);
 
       const ll = e?.lnglat ? e.lnglat : e;
 
@@ -240,6 +292,7 @@ export default {
         longitude: ll.lng,
         latitude: ll.lat,
         address: "",
+        zoom: this.form.zoom,
       });
 
       // 获取定位的详细中文地址名称
@@ -255,6 +308,7 @@ export default {
         map: this.map,
         position: [lng, lat],
         draggable: !this.disabled,
+        zIndex: 110,
         offset: new window.AMap.Pixel(-12.5, -28),
         icon: new window.AMap.Icon({
           image: imageMaker,
@@ -282,6 +336,7 @@ export default {
               longitude: ll.lng,
               latitude: ll.lat,
               cityName: address,
+              zoom: this.form.zoom,
             });
             this.emitGeoInfo();
           } else {
@@ -298,6 +353,7 @@ export default {
         longitude: ll.lng,
         latitude: ll.lat,
         cityName: "",
+        zoom: this.form.zoom,
       });
       this.getAddress(ll);
     },
@@ -305,11 +361,13 @@ export default {
     // 触发setPointInfo事件
     emitGeoInfo() {
       const geoInfo = this.form.geoInfo || {};
+      const zoom = this.map ? this.map.getZoom() : undefined;
       const data = {
         longitude: geoInfo?.longitude || 0,
         latitude: geoInfo?.latitude || 0,
         cityName: geoInfo?.cityName || "",
         address: geoInfo?.address || 0,
+        zoom,
       };
       this.$emit("setPointInfo", JSON.stringify(data));
     },
@@ -354,7 +412,7 @@ export default {
         this.$set(this.form, "geoInfo", {
           longitude: lng,
           latitude: lat,
-          address: item.name + (item.address ? " " + item.address : ""),
+          address: item.name + (item.address ? ` ${item.address}` : ""),
         });
 
         // 创建标记
@@ -434,7 +492,7 @@ export default {
     </div>
 
     <!-- 地图容器 -->
-    <div :id="mapId" class="map-container" />
+    <div :id="mapId" class="map-container" :style="{ height: `${mapHeight}px` }" />
   </div>
 </template>
 
@@ -550,9 +608,42 @@ export default {
 
 .map-container {
   width: 100%;
-  height: 300px;
   border-radius: 4px;
   border: 1px solid #dcdfe6;
   overflow: hidden;
+}
+</style>
+
+<!-- 参照点 marker 样式：高德 marker 的 DOM 注入到地图容器内，scoped 样式不生效，需全局定义 -->
+<style>
+.reference-marker {
+  display: flex;
+  align-items: center;
+}
+
+.reference-marker__dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #409eff;
+  border: 2px solid #fff;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
+  cursor: default;
+}
+
+.reference-marker__label {
+  display: none;
+  margin-left: 6px;
+  padding: 2px 6px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: #fff;
+  background: rgba(64, 158, 255, 0.92);
+  border-radius: 3px;
+  white-space: nowrap;
+}
+
+.reference-marker:hover .reference-marker__label {
+  display: inline-block;
 }
 </style>

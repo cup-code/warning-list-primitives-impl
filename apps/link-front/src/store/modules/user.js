@@ -1,4 +1,5 @@
 import { asyncRoutes, resetRouter } from '@/router/index'
+import { clearNamespacedSession } from '@/utils/storage-namespace'
 
 const state = {
   authtoken: null,
@@ -71,7 +72,12 @@ const actions = {
     commit('LTMENUS', menus)
   },
   logout({ commit }) {
+    // 退登时关闭远程指导通话，释放摄像头/麦克风。动态引入避免把 TRTC SDK 拉进启动包；容错、不阻塞登出。
+    import('@/views/yxInspection/composables/useTrtcRoom')
+      .then(m => m.destroyTrtcRoom())
+      .catch(() => {})
     commit('LOGOUT')
+    clearNamespacedSession()
   },
 }
 

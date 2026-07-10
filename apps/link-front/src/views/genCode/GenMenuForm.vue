@@ -56,12 +56,12 @@ export default {
             if (data && data.success) {
               this.$message.success({
                 dangerouslyUseHTMLString: true,
-                message: data.msg,
+                message: data.message,
               })
               this.visible = false
             }
             else {
-              this.$message.error(data.msg)
+              this.$message.error(data.message)
             }
           })
         }

@@ -146,8 +146,8 @@ export default {
 </script>
 
 <template>
-  <div class="page-container">
-    <ECard type="search">
+  <KyTreeTable ref="treeTable" :isShowLeft="false">
+    <ECard slot="search" type="search" noneBottom>
       <el-form
         ref="searchForm"
         size="small"
@@ -193,7 +193,7 @@ export default {
         </el-form-item>
       </el-form>
     </ECard>
-    <ECard>
+    <ECard slot="table">
       <div class="card-cell">
         <!-- <el-button v-if="hasPermission('extension:button:add')" type="primary" size="mini" icon="el-icon-plus" @click="add()">新建</el-button>
                 <el-button v-if="hasPermission('extension:button:edit')" type="warning" size="mini" icon="el-icon-edit-outline" @click="edit()" :disabled="dataListSelections.length != 1">修改</el-button> -->
@@ -309,7 +309,7 @@ export default {
         </el-table-column>
       </el-table>
     </ECard>
-    <ECard type="footer">
+    <ECard slot="page" type="footer">
       <el-pagination
         style="text-align: right"
         :current-page="pageNo"
@@ -324,8 +324,8 @@ export default {
     </ECard>
 
     <!-- 弹窗, 新增 / 修改 -->
-    <ButtonForm ref="buttonForm" @refreshDataList="refreshList" />
-  </div>
+    <ButtonForm slot="dialog" ref="buttonForm" @refreshDataList="refreshList" />
+  </KyTreeTable>
 </template>
 
 <style lang="scss" scoped>

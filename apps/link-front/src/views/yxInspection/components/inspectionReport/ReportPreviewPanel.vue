@@ -54,12 +54,12 @@ export default {
 
     const defaultTitle = computed(() => {
       const map = {
-        day: "两山巡检日报告",
-        week: "两山巡检周报告",
-        month: "两山巡检月报告",
-        custom: "两山巡检周期报告",
+        day: "巡检日报告",
+        week: "巡检周报告",
+        month: "巡检月报告",
+        custom: "巡检周期报告",
       };
-      return map[props.formData.timeType] || "两山巡检周报告";
+      return map[props.formData.timeType] || "巡检周报告";
     });
 
     /** 排班/执行时间区间展示，与报告预览一致：开始~结束 */
@@ -100,7 +100,7 @@ export default {
               统计周期：{{ periodDisplay }}
             </p>
           </div>
-          <span class="text-xs text-gray-500">智联无界，易巡有方</span>
+          <span class="text-xs text-gray-500"></span>
         </div>
 
         <div class="mb-5">
@@ -113,11 +113,11 @@ export default {
 
         <div class="mb-6 rounded-md border border-gray-100 bg-gray-50 p-3">
           <div class="mb-1 text-sm font-medium text-gray-700">任务总结</div>
-          <p class="text-sm leading-6 text-gray-600">
+          <div class="text-sm leading-6 text-gray-600 whitespace-pre-line">
             {{
               formData.reportSummary || reportData.remarks || "本周期巡检任务有序完成。"
             }}
-          </p>
+          </div>
         </div>
 
         <div v-if="formData.includeDetail">
@@ -201,7 +201,7 @@ export default {
               </div>
 
               <div class="overflow-x-auto">
-                <table class="min-w-[760px] w-full border-collapse text-xs">
+                <table class="w-full border-collapse text-xs">
                   <thead>
                     <tr>
                       <th
@@ -209,13 +209,17 @@ export default {
                       >
                         序号
                       </th>
-                      <th class="border border-gray-200 bg-gray-50 px-2 py-2 text-left">
+                      <th
+                        class="border border-gray-200 min-w-[7em] bg-gray-50 px-2 py-2 text-left"
+                      >
                         内容
                       </th>
                       <th class="border border-gray-200 bg-gray-50 px-2 py-2 text-left">
                         标准
                       </th>
-                      <th class="border border-gray-200 bg-gray-50 px-2 py-2 text-center">
+                      <th
+                        class="border border-gray-200 w-[5em] bg-gray-50 px-2 py-2 text-center"
+                      >
                         巡检人
                       </th>
                       <th
@@ -224,11 +228,13 @@ export default {
                         结果
                       </th>
                       <th
-                        class="border border-gray-200 bg-gray-50 px-2 py-2 text-left max-w-[200px] whitespace-normal break-words"
+                        class="border border-gray-200 bg-gray-50 w-[7em] px-2 py-2 text-left max-w-[200px] whitespace-normal break-words"
                       >
                         文字
                       </th>
-                      <th class="border border-gray-200 bg-gray-50 px-2 py-2 text-center">
+                      <th
+                        class="border border-gray-200 w-[12em] bg-gray-50 px-2 py-2 text-center"
+                      >
                         上报时间
                       </th>
                       <th class="border border-gray-200 bg-gray-50 px-2 py-2 text-center">

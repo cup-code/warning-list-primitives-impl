@@ -129,14 +129,14 @@ export default {
       saveTableFromDBFn(params).then(({ data }) => {
         if (data.success) {
           this.$message.success({
-            message: data.msg,
+            message: data.message,
             dangerouslyUseHTMLString: true,
           })
           this.$emit('refreshDataList')
           this.visible = false
         }
         else {
-          this.$message.error(data.msg)
+          this.$message.error(data.message)
         }
       })
     },

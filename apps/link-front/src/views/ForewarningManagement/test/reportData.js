@@ -1,3 +1,4 @@
+import moment from 'moment'
 import { getWeekday } from './dateUtils.js'
 
 /**
@@ -42,7 +43,7 @@ export function generateActualList(screenData, machineNumber) {
 
   return [
     {
-      value: `${alarmLive.cameraNormal || 0} 路`,
+      value: `${alarmLive?.cameraNormal || 0} 路`,
       label: '接入摄像头',
     },
     {
@@ -100,9 +101,10 @@ export function generateStatsList(machineNumber, cameraNumber, cameraSkillNumber
  */
 export function processTrendTableData(search, alarmTrend) {
   if (search.timeType == 0) {
+    const startDate = moment(search.alarmDateStart)
     return [{
-      date: search.alarmDateStart.format('MM-DD'),
-      week: getWeekday(search.alarmDateStart.format('MM-DD')),
+      date: startDate.format('MM-DD'),
+      week: getWeekday(startDate.format('MM-DD')),
       count: Object.values(alarmTrend).reduce((acc, curr) => acc + curr, 0) || 0,
     }]
   }

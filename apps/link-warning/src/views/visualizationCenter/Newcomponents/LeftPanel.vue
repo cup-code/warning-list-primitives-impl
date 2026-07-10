@@ -1,7 +1,7 @@
 <script>
-import { debounce } from 'lodash'
-import { getScreenDatas } from './common'
-import Panel from './Panel.vue'
+import { debounce } from "lodash";
+import { getScreenDatas } from "./common";
+import Panel from "./Panel.vue";
 
 export default {
   components: {
@@ -18,11 +18,11 @@ export default {
     },
     departmentIds: {
       type: Array,
-      default: [],
+      default: () => [],
     },
     defaultPeriod: {
       type: Object,
-      default: {},
+      default: () => ({}),
     },
   },
   data() {
@@ -36,323 +36,344 @@ export default {
       alarmTypeRank: {},
       statusList: [
         {
-          icon: require('@/assets/produce/zhengcahng.png'),
+          icon: require("@/assets/produce/zhengcahng.png"),
           count: 0,
-          label: '正常运行',
-          type: 'cameraNormal',
+          label: "正常运行",
+          type: "cameraNormal",
         },
         {
-          icon: require('@/assets/produce/guanlian.png'),
+          icon: require("@/assets/produce/guanlian.png"),
           count: 0,
-          label: '关联技能数',
-          type: 'cameraSkillNumber',
+          label: "关联技能数",
+          type: "cameraSkillNumber",
         },
         {
-          icon: require('@/assets/produce/yunxing.png'),
+          icon: require("@/assets/produce/yunxing.png"),
           count: 0,
-          label: '运行技能数',
-          type: 'cameraSkillNumber',
+          label: "运行技能数",
+          type: "cameraSkillNumber",
         },
       ],
       periods: [
         {
-          value: '0',
-          label: '日',
+          value: "0",
+          label: "日",
         },
         {
-          value: '1',
-          label: '周',
+          value: "1",
+          label: "周",
         },
         {
-          value: '2',
-          label: '月',
+          value: "2",
+          label: "月",
         },
       ],
-      selectedTrendPeriod: '1', // 默认选中的趋势按钮
-      selectedRankingPeriod: '1', // 默认选中的排名按钮
-    }
+      selectedTrendPeriod: "1", // 默认选中的趋势按钮
+      selectedRankingPeriod: "1", // 默认选中的排名按钮
+    };
   },
   computed: {
     warningTypeChartHeight() {
-      const baseFontSize = window.innerWidth / 100
-      const baseHeight
-        = Number(this.alarmTypeRank.length) * Number(baseFontSize * 0.8) * 4
+      const baseFontSize = window.innerWidth / 100;
+      const baseHeight =
+        Number(this.alarmTypeRank.length) * Number(baseFontSize * 0.8) * 4;
 
-      console.log(baseHeight, this.alarmTypeRank.length)
-      return baseHeight
+      return baseHeight;
     },
     getTrendText() {
       const tendTime = {
-        0: '今日',
-        1: '本周',
-        2: '本月',
-      }
-      return `${tendTime[this.selectedTrendPeriod]}暂无预警信息`
+        0: "今日",
+        1: "本周",
+        2: "本月",
+      };
+      return `${tendTime[this.selectedTrendPeriod]}暂预警信息`;
     },
     getRankingText() {
       const tendTime = {
-        0: '今日',
-        1: '本周',
-        2: '本月',
-      }
-      return `${tendTime[this.selectedRankingPeriod]}暂无预警信息`
+        0: "今日",
+        1: "本周",
+        2: "本月",
+      };
+      return `${tendTime[this.selectedRankingPeriod]}暂预警信息`;
     },
   },
   watch: {
-    'defaultPeriod': {
+    defaultPeriod: {
       handler(val) {
-        const { trendPeriod, typePeriod } = { ...val }
-        this.selectedTrendPeriod = trendPeriod || '1'
-        this.selectedRankingPeriod = typePeriod || '1'
+        const { trendPeriod, typePeriod } = { ...val };
+        this.selectedTrendPeriod = trendPeriod || "1";
+        this.selectedRankingPeriod = typePeriod || "1";
         this.getTrendData({
           type: 2,
           timeType: this.selectedTrendPeriod,
-        })
+        });
         this.getRankingData({
           type: 3,
           timeType: this.selectedRankingPeriod,
-        })
+        });
+        this.getAlarmLiveData({
+          type: 1,
+          timeType: 0,
+        });
       },
       immediate: true,
     },
-    'screenData.alarmLive': {
+    departmentIds: {
       handler(val) {
-        this.alarmLive = val
-        this.initAlarmLive(val)
+        this.getTrendData({
+          type: 2,
+          timeType: this.selectedTrendPeriod,
+        });
+        this.getRankingData({
+          type: 3,
+          timeType: this.selectedRankingPeriod,
+        });
+        this.getAlarmLiveData({
+          type: 1,
+          timeType: 0,
+        });
+      },
+      immediate: true,
+    },
+    "screenData.alarmLive": {
+      handler(val) {
+        this.alarmLive = val;
+        this.initAlarmLive(val);
       },
       deep: true,
     },
   },
   created() {
-    this.getPrefix()
+    this.getPrefix();
   },
   mounted() {
     // Add resize handler for responsive elements
-    window.addEventListener('resize', this.handleResize)
+    window.addEventListener("resize", this.handleResize);
   },
   beforeDestroy() {
     // Remove event listener when component is destroyed
-    window.removeEventListener('resize', this.handleResize)
+    window.removeEventListener("resize", this.handleResize);
   },
 
   methods: {
     async getTrendData(form) {
-      const data = await getScreenDatas(form, 'alarmTrend', this.departmentIds)
-      const { digital } = data
-      this.alarmTrend = digital
+      const data = await getScreenDatas(form, "alarmTrend", this.departmentIds);
+      const { digital } = data;
+      this.alarmTrend = digital;
       this.$nextTick(() => {
-        this.initAlarmTrend(digital)
-      })
+        this.initAlarmTrend(digital);
+      });
     },
     async getRankingData(form) {
-      const data = await getScreenDatas(form, 'alarmTypeRank', this.departmentIds)
-      const { digital } = data
-      this.alarmTypeRank = digital
+      const data = await getScreenDatas(form, "alarmTypeRank", this.departmentIds);
+      const { digital } = data;
+      this.alarmTypeRank = digital;
       this.$nextTick(() => {
-        this.initAlarmTypeRank(digital)
-      })
+        this.initAlarmTypeRank(digital);
+      });
     },
-
+    async getAlarmLiveData(form) {
+      const data = await getScreenDatas(form, "alarmLive", this.departmentIds);
+      const { digital } = data;
+      this.alarmLive = digital;
+      this.$nextTick(() => {
+        this.initAlarmLive(digital);
+      });
+    },
     initAlarmLive(val) {
       this.statusList.forEach((item, index) => {
-        item.count = val[item.type]
-      })
+        item.count = val[item.type];
+      });
     },
     initAlarmTrend(digital) {
       try {
         // 图表切换时，始终先销毁旧图表，避免残留
-        const chartDom = document.getElementById('trendChart')
+        const chartDom = document.getElementById("trendChart");
         if (chartDom) {
-          const existingChart = this.$echarts.getInstanceByDom(chartDom)
+          const existingChart = this.$echarts.getInstanceByDom(chartDom);
           if (existingChart) {
-            existingChart.dispose()
+            existingChart.dispose();
           }
         }
 
         // 没有数据时，直接返回，不再初始化新图表
         if (!digital || Object.keys(digital).length === 0) {
-          return
+          return;
         }
 
-        if (!chartDom)
-          return
+        if (!chartDom) return;
 
-        const chart = this.$echarts.init(chartDom)
+        const chart = this.$echarts.init(chartDom);
 
-        const sortedKeys = Object.keys(digital).sort()
+        const sortedKeys = Object.keys(digital).sort();
 
         // Add responsive font size calculation
-        const baseFontSize = Math.min(window.innerWidth / 100, 16)
-        const fontSize = Math.max(baseFontSize, 9)
-        const labelFontSize = Math.max(baseFontSize * 0.8, 8)
+        const baseFontSize = Math.min(window.innerWidth / 100, 16);
+        const fontSize = Math.max(baseFontSize, 9);
+        const labelFontSize = Math.max(baseFontSize * 0.8, 8);
 
         const option = {
           tooltip: {
-            trigger: 'axis',
+            trigger: "axis",
             axisPointer: {
-              type: 'shadow',
+              type: "shadow",
             },
             textStyle: {
               fontSize,
             },
           },
           grid: {
-            top: '15%',
-            left: '3%',
-            right: '5%',
-            bottom: '3%',
+            top: "15%",
+            left: "3%",
+            right: "5%",
+            bottom: "3%",
             containLabel: true,
           },
           xAxis: {
-            type: 'category',
+            type: "category",
             data: sortedKeys,
             axisLine: {
               lineStyle: {
-                color: '#8c8c8c',
+                color: "#8c8c8c",
               },
             },
             axisLabel: {
-              color: '#fff',
+              color: "#fff",
               fontSize: labelFontSize,
-              interval: 'auto',
+              interval: "auto",
               rotate: sortedKeys.length > 6 ? 30 : 0,
             },
           },
           yAxis: {
-            type: 'value',
+            type: "value",
             axisLine: {
               lineStyle: {
-                color: '#8c8c8c',
+                color: "#8c8c8c",
               },
             },
             splitLine: {
               lineStyle: {
-                color: 'rgba(140, 140, 140, 0.2)',
+                color: "rgba(140, 140, 140, 0.2)",
               },
             },
             minInterval: 1,
             axisLabel: {
-              color: '#fff',
+              color: "#fff",
               fontSize: labelFontSize,
               formatter(value) {
                 if (value >= 1000) {
-                  return `${Math.floor(value / 1000)}k`
+                  return `${Math.floor(value / 1000)}k`;
                 }
-                return Math.floor(value)
+                return Math.floor(value);
               },
             },
           },
           series: [
             {
-              data: sortedKeys.map(key => digital[key]),
-              type: 'line',
+              data: sortedKeys.map((key) => digital[key]),
+              type: "line",
               smooth: true,
-              symbol: 'circle',
+              symbol: "circle",
               symbolSize: Math.max(fontSize * 0.5, 5),
               lineStyle: {
-                color: '#00f0ff',
+                color: "#00f0ff",
                 width: Math.max(fontSize * 0.15, 1.5),
               },
               itemStyle: {
-                color: '#00f0ff',
+                color: "#00f0ff",
                 borderWidth: Math.max(fontSize * 0.15, 1.5),
               },
               areaStyle: {
                 color: new this.$echarts.graphic.LinearGradient(0, 0, 0, 1, [
                   {
                     offset: 0,
-                    color: 'rgba(0, 240, 255, 0.3)',
+                    color: "rgba(0, 240, 255, 0.3)",
                   },
                   {
                     offset: 1,
-                    color: 'rgba(0, 240, 255, 0)',
+                    color: "rgba(0, 240, 255, 0)",
                   },
                 ]),
               },
             },
           ],
-        }
+        };
 
-        chart.setOption(option)
+        chart.setOption(option);
 
         // Improve resize handling
         const resizeHandler = debounce(() => {
-          chart.resize()
+          chart.resize();
           // Update font sizes on resize
-          const baseFontSize = Math.min(window.innerWidth / 100, 16)
-          const fontSize = Math.max(baseFontSize, 9)
-          const labelFontSize = Math.max(baseFontSize * 0.8, 8)
+          const baseFontSize = Math.min(window.innerWidth / 100, 16);
+          const fontSize = Math.max(baseFontSize, 9);
+          const labelFontSize = Math.max(baseFontSize * 0.8, 8);
 
-          option.tooltip.textStyle.fontSize = fontSize
-          option.xAxis.axisLabel.fontSize = labelFontSize
-          option.yAxis.axisLabel.fontSize = labelFontSize
-          option.series[0].symbolSize = Math.max(fontSize * 0.5, 5)
-          option.series[0].lineStyle.width = Math.max(fontSize * 0.15, 1.5)
-          option.series[0].itemStyle.borderWidth = Math.max(fontSize * 0.15, 1.5)
+          option.tooltip.textStyle.fontSize = fontSize;
+          option.xAxis.axisLabel.fontSize = labelFontSize;
+          option.yAxis.axisLabel.fontSize = labelFontSize;
+          option.series[0].symbolSize = Math.max(fontSize * 0.5, 5);
+          option.series[0].lineStyle.width = Math.max(fontSize * 0.15, 1.5);
+          option.series[0].itemStyle.borderWidth = Math.max(fontSize * 0.15, 1.5);
 
-          chart.setOption(option)
-        }, 200)
+          chart.setOption(option);
+        }, 200);
 
-        window.addEventListener('resize', resizeHandler)
+        window.addEventListener("resize", resizeHandler);
 
         // Clean up event listener when component is destroyed
-        this.$once('hook:beforeDestroy', () => {
-          window.removeEventListener('resize', resizeHandler)
-        })
-      }
-      catch (error) {
-        console.error('初始化趋势图表失败:', error)
+        this.$once("hook:beforeDestroy", () => {
+          window.removeEventListener("resize", resizeHandler);
+        });
+      } catch (error) {
+        console.error("初始化趋势图表失败:", error);
       }
     },
 
     initAlarmTypeRank(digital) {
-      const chartDom = document.getElementById('warningTypeChart')
-      const existingChart = this.$echarts.getInstanceByDom(chartDom)
-      if (existingChart)
-        existingChart.dispose()
+      const chartDom = document.getElementById("warningTypeChart");
+      const existingChart = this.$echarts.getInstanceByDom(chartDom);
+      if (existingChart) existingChart.dispose();
 
-      if (!digital || Object.keys(digital).length === 0)
-        return
-      const data = digital.slice(0, 10)
+      if (!digital || Object.keys(digital).length === 0) return;
+      const data = digital.slice(0, 10);
 
-      const chart = this.$echarts.init(chartDom)
+      const chart = this.$echarts.init(chartDom);
 
       // Add responsive font size calculation
-      const baseFontSize = window.innerWidth / 100
-      const labelFontSize = Number(baseFontSize * 0.8).toFixed(0)
-
-      console.log(baseFontSize, labelFontSize)
+      const baseFontSize = window.innerWidth / 100;
+      const labelFontSize = Number(baseFontSize * 0.8).toFixed(0);
 
       const option = {
         grid: {
-          top: '10%',
-          left: '5%',
-          right: '10%',
-          bottom: '5%',
+          top: "10%",
+          left: "5%",
+          right: "10%",
+          bottom: "5%",
           containLabel: true,
         },
         tooltip: {
-          trigger: 'axis',
+          trigger: "axis",
           axisPointer: {
-            type: 'none',
+            type: "none",
           },
-          formatter: params => `${params[0].name} : ${params[0].value}`,
+          formatter: (params) => `${params[0].name} : ${params[0].value}`,
           textStyle: {
             fontSize: labelFontSize,
           },
         },
         xAxis: {
           show: false,
-          type: 'value',
-          max: Math.max(...data.map(item => item.alarmNumber)) + 1,
+          type: "value",
+          max: Math.max(...data.map((item) => item.alarmNumber)) + 1,
         },
         yAxis: [
           {
-            type: 'category',
+            type: "category",
             inverse: true,
             axisLabel: {
               show: false,
-              color: '#fff',
+              color: "#fff",
             },
             splitLine: {
               show: false,
@@ -363,16 +384,16 @@ export default {
             axisLine: {
               show: false,
             },
-            data: data.map(item => item.alarmType),
+            data: data.map((item) => item.alarmType),
           },
         ],
         series: [
           {
-            name: '背景',
-            type: 'bar',
+            name: "背景",
+            type: "bar",
             barWidth: labelFontSize,
-            barGap: '-100%',
-            data: data.map(item => item.alarmNumber),
+            barGap: "-100%",
+            data: data.map((item) => item.alarmNumber),
             showBackground: true,
             itemStyle: {
               normal: {
@@ -380,134 +401,137 @@ export default {
                 color: new this.$echarts.graphic.LinearGradient(0, 0, 1, 0, [
                   {
                     offset: 0,
-                    color: 'rgba(57,89,255,1)',
+                    color: "rgba(57,89,255,1)",
                   },
                   {
                     offset: 1,
-                    color: 'rgba(46,200,207,1)',
+                    color: "rgba(46,200,207,1)",
                   },
                 ]),
               },
             },
             backgroundStyle: {
-              color: 'rgba(225, 225, 225, 0.5)',
+              color: "rgba(225, 225, 225, 0.5)",
               barBorderRadius: 30,
             },
             label: {
               normal: {
-                color: '#fff',
+                color: "#fff",
                 show: true,
                 position: [0, -baseFontSize],
                 fontSize: labelFontSize,
                 formatter: (a) => {
                   // Truncate and format long names for better display
-                  let name = a.name
+                  let name = a.name;
                   const maxLength = Math.max(
                     Math.min(Math.floor(window.innerWidth / 70), 15),
-                    8,
-                  )
+                    8
+                  );
 
                   if (name.length > maxLength) {
-                    name = `${name.substring(0, maxLength)}...`
+                    name = `${name.substring(0, maxLength)}...`;
                   }
 
                   // Format number for better display
-                  let value = a.value
+                  let value = a.value;
                   if (value >= 1000) {
-                    value = `${(value / 1000).toFixed(1)}k`
+                    value = `${(value / 1000).toFixed(1)}k`;
                   }
 
-                  return `${name}: ${value}`
+                  return `${name}: ${value}`;
                 },
               },
             },
           },
         ],
-      }
-      chart.setOption(option)
+      };
+      chart.setOption(option);
 
       // Improve resize handling
       const resizeHandler = debounce(() => {
-        chart.resize()
+        chart.resize();
         // Update font sizes and spacings on resize
-        const baseFontSize = Math.min(window.innerWidth / 100, 16)
-        const fontSize = Math.max(baseFontSize, 9)
-        const labelFontSize = Math.max(baseFontSize * 0.8, 8)
-        const itemCount = data.length
-        const itemHeight = Math.min(28, Math.floor(300 / (itemCount || 1)))
+        const baseFontSize = Math.min(window.innerWidth / 100, 16);
+        const fontSize = Math.max(baseFontSize, 9);
+        const labelFontSize = Math.max(baseFontSize * 0.8, 8);
+        const itemCount = data.length;
+        const itemHeight = Math.min(28, Math.floor(300 / (itemCount || 1)));
 
         // Update relevant options
-        option.tooltip.textStyle.fontSize = fontSize
-        option.series[0].barWidth = Math.max(Math.min(itemHeight * 0.2, 10), 4)
-        option.series[0].label.normal.fontSize = labelFontSize
+        option.tooltip.textStyle.fontSize = fontSize;
+        option.series[0].barWidth = Math.max(Math.min(itemHeight * 0.2, 10), 4);
+        option.series[0].label.normal.fontSize = labelFontSize;
 
-        chart.setOption(option)
-      }, 200)
+        chart.setOption(option);
+      }, 200);
 
-      chart.on('click', (params) => {
-        console.log(params)
+      chart.on("click", (params) => {
         this.$router.push({
-          path: '/videoOperation/ForeWarningManagement/clientWarningInfoList',
+          path: "/videoOperation/ForeWarningManagement/clientWarningInfoList",
           query: {
             alarmType: params.name,
             timeType: this.selectedRankingPeriod,
           },
-        })
-      })
+        });
+      });
 
-      window.addEventListener('resize', resizeHandler)
+      window.addEventListener("resize", resizeHandler);
 
       // Clean up event listener when component is destroyed
-      this.$once('hook:beforeDestroy', () => {
-        window.removeEventListener('resize', resizeHandler)
-      })
+      this.$once("hook:beforeDestroy", () => {
+        window.removeEventListener("resize", resizeHandler);
+      });
     },
     handleTrendButtonClick(period) {
-      this.selectedTrendPeriod = period // 更新选中的趋势按钮
+      this.selectedTrendPeriod = period; // 更新选中的趋势按钮
       this.getTrendData({
         type: 2,
         timeType: period,
-      })
+      });
     },
     handleTypesButtonClick(period) {
-      this.selectedRankingPeriod = period // 更新选中的预警类型排名
+      this.selectedRankingPeriod = period; // 更新选中的预警类型排名
       this.getRankingData({
         type: 3,
         timeType: period,
-      })
+      });
     },
     RefreshLive() {
-      this.$emit('getScreenData', {
+      this.getAlarmLiveData({
         type: 1,
-      })
+        timeType: 0,
+      });
+      // this.$emit("getScreenData", {
+      //   type: 1,
+      // });
     },
     RefreshtRend() {
       // 使用当前选中的趋势按钮值刷新数据
-      this.$emit('getScreenData', {
+      this.getTrendData({
         type: 2,
         timeType: this.selectedTrendPeriod,
-      })
+      });
     },
     RefreshtRanking() {
       // 使用当前选中的排名按钮值刷新数据
-      this.$emit('getScreenData', {
+      this.getRankingData({
         type: 3,
         timeType: this.selectedRankingPeriod,
-      })
+      });
     },
     handleResize() {
       // Recalculate chart heights and responsiveness
       this.$nextTick(() => {
         if (this.alarmTrend) {
-          this.initAlarmTrend(this.alarmTrend)
+          this.initAlarmTrend(this.alarmTrend);
         }
         if (this.alarmTypeRank.length > 0) {
-          this.initAlarmTypeRank(this.alarmTypeRank)
+          this.initAlarmTypeRank(this.alarmTypeRank);
         }
-      })
+      });
     },
   },
-}
+};
 </script>
 
 <template>
@@ -519,12 +543,7 @@ export default {
           style="height: 90%; scrollbar-width: none; -ms-overflow-style: none"
         >
           <div v-for="(item, index) in statusList" :key="index" class="status-item">
-            <el-image
-              :src="`${item.icon}`"
-              alt="正常运行"
-              class="icon"
-              fit="cover"
-            />
+            <el-image :src="`${item.icon}`" alt="正常运行" class="icon" fit="cover" />
             <div class="status-info">
               <span class="count">{{ item.count || 0 }}</span>
               <span class="label">{{ item.label }}</span>

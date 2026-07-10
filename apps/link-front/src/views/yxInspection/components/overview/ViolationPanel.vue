@@ -11,7 +11,7 @@ const props = defineProps({
 <template>
   <section class="panel violation-panel">
     <div class="panel-header">
-      <span class="panel-title">违规任务</span>
+      <span class="panel-title">超时任务</span>
     </div>
 
     <div class="violation-list">
@@ -22,7 +22,7 @@ const props = defineProps({
           <span class="violation-detail">{{ task.detail }}</span>
         </div>
       </div>
-      <div v-if="tasks.length === 0" class="empty-tip">暂无违规任务</div>
+      <div v-if="tasks.length === 0" class="empty-tip">暂无超时任务</div>
     </div>
   </section>
 </template>
@@ -65,6 +65,7 @@ const props = defineProps({
   font-weight: 600;
   margin-left: 12px;
   color: var(--text-primary, #ffffff);
+  z-index: 88;
 }
 
 .violation-panel {
@@ -109,7 +110,7 @@ const props = defineProps({
 .violation-bar {
   width: 4px;
   border-radius: 0;
-  background: #FF4560;
+  background: #ff4560;
 }
 
 .violation-content {

@@ -1,3 +1,4 @@
+import '@/utils/storage-namespace'
 import Avue from '@smallwei/avue'
 import { VueQueryPlugin } from '@tanstack/vue-query'
 import request from 'axios'
@@ -97,6 +98,7 @@ Vue.use(VueQueryPlugin, {
       queries: {
         refetchOnWindowFocus: false,
         retry: false,
+        staleTime: 0,
       },
     },
   },

@@ -2,11 +2,11 @@
 import {
   getInspectionPlanById,
   queryExecuteRecordByPlan,
-} from '@/http/inspection/yx-inspection-api'
-import TemporaryScheduleDialog from './TemporaryScheduleDialog.vue'
+} from "@/http/inspection/yx-inspection-api";
+import TemporaryScheduleDialog from "./TemporaryScheduleDialog.vue";
 
 export default {
-  name: 'YxInspectionPlanTaskShifts',
+  name: "YxInspectionPlanTaskShifts",
   components: {
     TemporaryScheduleDialog,
   },
@@ -15,7 +15,7 @@ export default {
     method: String,
   },
   data() {
-    const currentYear = new Date().getFullYear()
+    const currentYear = new Date().getFullYear();
     return {
       loading: false,
       planInfo: {},
@@ -24,7 +24,7 @@ export default {
       searchForm: {
         pageNum: 1,
         pageSize: 10,
-        planId: '',
+        planId: "",
         year: currentYear,
         isExecute: false, // false返回排班记录
       },
@@ -33,16 +33,16 @@ export default {
         { value: currentYear, label: currentYear },
         { value: currentYear + 1, label: currentYear + 1 },
       ],
-    }
+    };
   },
   watch: {
     id: {
       immediate: true,
       handler(val) {
-        if (val && val !== 'null') {
-          this.searchForm.planId = val
-          this.getPlanInfo()
-          this.getTableData()
+        if (val && val !== "null") {
+          this.searchForm.planId = val;
+          this.getPlanInfo();
+          this.getTableData();
         }
       },
     },
@@ -50,59 +50,59 @@ export default {
   methods: {
     async getPlanInfo() {
       try {
-        const { data } = await getInspectionPlanById(this.id)
+        const { data } = await getInspectionPlanById(this.id);
         if (data.success && data.result) {
-          this.planInfo = data.result
+          this.planInfo = data.result;
         }
       } catch (error) {
-        console.error('获取计划信息失败', error)
+        console.error("获取计划信息失败", error);
       }
     },
     async getTableData() {
-      this.loading = true
+      this.loading = true;
       try {
-        const { data } = await queryExecuteRecordByPlan(this.searchForm)
-        this.loading = false
+        const { data } = await queryExecuteRecordByPlan(this.searchForm);
+        this.loading = false;
         if (data.success) {
-          this.tableData = data.result?.list || []
-          this.total = data.result?.total || 0
+          this.tableData = data.result?.list || [];
+          this.total = data.result?.total || 0;
         } else {
-          this.$message.error(data.message || '查询失败')
+          this.$message.error(data.message || "查询失败");
         }
       } catch (error) {
-        this.loading = false
-        this.$message.error('查询失败')
+        this.loading = false;
+        this.$message.error("查询失败");
       }
     },
     searchFn() {
-      if (!this.id || this.id === 'null') {
-        this.$message.error('请先保存巡检计划基础信息')
-        return
+      if (!this.id || this.id === "null") {
+        this.$message.error("请先保存巡检计划基础信息");
+        return;
       }
-      this.searchForm.pageNum = 1
-      this.getTableData()
+      this.searchForm.pageNum = 1;
+      this.getTableData();
     },
     sizeChangeHandle(val) {
-      this.searchForm.pageSize = val
-      this.searchForm.pageNum = 1
-      this.getTableData()
+      this.searchForm.pageSize = val;
+      this.searchForm.pageNum = 1;
+      this.getTableData();
     },
     currentChangeHandle(val) {
-      this.searchForm.pageNum = val
-      this.getTableData()
+      this.searchForm.pageNum = val;
+      this.getTableData();
     },
     addTemporarySchedule() {
-      if (!this.id || this.id === 'null') {
-        this.$message.error('请先保存巡检计划基础信息')
-        return
+      if (!this.id || this.id === "null") {
+        this.$message.error("请先保存巡检计划基础信息");
+        return;
       }
-      this.$refs.temporaryScheduleDialog.init(this.id)
+      this.$refs.temporaryScheduleDialog.init(this.id);
     },
     backFn() {
-      this.$router.back(-1)
+      this.$router.back(-1);
     },
   },
-}
+};
 </script>
 
 <template>
@@ -122,11 +122,7 @@ export default {
           </el-form-item>
           <el-form-item>
             <el-button type="primary" @click="searchFn">查询</el-button>
-            <el-button
-              type="primary"
-              :disabled="method === 'view'"
-              @click="addTemporarySchedule"
-            >
+            <el-button type="primary" @click="addTemporarySchedule">
               添加临时班次
             </el-button>
           </el-form-item>
@@ -150,19 +146,31 @@ export default {
       <el-table-column align="center" prop="taskName" label="任务名称" min-width="120" />
       <el-table-column align="center" prop="type" label="类型" width="100">
         <template slot-scope="scope">
-          {{ scope.row.type === '0' ? '计划班次' : '临时班次' }}
+          {{ scope.row.type === "0" ? "计划班次" : "临时班次" }}
         </template>
       </el-table-column>
       <el-table-column align="center" min-width="160" label="排班时间">
         <template slot-scope="scope">
-          {{ `${scope.row.scheduleStartTime || ''} 至 ${scope.row.scheduleEndTime || ''}` }}
+          {{
+            `${scope.row.scheduleStartTime || ""} 至 ${scope.row.scheduleEndTime || ""}`
+          }}
         </template>
       </el-table-column>
-      <el-table-column align="center" prop="expireTime" min-width="140" label="任务失效时间" />
+      <el-table-column
+        align="center"
+        prop="expireTime"
+        min-width="140"
+        label="任务失效时间"
+      />
       <el-table-column align="center" prop="postName" label="岗位角色" min-width="100" />
-      <el-table-column align="center" prop="executeUsersName" label="巡检人" min-width="120">
+      <el-table-column
+        align="center"
+        prop="executeUsersName"
+        label="巡检人"
+        min-width="120"
+      >
         <template slot-scope="scope">
-          {{ (scope.row.executeUsersName || []).join('、') }}
+          {{ (scope.row.executeUsersName || []).join("、") }}
         </template>
       </el-table-column>
       <el-table-column align="center" prop="remarks" label="备注" min-width="100" />

@@ -1,12 +1,12 @@
 <script>
 import { useMutation, useQuery } from "@tanstack/vue-query";
 import { getCurrentInstance, reactive, ref } from "vue";
-import { InspectionPlanTableConfig } from "./config";
 import {
-  queryInspectionPlanByPage,
-  deleteInspectionPlan,
   changeInspectionPlanState,
+  deleteInspectionPlan,
+  queryInspectionPlanByPage,
 } from "@/http/inspection/yx-inspection-api";
+import { InspectionPlanTableConfig } from "./config";
 
 export default {
   name: "InspectionPlan",

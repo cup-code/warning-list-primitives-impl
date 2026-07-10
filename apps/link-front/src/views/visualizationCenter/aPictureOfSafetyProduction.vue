@@ -1,11 +1,11 @@
 <script>
-import moment from 'moment'
-import { getSpecifiedModule } from '@/http/companyConfig/companyConfig-api.js'
-import { getScreenData } from '@/http/videoStat/screenData'
-import CenterPanel from './Newcomponents/CenterPanel.vue'
-import Header from './Newcomponents/Header.vue'
-import LeftPanel from './Newcomponents/LeftPanel.vue'
-import RightPanel from './Newcomponents/RightPanel.vue'
+import moment from "moment";
+import { getSpecifiedModule } from "@/http/companyConfig/companyConfig-api.js";
+import { getAlarmRecordTop10, getScreenData } from "@/http/videoStat/screenData";
+import CenterPanel from "./Newcomponents/CenterPanel.vue";
+import Header from "./Newcomponents/Header.vue";
+import LeftPanel from "./Newcomponents/LeftPanel.vue";
+import RightPanel from "./Newcomponents/RightPanel.vue";
 
 export default {
   components: {
@@ -29,144 +29,154 @@ export default {
         cameraAlarmRank: null,
       },
       isAutoRefresh: false,
-      companyId: '',
+      companyId: "",
       leftPeriod: {},
       centerPeriod: {},
       rightPeriod: {},
       interval: null,
       isInitialDataLoaded: false,
-    }
+      CarouselDataType: 0,
+    };
   },
   created() {
-    const userData = JSON.parse(sessionStorage.getItem('user'))
-    this.companyId = userData.companyId
-    this.initializeComponent()
+    const userData = JSON.parse(sessionStorage.getItem("user"));
+    this.companyId = userData.companyId;
+    this.initializeComponent();
   },
   mounted() {
-    this.handleResize()
-    window.addEventListener('resize', this.handleResize)
+    this.handleResize();
+    window.addEventListener("resize", this.handleResize);
   },
   beforeDestroy() {
-    window.removeEventListener('resize', this.handleResize)
+    window.removeEventListener("resize", this.handleResize);
     if (this.interval) {
-      clearInterval(this.interval)
+      clearInterval(this.interval);
     }
   },
   methods: {
     // 初始化组件
     async initializeComponent() {
-      await this.getTopLabel()
+      await this.getTopLabel();
       // 确保配置已加载后再获取数据
-      this.getDataHadler()
+      this.getDataHadler();
     },
     // 获取顶部导航栏信息
     async getTopLabel() {
       try {
-        const { data } = await getSpecifiedModule(this.companyId, 'videoManagement')
+        const { data } = await getSpecifiedModule(this.companyId, "videoManagement");
         if (data.success) {
-          const { result } = data
+          const { result } = data;
           this.isAutoRefresh = result?.filter(
-            s => s.item === 'isAutoRefresh',
-          )[0]?.value
+            (s) => s.item === "isAutoRefresh"
+          )[0]?.value;
           this.autoRefreshTime = result?.filter(
-            s => s.item === 'autoRefreshTime',
-          )[0]?.value
+            (s) => s.item === "autoRefreshTime"
+          )[0]?.value;
+          this.CarouselDataType = result?.filter(
+            (s) => s.item === "CarouselDataType"
+          )[0]?.value;
 
           result?.forEach((s) => {
-            if (['trendPeriod', 'typePeriod'].includes(s.item)) {
-              this.leftPeriod = { ...this.leftPeriod, [s.item]: String(s.value) }
+            if (["trendPeriod", "typePeriod"].includes(s.item)) {
+              this.leftPeriod = { ...this.leftPeriod, [s.item]: String(s.value) };
             }
-            if (['handlePeriod', 'levelPeriod'].includes(s.item)) {
-              this.centerPeriod = { ...this.centerPeriod, [s.item]: String(s.value) }
+            if (["handlePeriod", "levelPeriod"].includes(s.item)) {
+              this.centerPeriod = { ...this.centerPeriod, [s.item]: String(s.value) };
             }
-            if (['devicePeriod', 'orgPeriod'].includes(s.item)) {
-              this.rightPeriod = { ...this.rightPeriod, [s.item]: String(s.value) }
+            if (["devicePeriod", "orgPeriod"].includes(s.item)) {
+              this.rightPeriod = { ...this.rightPeriod, [s.item]: String(s.value) };
             }
-          })
+          });
 
           // 设置自动刷新
           if (this.isAutoRefresh && this.autoRefreshTime) {
-            this.setupAutoRefresh()
+            this.setupAutoRefresh();
           }
 
-          this.isInitialDataLoaded = true
+          this.isInitialDataLoaded = true;
         }
-      }
-      catch (error) {
-        console.error('获取配置信息失败:', error)
-        this.$message.error('获取配置信息失败')
+      } catch (error) {
+        console.error("获取配置信息失败:", error);
+        this.$message.error("获取配置信息失败");
       }
     },
     // 设置自动刷新
     setupAutoRefresh() {
       if (this.interval) {
-        clearInterval(this.interval)
+        clearInterval(this.interval);
       }
 
       this.interval = setInterval(() => {
-        this.getDataHadler(this.departmentIds)
-      }, this.autoRefreshTime * 60000)
+        this.getDataHadler(this.departmentIds);
+      }, this.autoRefreshTime * 60000);
     },
     handleResize() {
-      const width = window.innerWidth
-      let fontSize = 16
-      if (width <= 1366)
-        fontSize = 14
-      if (width <= 1024)
-        fontSize = 12
-      if (width >= 1920)
-        fontSize = 18
-      if (width >= 3840)
-        fontSize = 40
-      document.documentElement.style.fontSize = `${fontSize}px`
+      const width = window.innerWidth;
+      let fontSize = 16;
+      if (width <= 1366) fontSize = 14;
+      if (width <= 1024) fontSize = 12;
+      if (width >= 1920) fontSize = 18;
+      if (width >= 3840) fontSize = 40;
+      document.documentElement.style.fontSize = `${fontSize}px`;
     },
     async getDataHadler(ids = []) {
-      this.departmentIds = ids
-      const form = {}
-      form.timeType = 1
-      form.type = 0
-      await this.getScreenData(form)
+      this.departmentIds = ids;
+      const form = {};
+      form.timeType = 1;
+      form.type = 0;
+      await this.getScreenData(form);
     },
     async getScreenData(form) {
       try {
-        form.departmentIds = this.departmentIds.join(',')
-        form.alarmDateEnd = moment().format('YYYY-MM-DD HH:mm:ss')
+        form.departmentIds = this.departmentIds.join(",");
+        form.alarmDateEnd = moment().format("YYYY-MM-DD HH:mm:ss");
 
         if (form.timeType == 0) {
-          form.alarmDateStart = moment().startOf('date').format('YYYY-MM-DD HH:mm:ss')
-        }
-        else if (form.timeType == 1) {
+          form.alarmDateStart = moment().startOf("date").format("YYYY-MM-DD HH:mm:ss");
+        } else if (form.timeType == 1) {
           form.alarmDateStart = moment()
-            .startOf('week')
-            .add(1, 'day')
-            .format('YYYY-MM-DD HH:mm:ss')
-        }
-        else if (form.timeType == 2) {
-          form.alarmDateStart = moment().startOf('month').format('YYYY-MM-DD HH:mm:ss')
+            .startOf("week")
+            .add(1, "day")
+            .format("YYYY-MM-DD HH:mm:ss");
+        } else if (form.timeType == 2) {
+          form.alarmDateStart = moment().startOf("month").format("YYYY-MM-DD HH:mm:ss");
         }
 
-        const { data } = await getScreenData(JSON.parse(JSON.stringify(form)))
-        if (data.code == 200) {
+        const fn = this.CarouselDataType === 0 ? getScreenData : getAlarmRecordTop10;
+        const params =
+          this.CarouselDataType === 0
+            ? form
+            : {
+                departmentId: this.departmentIds,
+                onlyTodo: false,
+                n: 10,
+              };
+        const { data } = await fn(JSON.parse(JSON.stringify(params)));
+        if (data.code === 200) {
           if (form.type === 0) {
-            this.screenData = data.result
+            this.screenData =
+              this.CarouselDataType === 0
+                ? data.result || []
+                : { videoAlarmList: data.result || [] } || [];
+
+            console.log(this.screenData, 2222);
+          } else {
+            this.screenData.total = data.result.total;
+            const key = Object.keys(this.screenData)[form.type];
+            this.screenData[key] = data.result[key];
+
+            console.log(this.screenData, 111);
           }
-          else {
-            this.screenData.total = data.result.total
-            const key = Object.keys(this.screenData)[form.type]
-            this.screenData[key] = data.result[key]
-          }
+        } else {
+          this.$message.error(data.message || "查询失败");
         }
-        else {
-          this.$message.error(data.message || '查询失败')
-        }
-      }
-      catch (error) {
-        console.error('获取数据失败:', error)
-        this.$message.error('获取数据失败')
+      } catch (error) {
+        console.error("获取数据失败:", error);
+        this.$message.error("获取数据失败");
       }
     },
   },
-}
+};
 </script>
 
 <template>

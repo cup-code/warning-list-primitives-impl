@@ -168,7 +168,7 @@ export function postQuery(url, data) {
 }
 
 // axios的get params参数封装封装
-export function axiosParams(type, path, params = {}) {
+export function axiosParams(type, path, params = {}, config = {}) {
   let paramsStr = ''
   try {
     if (Object.keys(params).length > 0) {
@@ -194,5 +194,6 @@ export function axiosParams(type, path, params = {}) {
   return createAxiosFromStore()({
     url: connectUrl,
     method: type,
+    ...config,
   })
 }

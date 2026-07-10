@@ -1,6 +1,10 @@
 <script>
 import { getCurrentInstance, ref, computed, watch } from "vue";
-import { getScheduleRecordDetail } from "@/http/inspection/yx-inspection-api";
+import {
+  getScheduleRecordDetail,
+  getAiAgentAnswer,
+  updateRecordSummary,
+} from "@/http/inspection/yx-inspection-api";
 import { resolveMediaUrl } from "@/utils/media";
 
 export default {
@@ -29,6 +33,13 @@ export default {
     const loading = ref(false);
     const detail = ref({});
     const executePlaceInfoList = ref([]);
+
+    // AI summary state
+    const aiSummaryLoading = ref(false);
+    const aiSummaryAnswer = ref("");
+    const saveLoading = ref(false);
+    const conversationId = ref(null);
+    const abortController = ref(null);
 
     // 图片预览相关
     const previewVisible = ref(false);
@@ -127,13 +138,37 @@ export default {
             items.push({
               placeName: place.placeName,
               contentName: item.contentName,
-              executeResult: item.executeResult,
-              problemDesc: item.problemDesc || "",
+              inspectionBenchmark: item.inspectionBenchmark || "",
+              audioText: item.audioText || "异常",
+            });
+          } else {
+            items.push({
+              placeName: place.placeName,
+              contentName: item.contentName,
+              inspectionBenchmark: item.inspectionBenchmark || "",
+              audioText: item.audioText || "正常",
             });
           }
         });
       });
       return items;
+    });
+
+    // 异常项总结文本（用于AI接口）
+    const abnormalSummaryText = computed(() => {
+      if (!abnormalItems.value.length) return "";
+
+      return abnormalItems.value
+        .map((item) => {
+          const lines = [
+            `巡检点：${item.placeName || ""}`,
+            `巡检内容：${item.contentName || ""}`,
+            `巡检标准：${item.inspectionBenchmark || ""}`,
+            `现场结果：${item.audioText}`,
+          ];
+          return lines.join("\n");
+        })
+        .join("\n\n");
     });
 
     // 获取详情数据
@@ -145,6 +180,7 @@ export default {
         if (data?.success && data.result) {
           detail.value = data.result;
           executePlaceInfoList.value = data.result.executePlaceInfoList || [];
+          aiSummaryAnswer.value = data.result.summary || "";
         } else {
           proxy.$message.error("获取巡检详情失败");
         }
@@ -156,8 +192,75 @@ export default {
       }
     };
 
+    // 获取AI任务总结
+    const fetchAiSummary = async () => {
+      if (!abnormalItems.value.length) return;
+
+      // Cancel any pending request
+      if (abortController.value) {
+        abortController.value.abort();
+      }
+
+      // Create new AbortController for this request
+      abortController.value = new AbortController();
+      aiSummaryLoading.value = true;
+
+      try {
+        const { data } = await getAiAgentAnswer(
+          {
+            q: abnormalSummaryText.value,
+            cId: conversationId.value || undefined,
+          },
+          { signal: abortController.value.signal }
+        );
+        if (data?.success && data.result?.answer) {
+          aiSummaryAnswer.value = data.result.answer;
+          conversationId.value = data.result.conversationId;
+        }
+      } catch (error) {
+        // Ignore abort errors, handle other errors silently
+        if (error.name !== "AbortError") {
+          // Silent failure - use existing summary format
+        }
+      } finally {
+        aiSummaryLoading.value = false;
+        abortController.value = null;
+      }
+    };
+
+    // 保存总结
+    const saveSummary = async () => {
+      if (!aiSummaryAnswer.value || !props.scheduleRecordId) return;
+      saveLoading.value = true;
+      try {
+        const { data } = await updateRecordSummary({
+          scheduleRecordId: props.scheduleRecordId,
+          summary: aiSummaryAnswer.value,
+        });
+        if (data?.success) {
+          proxy.$message.success("保存成功");
+        } else {
+          proxy.$message.error(data?.message || "保存失败");
+        }
+      } catch (error) {
+        console.error("保存总结失败", error);
+        proxy.$message.error("保存失败");
+      } finally {
+        saveLoading.value = false;
+      }
+    };
+
     // 关闭弹窗
     const handleClose = () => {
+      // Cancel any pending AI API request
+      if (abortController.value) {
+        abortController.value.abort();
+        abortController.value = null;
+      }
+      // Reset AI summary state
+      conversationId.value = null;
+      aiSummaryAnswer.value = "";
+      aiSummaryLoading.value = false;
       emit("update:visible", false);
       emit("close");
     };
@@ -225,6 +328,7 @@ export default {
       cycleText,
       submitTime,
       abnormalItems,
+      abnormalSummaryText,
       handleClose,
       getResultClass,
       getResultText,
@@ -237,6 +341,13 @@ export default {
       previewVisible,
       previewImages,
       previewIndex,
+      // AI summary
+      aiSummaryLoading,
+      aiSummaryAnswer,
+      fetchAiSummary,
+      // Save summary
+      saveLoading,
+      saveSummary,
     };
   },
 };
@@ -264,10 +375,10 @@ export default {
             <span class="text-sm text-gray-600 font-medium">两山智联-易巡</span>
           </div>
           <div>
-            <h1 class="text-2xl font-bold text-gray-800">易巡班次报告</h1>
+            <h1 class="text-2xl font-bold text-gray-800">班次报告</h1>
           </div>
           <div>
-            <span class="text-xs text-gray-500">智联无界，易巡有方</span>
+            <span class="text-xs text-gray-500"></span>
           </div>
         </div>
 
@@ -316,19 +427,19 @@ export default {
         <!-- 基本信息 -->
         <div class="mb-8 p-5 bg-gray-50 rounded-lg">
           <div class="flex gap-10 mb-3">
-            <div class="flex-1 flex items-center">
+            <div class="flex-1 flex items-start">
               <span class="text-sm text-gray-500 min-w-[70px]">巡检班次：</span>
               <span class="text-sm text-gray-800 font-medium">{{
                 detail.taskName || "-"
               }}</span>
             </div>
-            <div class="flex-1 flex items-center">
+            <div class="flex-1 flex items-start">
               <span class="text-sm text-gray-500 min-w-[70px]">开始时间：</span>
               <span class="text-sm text-gray-800 font-medium">{{
                 detail.scheduleStartTime || "-"
               }}</span>
             </div>
-            <div class="flex-1 flex items-center">
+            <div class="flex-1 flex items-start">
               <span class="text-sm text-gray-500 min-w-[70px]">结束时间：</span>
               <span class="text-sm text-gray-800 font-medium">{{
                 detail.scheduleEndTime || "-"
@@ -336,15 +447,15 @@ export default {
             </div>
           </div>
           <div class="flex gap-10 mb-3">
-            <div class="flex-1 flex items-center">
+            <div class="flex-1 flex items-start">
               <span class="text-sm text-gray-500 min-w-[70px]">提交时间：</span>
               <span class="text-sm text-gray-800 font-medium">{{ submitTime }}</span>
             </div>
-            <div class="flex-1 flex items-center">
+            <div class="flex-1 flex items-start">
               <span class="text-sm text-gray-500 min-w-[70px]">周期：</span>
               <span class="text-sm text-gray-800 font-medium">{{ cycleText }}</span>
             </div>
-            <div class="flex-1 flex items-center">
+            <div class="flex-1 flex items-start">
               <span class="text-sm text-gray-500 min-w-[70px]">巡检路线：</span>
               <span class="text-sm text-gray-800 font-medium">{{
                 lineName || detail.lineName || "-"
@@ -352,19 +463,19 @@ export default {
             </div>
           </div>
           <div class="flex gap-10">
-            <div class="flex-1 flex items-center">
+            <div class="flex-1 flex items-start">
               <span class="text-sm text-gray-500 min-w-[70px]">所属部门：</span>
               <span class="text-sm text-gray-800 font-medium">{{
                 detail.departmentName || "-"
               }}</span>
             </div>
-            <div class="flex-1 flex items-center">
+            <div class="flex-1 flex items-start">
               <span class="text-sm text-gray-500 min-w-[70px]">巡检岗位：</span>
               <span class="text-sm text-gray-800 font-medium">{{
                 postName || detail.postName || "-"
               }}</span>
             </div>
-            <div class="flex-1 flex items-center">
+            <div class="flex-1 flex items-start">
               <span class="text-sm text-gray-500 min-w-[70px]">巡检人：</span>
               <span class="text-sm text-gray-800 font-medium">{{ executorNames }}</span>
             </div>
@@ -372,7 +483,7 @@ export default {
         </div>
 
         <!-- 巡检点详情 -->
-        <div class="mb-8">
+        <div>
           <div v-for="(place, pIndex) in executePlaceInfoList" :key="pIndex" class="mb-8">
             <!-- 巡检点标题 -->
             <div class="flex items-center gap-2 mb-4 pb-2.5 border-b-2 border-amber-400">
@@ -531,42 +642,40 @@ export default {
         </div>
 
         <!-- 任务总结 -->
-        <div class="mt-8 p-5 bg-gray-50 rounded-lg">
+        <div class="mt-8 p-5 bg-gray-50 rounded-lg summary-section">
           <div
             class="text-base font-bold text-gray-800 mb-4 pb-2.5 border-b border-gray-200"
           >
             任务总结
           </div>
-          <div class="text-sm leading-7">
-            <div v-if="abnormalItems.length > 0" class="mb-4">
-              <div class="text-gray-600 mb-2">
-                1、本次巡检共发现{{ abnormalItems.length }}项"异常"巡检项：
-              </div>
-              <div v-for="(item, index) in abnormalItems" :key="index" class="ml-5 mb-3">
-                <div class="text-red-500 mb-1">
-                  **{{ item.placeName }}：{{ item.contentName }}
-                  <span v-if="item.executeResult" class="font-medium">
-                    （{{ item.executeResult }}）
-                  </span>
-                  <span v-if="item.problemDesc" class="text-gray-500">
-                    ；{{ item.problemDesc }}
-                  </span>
-                </div>
-                <div
-                  v-if="item.executeResult || item.problemDesc"
-                  class="text-gray-600 ml-2.5"
-                >
-                  **改进建议：请考虑因受季节影响因素提高适当{{ item.contentName }}设置；
-                </div>
-              </div>
-            </div>
-            <div v-else class="text-green-500 mb-4">
-              <div class="mb-2">1、本次巡检未发现异常巡检项。</div>
-            </div>
-            <div class="text-gray-600">
-              <div class="mb-2">2、巡检时长正常，无漏检和超时。</div>
-              <div>**无紧急报警；</div>
-            </div>
+          <el-button
+            type="primary"
+            size="mini"
+            :loading="aiSummaryLoading"
+            @click="fetchAiSummary"
+          >
+            {{ aiSummaryAnswer ? "重新生成" : "AI生成总结" }}
+          </el-button>
+          <el-button
+            type="success"
+            size="mini"
+            :loading="saveLoading"
+            :disabled="!aiSummaryAnswer"
+            @click="saveSummary"
+          >
+            保存总结
+          </el-button>
+          <div class="text-sm leading-7 mt-3">
+            <!-- 编辑模式：textarea -->
+            <el-input
+              v-model="aiSummaryAnswer"
+              type="textarea"
+              :autosize="{ minRows: 4 }"
+              class="editable-summary screen-only"
+              v-loading="aiSummaryLoading"
+            />
+            <!-- 打印模式：纯文本 -->
+            <div class="print-only whitespace-pre-line">{{ aiSummaryAnswer }}</div>
           </div>
         </div>
       </div>
@@ -575,7 +684,7 @@ export default {
     <!-- 底部按钮 -->
     <div slot="footer" class="dialog-footer">
       <el-button @click="handleClose">关闭</el-button>
-      <el-button type="primary" v-print="printObj">打印</el-button>
+      <el-button type="primary" v-print="printObj"> 打印 </el-button>
     </div>
 
     <!-- 图片预览 -->
@@ -593,6 +702,11 @@ export default {
   padding: 0;
   max-height: 70vh;
   overflow: hidden;
+}
+
+/* 屏幕模式下隐藏打印专用文本 */
+.print-only {
+  display: none;
 }
 
 @media print {
@@ -615,7 +729,7 @@ export default {
 
   #print-report-content {
     box-shadow: none !important;
-    padding: 20px !important;
+    padding: 14px !important;
   }
 
   /* 确保背景色打印出来 */
@@ -626,9 +740,37 @@ export default {
     print-color-adjust: exact !important;
   }
 
-  /* 分页控制 */
-  .mb-8 {
+  /* 分页控制：表格行不分页，其余允许自由分页 */
+  table tr {
     page-break-inside: avoid;
+  }
+
+  /* 统计卡片和基本信息不分页 */
+  .bg-gradient-to-br,
+  .p-5.bg-gray-50:first-of-type {
+    page-break-inside: avoid;
+    page-break-after: auto;
+  }
+
+  /* 任务总结允许自由分页 */
+  .summary-section {
+    page-break-before: auto !important;
+    page-break-after: auto !important;
+    page-break-inside: auto !important;
+  }
+
+  /* 打印时隐藏按钮 */
+  .el-button {
+    display: none !important;
+  }
+
+  /* 打印时隐藏编辑框，显示纯文本 */
+  .screen-only {
+    display: none !important;
+  }
+
+  .print-only {
+    display: block !important;
   }
 }
 </style>

@@ -1,5 +1,5 @@
 <script>
-import { ref, reactive, watch } from "vue";
+import { nextTick, reactive, ref, watch } from "vue";
 import { getPageContent } from "@/http/inspection/yx-inspection-api";
 
 // 巡检项选择表格配置
@@ -37,8 +37,8 @@ export default {
       type: Boolean,
       default: false,
     },
-    // 已选中的巡检项ID列表（用于回显选中状态）
-    selectedIds: {
+    // 已选中的巡检项列表（用于回显选中状态，含跨页项；需带 contentId/id 及名称等字段）
+    selectedItems: {
       type: Array,
       default: () => [],
     },
@@ -69,7 +69,14 @@ export default {
         dialogVisible.value = val;
         if (val) {
           selectedRows.value = [];
-          fetchData();
+          // 打开时按顺序：先清掉跨「关闭→重开」残留的内部选中，再把已选项（含跨页）
+          // 播种进选中，最后再拉数据。三步都要在 nextTick 里、且早于 fetchData 的 await，
+          // 这样 reserve-selection 的 updateSelectionByRowKey 能把当前页的种子换成真实行
+          nextTick(() => {
+            tableRef.value?.clearSelection();
+            seedSelection();
+            fetchData();
+          });
         }
       }
     );
@@ -88,8 +95,8 @@ export default {
             category: item.contentCategory,
           }));
           total.value = result.total || 0;
-          // 数据加载后，回显已选中的巡检项
-          await setDefaultSelection();
+          // 选中回显交给 reserve-selection：tableData 变化时 Element 会按 row-key
+          // 自动把当前页里已在选中集合中的行勾上，无需在每页手动 toggle
         }
       } catch (error) {
         console.error("获取巡检项列表失败:", error);
@@ -98,16 +105,22 @@ export default {
       }
     };
 
-    // 回显已选中的巡检项
-    const setDefaultSelection = async () => {
-      await new Promise((resolve) => setTimeout(resolve, 0));
-      if (tableRef.value && props.selectedIds.length > 0) {
-        tableData.value.forEach((row) => {
-          if (props.selectedIds.includes(row.id)) {
-            tableRef.value.toggleRowSelection(row, true);
-          }
-        });
-      }
+    // 把父组件传入的已选项（含跨页）重建成表格行形状，作为 row-key 行身份
+    const buildSeedRow = (item) => ({
+      id: item.contentId ?? item.id,
+      contentName: item.itemName,
+      inspectionBenchmark: item.standard,
+      contentCategory: item.category,
+    });
+
+    // 打开弹窗时一次性播种已选项到选中集合（含当前页之外的跨页项）。
+    // 仅在打开时调用一次：toggleRowStatus 按引用去重，重复播种会产生重复项；
+    // 翻页时由 reserve-selection 的 updateSelectionByRowKey 按 id 自动对账当前页。
+    const seedSelection = () => {
+      if (!tableRef.value || props.selectedItems.length === 0) return;
+      props.selectedItems.forEach((item) => {
+        tableRef.value.toggleRowSelection(buildSeedRow(item), true);
+      });
     };
 
     // 搜索
@@ -219,9 +232,7 @@ export default {
         <el-button type="primary" icon="el-icon-search" @click="handleSearch">
           查询
         </el-button>
-        <el-button icon="el-icon-refresh-right" @click="handleReset">
-          重置
-        </el-button>
+        <el-button icon="el-icon-refresh-right" @click="handleReset"> 重置 </el-button>
       </el-form-item>
     </el-form>
 
@@ -234,9 +245,15 @@ export default {
       size="small"
       style="width: 100%"
       height="400px"
+      row-key="id"
       @selection-change="handleSelectionChange"
     >
-      <el-table-column type="selection" width="50" align="center" />
+      <el-table-column
+        type="selection"
+        width="50"
+        align="center"
+        :reserve-selection="true"
+      />
       <el-table-column
         v-for="col in SelectItemTableConfig"
         :key="col.prop"
@@ -249,7 +266,7 @@ export default {
         <template #default="{ row }">
           <!-- 类别列显示字典翻译 -->
           <span v-if="col.prop === 'contentCategory'">
-            {{ $dictUtils.getDictLabel('inspectionCategory', row.contentCategory) }}
+            {{ $dictUtils.getDictLabel("inspectionCategory", row.contentCategory) }}
           </span>
           <span v-else>{{ row[col.prop] }}</span>
         </template>

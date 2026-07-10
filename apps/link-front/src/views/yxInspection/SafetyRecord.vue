@@ -254,7 +254,7 @@ export default {
 
     <!-- 表格区域 -->
     <ECard slot="table">
-      <div class="mb-4 flex justify-between items-center">
+      <!-- <div class="mb-4 flex justify-between items-center">
         <EButton type="success" icon="el-icon-download" @click="handleExport">
           Excel导出
         </EButton>
@@ -276,7 +276,7 @@ export default {
             }}（{{ count }}）
           </span>
         </div>
-      </div>
+      </div> -->
       <CTable
         type="index"
         :tableData="tableData"

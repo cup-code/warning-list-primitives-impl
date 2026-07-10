@@ -360,7 +360,8 @@ export default {
       return dictItem.extend
     },
     getPrefix() {
-      this.filePrefix = JSON.parse(localStorage.getItem('globalData')).minioFilePrefix
+      const data = JSON.parse(localStorage.getItem('globalData'))
+      this.filePrefix = data?.minioFilePrefix || ''
     },
   },
 }

@@ -102,6 +102,9 @@ export default {
         xAxis: {
           type: 'category',
           data: data?.map(item => item.alarmType || '') || [],
+          axisTick: {
+            alignWithLabel: true,
+          },
         },
         series: [
           {

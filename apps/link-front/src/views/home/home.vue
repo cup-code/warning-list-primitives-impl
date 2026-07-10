@@ -33,7 +33,7 @@ export default {
   },
   created() {
     this.getDateDes()
-    this.companyRecordInfo = JSON.parse(localStorage.getItem('globalData')).companyRecordInfo || ''
+    this.companyRecordInfo = JSON.parse(localStorage.getItem('globalData'))?.companyRecordInfo || ''
   },
   methods: {
     getDateDes() {

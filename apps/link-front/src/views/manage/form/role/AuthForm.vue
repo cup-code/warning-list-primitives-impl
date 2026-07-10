@@ -116,6 +116,32 @@ export default {
         }
       }
     },
+    // 菜单树勾选联动：勾选双向联动，取消只向下
+    menuCheckChange(data, state) {
+      const tree = this.$refs.menuListTree;
+      // 这次点击是"勾上"还是"取消"
+      const isChecked = state.checkedKeys.includes(data.tenantMenuId);
+      const node = tree.getNode(data.tenantMenuId);
+      // 向下：手动递归（check-strictly 下 setChecked 的 deep 参数会被短路，必须自己遍历后代）
+      this.setMenuSubtree(node, isChecked);
+      // 取消不向上，父保持原状
+      if (!isChecked) {
+        return;
+      }
+      // 勾选向上回填：任一子被选中即勾父，逐级上溯至根
+      let p = node.parent;
+      while (p && p.data && p.data.tenantMenuId != null) {
+        tree.setChecked(p.data.tenantMenuId, true, false);
+        p = p.parent;
+      }
+    },
+    // 递归勾选/取消整棵子树（check-strictly 下 deep 被短路，需手动遍历）
+    setMenuSubtree(node, value) {
+      if (node.data && node.data.tenantMenuId != null) {
+        this.$refs.menuListTree.setChecked(node.data.tenantMenuId, value, false);
+      }
+      (node.childNodes || []).forEach((child) => this.setMenuSubtree(child, value));
+    },
     // 表单提交
     inputFormSubmit() {
       this.$refs.inputForm.validate((valid) => {
@@ -202,9 +228,9 @@ export default {
       <el-form-item label="责任组织" prop="departmentId">
         <SelectTree
           :props="{
-            value: 'id', // ID字段名
-            label: 'departmentName', // 显示名称
-            children: 'children', // 子级字段名
+            value: 'id',
+            label: 'departmentName',
+            children: 'children',
           }"
           :url="`sysDepartment/companyDepartment/${inputForm.companyId}`"
           :value="inputForm.departmentId"
@@ -249,6 +275,7 @@ export default {
               default-expand-all
               show-checkbox
               check-strictly
+              @check="menuCheckChange"
             />
           </div>
         </el-col>

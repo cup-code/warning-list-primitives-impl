@@ -1,8 +1,8 @@
 <script>
-import path from 'path'
-import Item from '@/layout/components/Item'
+import path from "path";
+import Item from "@/layout/components/Item";
 
-import { isExternal } from '@/utils/validate'
+import { isExternal } from "@/utils/validate";
 
 export default {
   components: {
@@ -12,95 +12,92 @@ export default {
     return {
       routeList: [],
       moreList: [],
-      CurrentActiveMenu: '',
+      CurrentActiveMenu: "",
       menuNameLists: [],
-    }
+    };
   },
   computed: {
     routes() {
-      this.routeList = []
-      const mainList = []
-      this.moreList = []
+      this.routeList = [];
+      const mainList = [];
+      this.moreList = [];
       this.$router.options.routes.forEach((item) => {
         if (!item.hidden && !item.redirect) {
-          const obj = { route: item, single: false }
+          const obj = { route: item, single: false };
           if (!item.children || item.children.length == 0) {
-            obj.single = true
+            obj.single = true;
           }
-          this.routeList.push(obj)
+          this.routeList.push(obj);
         }
-      })
+      });
       // 1-6个菜单时不显示更多
       if (this.routeList.length < 7) {
         for (const item of this.routeList) {
-          mainList.push(item)
+          mainList.push(item);
         }
       }
       // 大于6个菜单时，显示5个菜单+更多
       else {
         for (let i = 0; i < this.routeList.length; i++) {
           if (i < 5) {
-            mainList.push(this.routeList[i])
-          }
-          else {
-            this.moreList.push(this.routeList[i])
+            mainList.push(this.routeList[i]);
+          } else {
+            this.moreList.push(this.routeList[i]);
           }
         }
       }
 
-      return mainList
+      return mainList;
     },
     activeMenuName() {
-      const route = this.$route
-      const { meta, path } = route
+      const route = this.$route;
+      const { meta, path } = route;
 
       const menuNameLists = this.routes.map((item) => {
-        const { name } = item.route
-        return name
-      })
+        const { name } = item.route;
+        return name;
+      });
 
       // if set path, the sidebar will highlight the path you set
       if (meta.activeMenu) {
-        return meta.activeMenu
+        return meta.activeMenu;
       }
 
-      if (menuNameLists.includes(route.path.split('/')[1])) {
-        return `/${path.split('/')[1]}`
-      }
-      else {
-        return localStorage.getItem('activeMenu')
+      if (menuNameLists.includes(route.path.split("/")[1])) {
+        return `/${path.split("/")[1]}`;
+      } else {
+        return localStorage.getItem("activeMenu");
       }
     },
   },
   created() {
-    this.dropClick(this.activeMenuName)
+    this.dropClick(this.activeMenuName);
   },
 
   methods: {
     dropClick(routePath) {
-      localStorage.setItem('activeMenu', routePath)
-      let routeItem = {}
+      localStorage.setItem("activeMenu", routePath);
+      let routeItem = {};
       for (const item of this.routeList) {
         if (item.route.path == routePath) {
-          routeItem = item
-          break
+          routeItem = item;
+          break;
         }
       }
-      if (routeItem.single)
-        this.$router.push(routeItem.path)
-      else this.$store.dispatch('user/ltMenus', routeItem.route)
+      if (routeItem.single) this.$router.push(routeItem.path);
+      else this.$store.dispatch("user/ltMenus", routeItem.route);
     },
     resolvePath(routePath) {
       if (isExternal(routePath)) {
-        return routePath
+        return routePath;
       }
       if (isExternal(this.basePath)) {
-        return this.basePath
+        return this.basePath;
       }
-      return path.resolve(this.basePath, routePath)
+      return path.resolve(this.basePath, routePath);
     },
   },
-}
+};
 </script>
 
 <template>
@@ -124,18 +121,9 @@ export default {
         />
       </el-menu-item>
       <!-- 更多 -->
-      <el-submenu
-        v-if="moreList.length"
-        ref="subMenu"
-        popper-append-to-body
-        index=""
-      >
+      <el-submenu v-if="moreList.length" ref="subMenu" popper-append-to-body index="">
         <template slot="title">
-          <item
-            icon="el-icon-menu"
-            title="更多"
-            align="center"
-          />
+          <item icon="el-icon-menu" title="更多" align="center" />
         </template>
         <el-menu-item
           v-for="child in moreList"
@@ -198,13 +186,13 @@ export default {
     .el-menu-item.is-active {
       color: var(--ky-primary) !important;
     }
-    .el-menu-item.is-active,
-    .el-submenu.is-active > .el-submenu__title {
-      color: #409eff;
-      & > .svg-icon {
-        color: #409eff;
-      }
-    }
+    // .el-menu-item.is-active,
+    // .el-submenu.is-active > .el-submenu__title {
+    //   color: #409eff;
+    //   & > .svg-icon {
+    //     color: #409eff;
+    //   }
+    // }
   }
 }
 </style>

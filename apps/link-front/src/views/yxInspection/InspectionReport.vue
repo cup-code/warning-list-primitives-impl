@@ -1,6 +1,10 @@
 <script>
 import { computed, getCurrentInstance, onMounted, reactive, ref } from "vue";
-import { queryDateRangeReport } from "@/http/inspection/yx-inspection-api";
+import {
+  queryDateRangeReport,
+  queryReportArchive,
+  saveReportArchive,
+} from "@/http/inspection/yx-inspection-api";
 import ReportFilterPanel from "./components/inspectionReport/ReportFilterPanel.vue";
 import ReportPreviewPanel from "./components/inspectionReport/ReportPreviewPanel.vue";
 import { InspectionReportDefaultForm, InspectionReportStatConfig } from "./config";
@@ -62,10 +66,29 @@ export default {
   },
   setup() {
     const { proxy } = getCurrentInstance();
+    const route = proxy.$route;
+    const isArchiveView = !!route.query.id;
+
     const loading = ref(false);
+    const archiveLoading = ref(false);
     const reportData = ref({});
+
+    const archiveFormData = isArchiveView
+      ? {
+          reportTitle: route.query.title || "",
+          reportSummary: route.query.summary || "",
+          timeType: route.query.type || "week",
+          dateRange:
+            route.query.type === "custom" && route.query.startDate && route.query.endDate
+              ? [route.query.startDate, route.query.endDate]
+              : [],
+          includeDetail: route.query.containDetail === "1",
+          includeChart: route.query.containChart === "1",
+        }
+      : null;
+
     const formData = reactive({
-      ...InspectionReportDefaultForm,
+      ...(archiveFormData || InspectionReportDefaultForm),
     });
 
     const buildRange = () => {
@@ -107,6 +130,52 @@ export default {
       }
     };
 
+    const fetchArchiveData = async () => {
+      if (formData.timeType === "custom" && formData.dateRange.length !== 2) {
+        return;
+      }
+      try {
+        const [startDate, endDate] = buildRange();
+        const { data } = await queryReportArchive({ startDate, endDate });
+        if (data?.success) {
+          formData.reportTitle = data.result?.title || "";
+          formData.reportSummary = data.result?.summary || "";
+        }
+      } catch {
+        // 归档查询失败不阻断主流程
+      }
+    };
+
+    const handleArchive = async () => {
+      if (formData.timeType === "custom" && formData.dateRange.length !== 2) {
+        proxy.$message.warning("请选择完整的自定义时间范围");
+        return;
+      }
+      archiveLoading.value = true;
+      try {
+        const [startDate, endDate] = buildRange();
+        const { data } = await saveReportArchive({
+          startDate,
+          endDate,
+          title: formData.reportTitle,
+          summary: formData.reportSummary,
+          type: formData.timeType,
+          containChart: formData.includeChart,
+          containDetail: formData.includeDetail,
+        });
+        if (data?.success) {
+          proxy.$message.success("存档成功");
+        } else {
+          proxy.$message.error(data?.message || "存档失败");
+        }
+      } catch (error) {
+        console.error("存档失败", error);
+        proxy.$message.error("存档失败");
+      } finally {
+        archiveLoading.value = false;
+      }
+    };
+
     /** 生成报告并打开系统打印（与详情中报告打印一致，使用 vue-print-nb） */
     const handleGenerateReport = async () => {
       const ok = await fetchReportData();
@@ -139,8 +208,10 @@ export default {
       if (field === "timeType") {
         if (value !== "custom") {
           fetchReportData();
+          fetchArchiveData();
         } else if (formData.dateRange?.length === 2) {
           fetchReportData();
+          fetchArchiveData();
         }
       } else if (
         field === "dateRange" &&
@@ -149,28 +220,49 @@ export default {
         value.length === 2
       ) {
         fetchReportData();
+        fetchArchiveData();
       }
     };
 
     const handleReset = () => {
       Object.assign(formData, InspectionReportDefaultForm);
       fetchReportData();
+      fetchArchiveData();
     };
 
-    onMounted(() => {
-      fetchReportData();
+    onMounted(async () => {
+      if (isArchiveView && route.query.startDate && route.query.endDate) {
+        const [startDate, endDate] = [route.query.startDate, route.query.endDate];
+        loading.value = true;
+        try {
+          const { data } = await queryDateRangeReport({ startDate, endDate });
+          if (data?.success) {
+            reportData.value = data.result || {};
+          }
+        } catch {
+          // 静默处理
+        } finally {
+          loading.value = false;
+        }
+      } else {
+        await fetchReportData();
+        fetchArchiveData();
+      }
     });
 
     return {
       formData,
       loading,
+      archiveLoading,
       reportData,
       statCards,
       reportPeriodDisplay,
       printTriggerRef,
       printConfig,
+      isArchiveView,
       fetchReportData,
       handleGenerateReport,
+      handleArchive,
       handleUpdateField,
       handleReset,
     };
@@ -195,8 +287,12 @@ export default {
           <ReportFilterPanel
             :form-data="formData"
             :loading="loading"
+            :archive-loading="archiveLoading"
+            :report-data="reportData"
+            :disabled="isArchiveView"
             @update-field="handleUpdateField"
             @search="handleGenerateReport"
+            @archive="handleArchive"
             @reset="handleReset"
           />
           <ReportPreviewPanel

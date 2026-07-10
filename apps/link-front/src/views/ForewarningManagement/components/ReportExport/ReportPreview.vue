@@ -1,6 +1,4 @@
 <script>
-import headIcon from '../../static/headIcon.png'
-import topLabel from '../../static/topLabel.png'
 import ReportChart from '../../test/reportChart.js'
 import ReportTable from './ReportTable.vue'
 import SkillTable from './SkillTable.vue'
@@ -18,6 +16,10 @@ export default {
     reportTitle: {
       type: String,
       default: '',
+    },
+    defaultReportTitle: {
+      type: String,
+      default: '视频智能运营平台管理周报',
     },
     reportSummary: {
       type: String,
@@ -69,7 +71,19 @@ export default {
     },
     getText: {
       type: String,
-      required: true,
+      default: '',
+    },
+    showAdvert: {
+      type: Boolean,
+      default: true,
+    },
+    headerLogo: {
+      type: String,
+      default: '',
+    },
+    headerText: {
+      type: String,
+      default: '',
     },
     chartData: {
       type: Object,
@@ -83,12 +97,13 @@ export default {
       type: String,
       required: true,
     },
+    timeTitle: {
+      type: String,
+      required: true,
+    },
   },
   data() {
-    return {
-      headIcon,
-      topLabel,
-    }
+    return {}
   },
   computed: {
     trendColumns() {
@@ -154,27 +169,17 @@ export default {
         padding: 0 20px;
       "
     >
-      <div class="report-header">
-        <div>
-          <img
-            :src="headIcon"
-            alt="Logo"
-            class="logo"
-          >
+      <div v-if="headerLogo || headerText" ref="reportHeader" class="report-header">
+        <div class="header-text">
+          {{ headerLogo || " " }}
         </div>
         <div>
-          <img
-            :src="topLabel"
-            alt="Right"
-            class="right-logo"
-          >
+          <div class="header-text">
+            {{ headerText || " " }}
+          </div>
         </div>
       </div>
-      <div
-        id="printBox"
-        ref="printBox"
-        class="pdf-export-content"
-      >
+      <div id="printBox" ref="printBox" class="pdf-export-content">
         <!-- 报告标题 -->
         <div class="flex flex-col items-center mb-4">
           <h1
@@ -185,7 +190,7 @@ export default {
               font-family: 'Microsoft YaHei', '微软雅黑', Arial, sans-serif;
             "
           >
-            {{ reportTitle || "视频智能运营平台管理周报" }}
+            {{ reportTitle || defaultReportTitle }}
           </h1>
           <div
             class="mb-2 text-base text-black"
@@ -198,7 +203,7 @@ export default {
         <!-- 报告主体内容 -->
         <div class="p-2 px-4 mb-4 mx-4 bg-white rounded-lg border border-gray-200">
           <div class="text-lg font-semibold">
-            本周小结：
+            {{ timeTitle }}小结：
           </div>
           <div class="text-base leading-relaxed pb-1" style="text-indent: 2em">
             {{ reportSummary || " " }}
@@ -212,11 +217,7 @@ export default {
           </h3>
           <div class="table-container box-border">
             <ul class="flex justify-between items-center">
-              <li
-                v-for="item in list"
-                :key="item.name"
-                class="text-base"
-              >
+              <li v-for="item in list" :key="item.name" class="text-base">
                 <span class="mr-2 text-base font-semibold">•</span>
                 {{ item.name }}
               </li>
@@ -227,14 +228,14 @@ export default {
 
         <div class="mb-8 mx-4">
           <h3 class="mb-4 text-xl font-semibold">
-            二、本周预警智能运营报告
+            二、{{ timeTitle }}预警智能运营报告
           </h3>
-          <StatGrid :actual-list="actualList" />
+          <StatGrid :actual-list="actualList" :time-title="timeTitle" />
 
           <!-- 预警趋势 -->
           <div class="table-container">
             <div class="mb-4 py-2 box-border text-lg font-semibold">
-              本周预警趋势
+              {{ timeTitle }}预警趋势
             </div>
             <div
               class="py-2 flex flex-col items-center justify-center w-full bg-white rounded-md"
@@ -248,7 +249,7 @@ export default {
 
               <ReportTable
                 :show-table="showTable"
-                title="视频智能运营平台管理-本周预警趋势"
+                :title="`视频智能运营平台管理-${timeTitle}预警趋势`"
                 :subtitle="weekDateStr"
                 width="620px"
                 :columns="trendColumns"
@@ -260,7 +261,7 @@ export default {
           <!-- 预警类型排名 -->
           <div class="table-container">
             <div class="mb-4 py-2 box-border text-lg font-semibold">
-              本周预警类型排名TOP10
+              {{ timeTitle }}预警类型排名TOP10
             </div>
 
             <div
@@ -275,7 +276,7 @@ export default {
 
               <ReportTable
                 :show-table="showTable"
-                title="视频智能运营平台管理-本周预警类型排名TOP10"
+                :title="`视频智能运营平台管理-${timeTitle}预警类型排名TOP10`"
                 :subtitle="weekDateStr"
                 width="620px"
                 :columns="typeRankColumns"
@@ -287,7 +288,7 @@ export default {
           <!-- 设备预警排名 -->
           <div class="table-container">
             <div class="mb-4 py-2 box-border text-lg font-semibold">
-              本周设备预警排名TOP10
+              {{ timeTitle }}设备预警排名TOP10
             </div>
             <div
               class="py-2 flex flex-col items-center justify-center w-full bg-white rounded-md"
@@ -301,7 +302,7 @@ export default {
 
               <ReportTable
                 :show-table="showTable"
-                title="视频智能运营平台管理-本周设备预警排名TOP10"
+                :title="`视频智能运营平台管理-${timeTitle}设备预警排名TOP10`"
                 :subtitle="weekDateStr"
                 width="620px"
                 :columns="deviceRankColumns"
@@ -314,7 +315,7 @@ export default {
           <!-- 预警等级占比 -->
           <div class="table-container">
             <div class="mb-4 py-2 box-border text-lg font-semibold">
-              本周预警等级占比
+              {{ timeTitle }}预警等级占比
             </div>
             <div
               class="py-2 flex flex-col items-center justify-center w-full bg-white rounded-md"
@@ -328,7 +329,7 @@ export default {
 
               <ReportTable
                 :show-table="showTable"
-                title="视频智能运营平台管理-本周预警等级占比"
+                :title="`视频智能运营平台管理-${timeTitle}预警等级占比`"
                 width="620px"
                 :subtitle="weekDateStr"
                 :columns="levelRankColumns"
@@ -337,7 +338,7 @@ export default {
             </div>
           </div>
 
-          <div class="table-container">
+          <div v-if="showAdvert" class="table-container">
             <div
               class="py-2 text-lg font-semibold"
               style="text-indent: 2em; color: #1d376a"
@@ -349,11 +350,7 @@ export default {
           <div class="flex flex-col justify-end items-end mt-4 w-full">
             <div v-if="wechat" class="flex items-end">
               <span class="ml-2">企业微信：</span>
-              <img
-                :src="filePrefix + wechat"
-                alt="Logo"
-                class="w-10 h-10"
-              >
+              <img :src="filePrefix + wechat" alt="Logo" class="w-10 h-10">
             </div>
             <div v-if="phone" class="flex items-end">
               <span class="ml-2">联系电话：</span>
@@ -398,9 +395,14 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid #ccc;
   margin: 0 0 20px 0;
   padding: 10px 0;
+}
+
+.header-text {
+  font-size: 16px;
+  font-weight: bold;
+  color: #1d376a;
 }
 
 .logo {

@@ -1,0 +1,6412 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "巡检管理",
+    "version": "1.0",
+    "title": "巡检管理",
+    "contact": {}
+  },
+  "host": "ls.e20.com.cn",
+  "basePath": "/api",
+  "tags": [
+    {
+      "name": "巡检任务班次",
+      "description": "Yx Inspection Plan Schedule Record Controller"
+    },
+    {
+      "name": "巡检内容",
+      "description": "Yx Inspection Content Controller"
+    },
+    {
+      "name": "巡检地点",
+      "description": "Yx Inspection Place Controller"
+    },
+    {
+      "name": "巡检安全记录",
+      "description": "Yx Inspection Safe Record Controller"
+    },
+    {
+      "name": "巡检异常",
+      "description": "Yx Inspection Plan Abnormal Controller"
+    },
+    {
+      "name": "巡检班次执行",
+      "description": "Yx Inspection Execute Record Controller"
+    },
+    {
+      "name": "巡检计划",
+      "description": "Yx Inspection Plan Controller"
+    },
+    {
+      "name": "巡检计划排班",
+      "description": "Yx Inspection Plan Schedule Configure Controller"
+    },
+    {
+      "name": "巡检路线",
+      "description": "Yx Inspection Plan Line Controller"
+    },
+    {
+      "name": "巡检违规",
+      "description": "Yx Inspection Plan Violation Record Controller"
+    }
+  ],
+  "paths": {
+    "/yx/inspectionAbnormal/audit": {
+      "post": {
+        "tags": [
+          "巡检异常"
+        ],
+        "summary": "审核异常的纪录",
+        "operationId": "auditUsingPOST",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "dto",
+            "description": "dto",
+            "required": true,
+            "schema": {
+              "originalRef": "审核异常纪录dto",
+              "$ref": "#/definitions/审核异常纪录dto"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "originalRef": "统一返回结果",
+              "$ref": "#/definitions/统一返回结果"
+            }
+          },
+          "201": {
+            "description": "Created"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "deprecated": false,
+        "x-order": "2147483647"
+      }
+    },
+    "/yx/inspectionAbnormal/auditOnApp": {
+      "post": {
+        "tags": [
+          "巡检异常"
+        ],
+        "summary": "APP审核异常的纪录",
+        "operationId": "auditOnAppUsingPOST",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "dto",
+            "description": "dto",
+            "required": true,
+            "schema": {
+              "originalRef": "审核异常纪录dto",
+              "$ref": "#/definitions/审核异常纪录dto"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "originalRef": "统一返回结果«APP巡检审核结果VO»",
+              "$ref": "#/definitions/统一返回结果«APP巡检审核结果VO»"
+            }
+          },
+          "201": {
+            "description": "Created"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "deprecated": false,
+        "x-order": "2147483647"
+      }
+    },
+    "/yx/inspectionAbnormal/getByExecuteRecordId/{executeRecordId}": {
+      "get": {
+        "tags": [
+          "巡检异常"
+        ],
+        "summary": "查询指定执行纪录的异常信息",
+        "operationId": "getByExecuteRecordIdUsingGET",
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "name": "executeRecordId",
+            "in": "path",
+            "description": "executeRecordId",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "originalRef": "统一返回结果«巡检异常VO»",
+              "$ref": "#/definitions/统一返回结果«巡检异常VO»"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "deprecated": false,
+        "x-order": "2147483647"
+      }
+    },
+    "/yx/inspectionAbnormal/groupBystate": {
+      "get": {
+        "tags": [
+          "巡检异常"
+        ],
+        "summary": "按条件查询巡检异常的纪录审核状态数量",
+        "operationId": "groupByStateUsingGET",
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "name": "auditResult",
+            "in": "query",
+            "description": "审核结果.误报:0;问题:1;安全隐患:2",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "departmentId",
+            "in": "query",
+            "description": "组织机构id",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "description": "巡检结束时间,字符串格式:yyyy-MM-dd HH:mm:ss",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "inspectionType",
+            "in": "query",
+            "description": "巡检类型：日常巡检-1；专业点检-2；精密点检-3；辅助纪录-4；",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "planName",
+            "in": "query",
+            "description": "计划名称",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "startDate",
+            "in": "query",
+            "description": "巡检开始时间,字符串格式:yyyy-MM-dd HH:mm:ss",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "originalRef": "统一返回结果«List«巡检异常分审核状态统计数量»»",
+              "$ref": "#/definitions/统一返回结果«List«巡检异常分审核状态统计数量»»"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "deprecated": false,
+        "x-order": "2147483647"
+      }
+    },
+    "/yx/inspectionAbnormal/queryMyAbnormal": {
+      "get": {
+        "tags": [
+          "巡检异常"
+        ],
+        "summary": "查询我的异常纪录",
+        "description": "APP使用",
+        "operationId": "queryMyAbnormalUsingGET",
+        "produces": [
+          "*/*"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "originalRef": "统一返回结果«List«巡检异常VO»»",
+              "$ref": "#/definitions/统一返回结果«List«巡检异常VO»»"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "deprecated": false,
+        "x-order": "2147483647"
+      }
+    },
+    "/yx/inspectionAbnormal/queryPage": {
+      "get": {
+        "tags": [
+          "巡检异常"
+        ],
+        "summary": "分页查询巡检异常的纪录",
+        "operationId": "queryPageUsingGET",
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "name": "auditResult",
+            "in": "query",
+            "description": "审核结果.误报:0;问题:1;安全隐患:2",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "auditState",
+            "in": "query",
+            "description": "审核状态.待审核:0;处理中:1;已处理:2",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "departmentId",
+            "in": "query",
+            "description": "组织机构id",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "description": "巡检结束时间,字符串格式:yyyy-MM-dd HH:mm:ss",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "inspectionType",
+            "in": "query",
+            "description": "巡检类型：日常巡检-1；专业点检-2；精密点检-3；辅助纪录-4；",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "pageNum",
+            "in": "query",
+            "description": "页码",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "description": "显示数",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "planName",
+            "in": "query",
+            "description": "计划名称",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "startDate",
+            "in": "query",
+            "description": "巡检开始时间,字符串格式:yyyy-MM-dd HH:mm:ss",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "originalRef": "统一返回结果«PageInfo«巡检异常VO»»",
+              "$ref": "#/definitions/统一返回结果«PageInfo«巡检异常VO»»"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "deprecated": false,
+        "x-order": "2147483647"
+      }
+    },
+    "/yx/inspectionContent/delete/{contentId}": {
+      "delete": {
+        "tags": [
+          "巡检内容"
+        ],
+        "summary": "删除巡检内容",
+        "operationId": "deleteUsingDELETE_22",
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "name": "contentId",
+            "in": "path",
+            "description": "contentId",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "originalRef": "统一返回结果",
+              "$ref": "#/definitions/统一返回结果"
+            }
+          },
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "deprecated": false,
+        "x-order": "2147483647"
+      }
+    },
+    "/yx/inspectionContent/getPageContent": {
+      "get": {
+        "tags": [
+          "巡检内容"
+        ],
+        "summary": "分页查询巡检内容",
+        "operationId": "getPageContentUsingGET",
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "name": "contentCode",
+            "in": "query",
+            "description": "内容编号",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "contentName",
+            "in": "query",
+            "description": "内容名称",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "inspectionBenchmark",
+            "in": "query",
+            "description": "巡检基准",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "pageNum",
+            "in": "query",
+            "description": "页码",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "description": "显示数",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "originalRef": "统一返回结果«PageInfo«巡检内容VO»»",
+              "$ref": "#/definitions/统一返回结果«PageInfo«巡检内容VO»»"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "deprecated": false,
+        "x-order": "2147483647"
+      }
+    },
+    "/yx/inspectionContent/save": {
+      "post": {
+        "tags": [
+          "巡检内容"
+        ],
+        "summary": "保存或修改巡检内容",
+        "operationId": "addUsingPOST",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "dto",
+            "description": "dto",
+            "required": true,
+            "schema": {
+              "originalRef": "添加或修改巡检内容dto",
+              "$ref": "#/definitions/添加或修改巡检内容dto"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "originalRef": "统一返回结果",
+              "$ref": "#/definitions/统一返回结果"
+            }
+          },
+          "201": {
+            "description": "Created"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "deprecated": false,
+        "x-order": "2147483647"
+      }
+    },
+    "/yx/inspectionPlace/delete/{placeId}": {
+      "delete": {
+        "tags": [
+          "巡检地点"
+        ],
+        "summary": "删除巡检地点",
+        "operationId": "deleteUsingDELETE_23",
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "name": "placeId",
+            "in": "path",
+            "description": "placeId",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "originalRef": "统一返回结果",
+              "$ref": "#/definitions/统一返回结果"
+            }
+          },
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "deprecated": false,
+        "x-order": "2147483647"
+      }
+    },
+    "/yx/inspectionPlace/getDetailById/{placeId}": {
+      "get": {
+        "tags": [
+          "巡检地点"
+        ],
+        "summary": "根据id查询巡检地点详情",
+        "operationId": "getDetailByIdUsingGET",
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "name": "placeId",
+            "in": "path",
+            "description": "placeId",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "originalRef": "统一返回结果«巡检地点VO»",
+              "$ref": "#/definitions/统一返回结果«巡检地点VO»"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "deprecated": false,
+        "x-order": "2147483647"
+      }
+    },
+    "/yx/inspectionPlace/queryByPage": {
+      "get": {
+        "tags": [
+          "巡检地点"
+        ],
+        "summary": "分页查询巡检地点",
+        "operationId": "queryByPageUsingGET_2",
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "name": "departmentId",
+            "in": "query",
+            "description": "组织机构id",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "fuzzyQuery",
+            "in": "query",
+            "description": "点位名称/编号模糊查询",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "pageNum",
+            "in": "query",
+            "description": "页码",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "description": "显示数",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "originalRef": "统一返回结果«PageInfo«巡检地点VO»»",
+              "$ref": "#/definitions/统一返回结果«PageInfo«巡检地点VO»»"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "deprecated": false,
+        "x-order": "2147483647"
+      }
+    },
+    "/yx/inspectionPlace/save": {
+      "post": {
+        "tags": [
+          "巡检地点"
+        ],
+        "summary": "保存或修改巡检地点",
+        "operationId": "addUsingPOST_1",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "dto",
+            "description": "dto",
+            "required": true,
+            "schema": {
+              "originalRef": "添加或修改巡检地点dto",
+              "$ref": "#/definitions/添加或修改巡检地点dto"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "originalRef": "统一返回结果",
+              "$ref": "#/definitions/统一返回结果"
+            }
+          },
+          "201": {
+            "description": "Created"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "deprecated": false,
+        "x-order": "2147483647"
+      }
+    },
+    "/yx/inspectionPlan/changeState": {
+      "post": {
+        "tags": [
+          "巡检计划"
+        ],
+        "summary": "切换计划状态",
+        "operationId": "changeStateUsingPOST",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "dto",
+            "description": "dto",
+            "required": true,
+            "schema": {
+              "originalRef": "切换计划状态dto",
+              "$ref": "#/definitions/切换计划状态dto"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "originalRef": "统一返回结果",
+              "$ref": "#/definitions/统一返回结果"
+            }
+          },
+          "201": {
+            "description": "Created"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "deprecated": false,
+        "x-order": "2147483647"
+      }
+    },
+    "/yx/inspectionPlan/delete/{planId}": {
+      "delete": {
+        "tags": [
+          "巡检计划"
+        ],
+        "summary": "删除巡检计划",
+        "operationId": "deleteUsingDELETE_24",
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "name": "planId",
+            "in": "path",
+            "description": "planId",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "originalRef": "统一返回结果",
+              "$ref": "#/definitions/统一返回结果"
+            }
+          },
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "deprecated": false,
+        "x-order": "2147483647"
+      }
+    },
+    "/yx/inspectionPlan/getById/{planId}": {
+      "get": {
+        "tags": [
+          "巡检计划"
+        ],
+        "summary": "查询指定计划id的信息",
+        "operationId": "getByIdUsingGET_5",
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "name": "planId",
+            "in": "path",
+            "description": "planId",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "originalRef": "统一返回结果«巡检计划VO»",
+              "$ref": "#/definitions/统一返回结果«巡检计划VO»"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "deprecated": false,
+        "x-order": "2147483647"
+      }
+    },
+    "/yx/inspectionPlan/getRemindById/{planId}": {
+      "get": {
+        "tags": [
+          "巡检计划"
+        ],
+        "summary": "获取指定计划的提醒设置信息",
+        "operationId": "getRemindByIdUsingGET",
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "name": "planId",
+            "in": "path",
+            "description": "planId",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "originalRef": "统一返回结果«巡检计划提醒设置VO»",
+              "$ref": "#/definitions/统一返回结果«巡检计划提醒设置VO»"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "deprecated": false,
+        "x-order": "2147483647"
+      }
+    },
+    "/yx/inspectionPlan/groupBystate": {
+      "get": {
+        "tags": [
+          "巡检计划"
+        ],
+        "summary": "按条件查询巡检计划各个状态的数量",
+        "operationId": "groupByStateUsingGET_1",
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "name": "departmentId",
+            "in": "query",
+            "description": "组织机构id",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "inspectionType",
+            "in": "query",
+            "description": "巡检类型",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "planName",
+            "in": "query",
+            "description": "计划名称模糊查询",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "originalRef": "统一返回结果«List«巡检计划分状态统计»»",
+              "$ref": "#/definitions/统一返回结果«List«巡检计划分状态统计»»"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "deprecated": false,
+        "x-order": "2147483647"
+      }
+    },
+    "/yx/inspectionPlan/queryByPage": {
+      "get": {
+        "tags": [
+          "巡检计划"
+        ],
+        "summary": "分页查询部门下的巡检计划",
+        "description": "分页查询部门下的巡检计划",
+        "operationId": "queryByPageUsingGET_3",
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "name": "departmentId",
+            "in": "query",
+            "description": "组织机构id",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "inspectionType",
+            "in": "query",
+            "description": "巡检类型",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "pageNum",
+            "in": "query",
+            "description": "页码",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "description": "显示数",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "planName",
+            "in": "query",
+            "description": "计划名称模糊查询",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "planState",
+            "in": "query",
+            "description": "状态：待提交-1；发布-2；停用-3",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "originalRef": "统一返回结果«PageInfo«巡检计划VO»»",
+              "$ref": "#/definitions/统一返回结果«PageInfo«巡检计划VO»»"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "deprecated": false,
+        "x-order": "2147483647"
+      }
+    },
+    "/yx/inspectionPlan/remindSet/{planId}": {
+      "post": {
+        "tags": [
+          "巡检计划"
+        ],
+        "summary": "设置计划提醒",
+        "operationId": "remindSetUsingPOST",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "dto",
+            "description": "dto",
+            "required": true,
+            "schema": {
+              "originalRef": "添加或修改巡检计划提醒dto",
+              "$ref": "#/definitions/添加或修改巡检计划提醒dto"
+            }
+          },
+          {
+            "name": "planId",
+            "in": "path",
+            "description": "planId",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "originalRef": "统一返回结果",
+              "$ref": "#/definitions/统一返回结果"
+            }
+          },
+          "201": {
+            "description": "Created"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "deprecated": false,
+        "x-order": "2147483647"
+      }
+    },
+    "/yx/inspectionPlan/save": {
+      "post": {
+        "tags": [
+          "巡检计划"
+        ],
+        "summary": "保存或修改巡检计划",
+        "operationId": "addUsingPOST_2",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "dto",
+            "description": "dto",
+            "required": true,
+            "schema": {
+              "originalRef": "添加或修改巡检计划dto",
+              "$ref": "#/definitions/添加或修改巡检计划dto"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "originalRef": "统一返回结果",
+              "$ref": "#/definitions/统一返回结果"
+            }
+          },
+          "201": {
+            "description": "Created"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "deprecated": false,
+        "x-order": "2147483647"
+      }
+    },
+    "/yx/inspectionPlanLine/deleteLine/{id}": {
+      "delete": {
+        "tags": [
+          "巡检路线"
+        ],
+        "summary": "删除巡检路线",
+        "operationId": "deleteLineUsingDELETE",
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "id",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "originalRef": "统一返回结果",
+              "$ref": "#/definitions/统一返回结果"
+            }
+          },
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "deprecated": false,
+        "x-order": "2147483647"
+      }
+    },
+    "/yx/inspectionPlanLine/getLineById/{id}": {
+      "get": {
+        "tags": [
+          "巡检路线"
+        ],
+        "summary": "按路线ID查询巡检路线",
+        "operationId": "getLineByIdUsingGET",
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "id",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "originalRef": "统一返回结果«YxInspectionLineVO»",
+              "$ref": "#/definitions/统一返回结果«YxInspectionLineVO»"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "deprecated": false,
+        "x-order": "2147483647"
+      }
+    },
+    "/yx/inspectionPlanLine/queryLine": {
+      "get": {
+        "tags": [
+          "巡检路线"
+        ],
+        "summary": "分页查询巡检路线",
+        "operationId": "queryLineUsingGET",
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "name": "lineName",
+            "in": "query",
+            "description": "路线名称",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "pageNum",
+            "in": "query",
+            "description": "页码",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "description": "显示数",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "originalRef": "统一返回结果«PageInfo«YxInspectionLineVO»»",
+              "$ref": "#/definitions/统一返回结果«PageInfo«YxInspectionLineVO»»"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "deprecated": false,
+        "x-order": "2147483647"
+      }
+    },
+    "/yx/inspectionPlanLine/saveOrUpdateLine": {
+      "post": {
+        "tags": [
+          "巡检路线"
+        ],
+        "summary": "保存或修改巡检路线",
+        "operationId": "saveOrUpdateLineUsingPOST",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "dto",
+            "description": "dto",
+            "required": true,
+            "schema": {
+              "originalRef": "添加或修改巡检路线",
+              "$ref": "#/definitions/添加或修改巡检路线"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "originalRef": "统一返回结果",
+              "$ref": "#/definitions/统一返回结果"
+            }
+          },
+          "201": {
+            "description": "Created"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "deprecated": false,
+        "x-order": "2147483647"
+      }
+    },
+    "/yx/inspectionPlanScheduleConfigure/generateTask": {
+      "get": {
+        "tags": [
+          "巡检计划排班"
+        ],
+        "summary": "生成指定计划/年份的任务班次",
+        "operationId": "generateTaskUsingGET",
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "name": "planId",
+            "in": "query",
+            "description": "计划id",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "year",
+            "in": "query",
+            "description": "年份数",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "originalRef": "统一返回结果",
+              "$ref": "#/definitions/统一返回结果"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "deprecated": false,
+        "x-order": "2147483647"
+      }
+    },
+    "/yx/inspectionPlanScheduleConfigure/getByPlanIdAndYear": {
+      "get": {
+        "tags": [
+          "巡检计划排班"
+        ],
+        "summary": "查询指定计划/年份的排班信息",
+        "operationId": "getByPlanIdAndYearUsingGET_1",
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "name": "planId",
+            "in": "query",
+            "description": "计划id",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "year",
+            "in": "query",
+            "description": "年份数",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "originalRef": "统一返回结果«List«巡检计划排班配置详情VO»»",
+              "$ref": "#/definitions/统一返回结果«List«巡检计划排班配置详情VO»»"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "deprecated": false,
+        "x-order": "2147483647"
+      }
+    },
+    "/yx/inspectionPlanScheduleConfigure/getByPlanIdAndYearAndType": {
+      "get": {
+        "tags": [
+          "巡检计划排班"
+        ],
+        "summary": "查询指定计划/年份/类型的排班信息",
+        "operationId": "getByPlanIdAndYearUsingGET",
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "name": "planId",
+            "in": "query",
+            "description": "计划id",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "scheduleType",
+            "in": "query",
+            "description": "排班类型:专人;专岗",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "year",
+            "in": "query",
+            "description": "年份数",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "originalRef": "统一返回结果«巡检计划排班配置VO»",
+              "$ref": "#/definitions/统一返回结果«巡检计划排班配置VO»"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "deprecated": false,
+        "x-order": "2147483647"
+      }
+    },
+    "/yx/inspectionPlanScheduleConfigure/save": {
+      "post": {
+        "tags": [
+          "巡检计划排班"
+        ],
+        "summary": "保存或修改巡检计划排班配置",
+        "operationId": "saveUsingPOST_15",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "dto",
+            "description": "dto",
+            "required": true,
+            "schema": {
+              "originalRef": "添加或修改巡检计划排班配置vo",
+              "$ref": "#/definitions/添加或修改巡检计划排班配置vo"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "originalRef": "统一返回结果",
+              "$ref": "#/definitions/统一返回结果"
+            }
+          },
+          "201": {
+            "description": "Created"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "deprecated": false,
+        "x-order": "2147483647"
+      }
+    },
+    "/yx/inspectionPlanScheduleRecord/getExecuteInfoById/{executeRecordId}": {
+      "get": {
+        "tags": [
+          "巡检班次执行"
+        ],
+        "summary": "查看指定执行纪录的详情",
+        "operationId": "getExecuteInfoByIdUsingGET",
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "name": "executeRecordId",
+            "in": "path",
+            "description": "executeRecordId",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "originalRef": "统一返回结果«巡检异常VO»",
+              "$ref": "#/definitions/统一返回结果«巡检异常VO»"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "deprecated": false,
+        "x-order": "2147483647"
+      }
+    },
+    "/yx/inspectionPlanScheduleRecord/infoByScheduleRecorId/{scheduleRecordId}": {
+      "get": {
+        "tags": [
+          "巡检班次执行"
+        ],
+        "summary": "查看指定班次的执行纪录详情",
+        "description": "web页面使",
+        "operationId": "infoByScheduleRecorIdUsingGET",
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "name": "scheduleRecordId",
+            "in": "path",
+            "description": "scheduleRecordId",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "originalRef": "统一返回结果«巡检计划班次执行纪录VO»",
+              "$ref": "#/definitions/统一返回结果«巡检计划班次执行纪录VO»"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "deprecated": false,
+        "x-order": "2147483647"
+      }
+    },
+    "/yx/inspectionPlanScheduleRecord/placeMark": {
+      "post": {
+        "tags": [
+          "巡检班次执行"
+        ],
+        "summary": "巡检点打卡/现场拍照",
+        "operationId": "placeMarkUsingPOST",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "dto",
+            "description": "dto",
+            "required": true,
+            "schema": {
+              "originalRef": "YxInspectionMarkDTO",
+              "$ref": "#/definitions/YxInspectionMarkDTO"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "originalRef": "统一返回结果",
+              "$ref": "#/definitions/统一返回结果"
+            }
+          },
+          "201": {
+            "description": "Created"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "deprecated": false,
+        "x-order": "2147483647"
+      }
+    },
+    "/yx/inspectionPlanScheduleRecord/queryMyInspection": {
+      "get": {
+        "tags": [
+          "巡检任务班次"
+        ],
+        "summary": "查询当前登录用户的巡检概览",
+        "description": "返回当前用户巡检任务状态数量及待执行纪录",
+        "operationId": "queryMyInspectionUsingGET",
+        "produces": [
+          "*/*"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "originalRef": "统一返回结果«我的巡检计划排班纪录VO»",
+              "$ref": "#/definitions/统一返回结果«我的巡检计划排班纪录VO»"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "deprecated": false,
+        "x-order": "2147483647"
+      }
+    },
+    "/yx/inspectionPlanScheduleRecord/queryMyTask": {
+      "get": {
+        "tags": [
+          "巡检任务班次"
+        ],
+        "summary": "查询当前登录用户的巡检任务",
+        "operationId": "queryMyTaskUsingGET",
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "name": "isCompleted",
+            "in": "query",
+            "description": "是否已完成,否则查询待执行的",
+            "required": true,
+            "type": "boolean"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "originalRef": "统一返回结果«List«巡检任务信息VO»»",
+              "$ref": "#/definitions/统一返回结果«List«巡检任务信息VO»»"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "deprecated": false,
+        "x-order": "2147483647"
+      }
+    },
+    "/yx/inspectionPlanScheduleRecord/queryPage": {
+      "get": {
+        "tags": [
+          "巡检任务班次"
+        ],
+        "summary": "分页查询执行纪录",
+        "description": "仅返回已经提交的排班记录,巡检纪录页面使用",
+        "operationId": "queryPageUsingGET_1",
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "name": "abnormal",
+            "in": "query",
+            "description": "是否异常",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "departmentId",
+            "in": "query",
+            "description": "组织机构id",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "description": "巡检结束时间,字符串格式:yyyy-MM-dd HH:mm:ss",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "pageNum",
+            "in": "query",
+            "description": "页码",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "description": "显示数",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "postId",
+            "in": "query",
+            "description": "岗位id",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "startDate",
+            "in": "query",
+            "description": "巡检开始时间,字符串格式:yyyy-MM-dd HH:mm:ss",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "taskName",
+            "in": "query",
+            "description": "任务名称",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "originalRef": "统一返回结果«PageInfo«巡检计划排班纪录分页VO»»",
+              "$ref": "#/definitions/统一返回结果«PageInfo«巡检计划排班纪录分页VO»»"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "deprecated": false,
+        "x-order": "2147483647"
+      }
+    },
+    "/yx/inspectionPlanScheduleRecord/queryPageByDepartmentAndDate": {
+      "get": {
+        "tags": [
+          "巡检任务班次"
+        ],
+        "summary": "分页查询指定公司部门及年月的执行纪录",
+        "description": "仅返回已经提交的排班记录,巡检纪录页面使用",
+        "operationId": "queryPageByDepartmentAndDateUsingGET",
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "query",
+            "description": "公司id",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "departmentId",
+            "in": "query",
+            "description": "组织机构id",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "month",
+            "in": "query",
+            "description": "月份,取值为1-12",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "pageNum",
+            "in": "query",
+            "description": "页码",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "description": "显示数",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "year",
+            "in": "query",
+            "description": "年份",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "originalRef": "统一返回结果«巡检计划执行纪录统计VO»",
+              "$ref": "#/definitions/统一返回结果«巡检计划执行纪录统计VO»"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "deprecated": false,
+        "x-order": "2147483647"
+      }
+    },
+    "/yx/inspectionPlanScheduleRecord/queryPageByOnePlan": {
+      "get": {
+        "tags": [
+          "巡检任务班次"
+        ],
+        "summary": "分页查询指定计划和年份的排班或执行纪录",
+        "description": "isExecute为true返回执行纪录,为false返回排班记录",
+        "operationId": "queryPageByOnePlanUsingGET",
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "name": "isExecute",
+            "in": "query",
+            "description": "是否已执行巡检",
+            "required": true,
+            "type": "boolean"
+          },
+          {
+            "name": "pageNum",
+            "in": "query",
+            "description": "页码",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "description": "显示数",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "planId",
+            "in": "query",
+            "description": "计划id",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "year",
+            "in": "query",
+            "description": "年份",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "originalRef": "统一返回结果«PageInfo«巡检计划排班纪录VO»»",
+              "$ref": "#/definitions/统一返回结果«PageInfo«巡检计划排班纪录VO»»"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "deprecated": false,
+        "x-order": "2147483647"
+      }
+    },
+    "/yx/inspectionPlanScheduleRecord/queryTaskDetails": {
+      "get": {
+        "tags": [
+          "巡检班次执行"
+        ],
+        "summary": "查询指定班次和巡检人的任务执行详情",
+        "description": "用App端使用,不指定用户id则查询当前登录用户",
+        "operationId": "queryTaskDetailsUsingGET",
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "name": "scheduleRecordId",
+            "in": "query",
+            "description": "任务班次id",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "userId",
+            "in": "query",
+            "description": "执行用户id,为空则查询当前登录用户",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "originalRef": "统一返回结果«巡检任务执行详情VO»",
+              "$ref": "#/definitions/统一返回结果«巡检任务执行详情VO»"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "deprecated": false,
+        "x-order": "2147483647"
+      }
+    },
+    "/yx/inspectionPlanScheduleRecord/saveInspectionPlace": {
+      "post": {
+        "tags": [
+          "巡检班次执行"
+        ],
+        "summary": "保存班次任务的巡检点巡检结果",
+        "description": "对应app中的[保存巡检数据]按钮",
+        "operationId": "executeUsingPOST_1",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "dto",
+            "description": "dto",
+            "required": true,
+            "schema": {
+              "originalRef": "保存班次任务巡检点巡检结果dto",
+              "$ref": "#/definitions/保存班次任务巡检点巡检结果dto"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "originalRef": "统一返回结果",
+              "$ref": "#/definitions/统一返回结果"
+            }
+          },
+          "201": {
+            "description": "Created"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "deprecated": false,
+        "x-order": "2147483647"
+      }
+    },
+    "/yx/inspectionPlanScheduleRecord/saveTemporaryScheduleRecord": {
+      "post": {
+        "tags": [
+          "巡检任务班次"
+        ],
+        "summary": "添加临时班次",
+        "operationId": "saveTemporaryScheduleRecordUsingPOST",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "dto",
+            "description": "dto",
+            "required": true,
+            "schema": {
+              "originalRef": "临时排班任务DTO",
+              "$ref": "#/definitions/临时排班任务DTO"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "originalRef": "统一返回结果",
+              "$ref": "#/definitions/统一返回结果"
+            }
+          },
+          "201": {
+            "description": "Created"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "deprecated": false,
+        "x-order": "2147483647"
+      }
+    },
+    "/yx/inspectionPlanScheduleRecord/submit/{scheduleRecordId}": {
+      "post": {
+        "tags": [
+          "巡检班次执行"
+        ],
+        "summary": "提交班次巡检任务",
+        "description": "对应app中的[巡检完毕]按钮",
+        "operationId": "executeUsingPOST_2",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "name": "scheduleRecordId",
+            "in": "path",
+            "description": "scheduleRecordId",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "originalRef": "统一返回结果",
+              "$ref": "#/definitions/统一返回结果"
+            }
+          },
+          "201": {
+            "description": "Created"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "deprecated": false,
+        "x-order": "2147483647"
+      }
+    },
+    "/yx/inspectionPlanViolationRecord/audit": {
+      "post": {
+        "tags": [
+          "巡检违规"
+        ],
+        "summary": "审核违规纪录",
+        "operationId": "auditUsingPOST_1",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "dto",
+            "description": "dto",
+            "required": true,
+            "schema": {
+              "originalRef": "审核违规纪录dto",
+              "$ref": "#/definitions/审核违规纪录dto"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "originalRef": "统一返回结果",
+              "$ref": "#/definitions/统一返回结果"
+            }
+          },
+          "201": {
+            "description": "Created"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "deprecated": false,
+        "x-order": "2147483647"
+      }
+    },
+    "/yx/inspectionPlanViolationRecord/getById/{violationId}": {
+      "get": {
+        "tags": [
+          "巡检违规"
+        ],
+        "summary": "查询指定id的违规纪录",
+        "operationId": "getByIdUsingGET_6",
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "name": "violationId",
+            "in": "path",
+            "description": "violationId",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "originalRef": "统一返回结果«巡检计划班次违规VO»",
+              "$ref": "#/definitions/统一返回结果«巡检计划班次违规VO»"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "deprecated": false,
+        "x-order": "2147483647"
+      }
+    },
+    "/yx/inspectionPlanViolationRecord/groupByAuditResult": {
+      "get": {
+        "tags": [
+          "巡检违规"
+        ],
+        "summary": "按条件查询违规纪录各个审核结果的数量",
+        "operationId": "groupByAuditResultUsingGET",
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "name": "departmentId",
+            "in": "query",
+            "description": "组织机构id",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "description": "违规结束时间,字符串格式:yyyy-MM-dd HH:mm:ss",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "planName",
+            "in": "query",
+            "description": "计划名称",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "postId",
+            "in": "query",
+            "description": "岗位id",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "startDate",
+            "in": "query",
+            "description": "违规开始时间,字符串格式:yyyy-MM-dd HH:mm:ss",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "violationType",
+            "in": "query",
+            "description": "违规类型.未按时做:NOT_ON_TIME;未做:NOT_DONE",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "originalRef": "统一返回结果«List«巡检违规分审核结果统计数量»»",
+              "$ref": "#/definitions/统一返回结果«List«巡检违规分审核结果统计数量»»"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "deprecated": false,
+        "x-order": "2147483647"
+      }
+    },
+    "/yx/inspectionPlanViolationRecord/queryMyViolation": {
+      "get": {
+        "tags": [
+          "巡检违规"
+        ],
+        "summary": "查询我的违规纪录",
+        "description": "APP使用",
+        "operationId": "queryMyViolationUsingGET",
+        "produces": [
+          "*/*"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "originalRef": "统一返回结果«List«巡检计划班次违规VO»»",
+              "$ref": "#/definitions/统一返回结果«List«巡检计划班次违规VO»»"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "deprecated": false,
+        "x-order": "2147483647"
+      }
+    },
+    "/yx/inspectionPlanViolationRecord/queryPage": {
+      "get": {
+        "tags": [
+          "巡检违规"
+        ],
+        "summary": "分页查询执行纪录中的违规纪录",
+        "operationId": "queryPageUsingGET_2",
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "name": "auditResult",
+            "in": "query",
+            "description": "审核结果",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "departmentId",
+            "in": "query",
+            "description": "组织机构id",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "description": "违规结束时间,字符串格式:yyyy-MM-dd HH:mm:ss",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "pageNum",
+            "in": "query",
+            "description": "页码",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "description": "显示数",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "planName",
+            "in": "query",
+            "description": "计划名称",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "postId",
+            "in": "query",
+            "description": "岗位id",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "startDate",
+            "in": "query",
+            "description": "违规开始时间,字符串格式:yyyy-MM-dd HH:mm:ss",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "violationType",
+            "in": "query",
+            "description": "违规类型.未按时做:NOT_ON_TIME;未做:NOT_DONE",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "originalRef": "统一返回结果«PageInfo«巡检计划班次违规VO»»",
+              "$ref": "#/definitions/统一返回结果«PageInfo«巡检计划班次违规VO»»"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "deprecated": false,
+        "x-order": "2147483647"
+      }
+    },
+    "/yx/inspectionSafeRecord/auditSafeRecord": {
+      "post": {
+        "tags": [
+          "巡检安全记录"
+        ],
+        "summary": "审核安全记录",
+        "operationId": "auditSafeRecordUsingPOST",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "name": "auditOpinion",
+            "in": "query",
+            "description": "审核意见",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "auditResult",
+            "in": "query",
+            "description": "审核结果,0:安全|1:误操作",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "in": "query",
+            "description": "记录ID",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "originalRef": "统一返回结果«string»",
+              "$ref": "#/definitions/统一返回结果«string»"
+            }
+          },
+          "201": {
+            "description": "Created"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "deprecated": false,
+        "x-order": "2147483647"
+      }
+    },
+    "/yx/inspectionSafeRecord/deleteSafeRecord/{id}": {
+      "post": {
+        "tags": [
+          "巡检安全记录"
+        ],
+        "summary": "删除安全记录",
+        "operationId": "deleteSafeRecordUsingPOST",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "id",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "originalRef": "统一返回结果«string»",
+              "$ref": "#/definitions/统一返回结果«string»"
+            }
+          },
+          "201": {
+            "description": "Created"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "deprecated": false,
+        "x-order": "2147483647"
+      }
+    },
+    "/yx/inspectionSafeRecord/doneSos": {
+      "post": {
+        "tags": [
+          "巡检安全记录"
+        ],
+        "summary": "紧急报警SOS",
+        "operationId": "doneSosUsingPOST",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "name": "geoInfo",
+            "in": "query",
+            "description": "位置信息",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "scheduleRecordId",
+            "in": "query",
+            "description": "任务班次id",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "originalRef": "统一返回结果«string»",
+              "$ref": "#/definitions/统一返回结果«string»"
+            }
+          },
+          "201": {
+            "description": "Created"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "deprecated": false,
+        "x-order": "2147483647"
+      }
+    },
+    "/yx/inspectionSafeRecord/querySafeRecord": {
+      "get": {
+        "tags": [
+          "巡检安全记录"
+        ],
+        "summary": "查询安全记录",
+        "operationId": "querySafeRecordUsingGET",
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "name": "auditResult",
+            "in": "query",
+            "description": "结果",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "pageNum",
+            "in": "query",
+            "description": "页码",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "description": "显示数",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "planName",
+            "in": "query",
+            "description": "计划名称",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "reportTimeEnd",
+            "in": "query",
+            "description": "上报时间结束",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "reportTimeStart",
+            "in": "query",
+            "description": "上报时间开始",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "originalRef": "统一返回结果«PageInfo«YxInspectionSafeRecordVO»»",
+              "$ref": "#/definitions/统一返回结果«PageInfo«YxInspectionSafeRecordVO»»"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "deprecated": false,
+        "x-order": "2147483647"
+      }
+    }
+  },
+  "definitions": {
+    "APP巡检审核结果VO": {
+      "type": "object",
+      "properties": {
+        "auditUserName": {
+          "type": "string",
+          "description": "其他处理人岗位及用户名"
+        },
+        "code": {
+          "type": "string",
+          "description": "结果状态.0:其他人正在处理;1:其他人已处理完毕;2:当前用户处理完成"
+        }
+      },
+      "title": "APP巡检审核结果VO"
+    },
+    "PageInfo«YxInspectionLineVO»": {
+      "type": "object",
+      "properties": {
+        "endRow": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "hasNextPage": {
+          "type": "boolean"
+        },
+        "hasPreviousPage": {
+          "type": "boolean"
+        },
+        "isFirstPage": {
+          "type": "boolean"
+        },
+        "isLastPage": {
+          "type": "boolean"
+        },
+        "list": {
+          "type": "array",
+          "items": {
+            "originalRef": "YxInspectionLineVO",
+            "$ref": "#/definitions/YxInspectionLineVO"
+          }
+        },
+        "navigateFirstPage": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "navigateLastPage": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "navigatePages": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "navigatepageNums": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "nextPage": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "pageNum": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "pageSize": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "pages": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "prePage": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "size": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "startRow": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "total": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      "title": "PageInfo«YxInspectionLineVO»"
+    },
+    "PageInfo«YxInspectionSafeRecordVO»": {
+      "type": "object",
+      "properties": {
+        "endRow": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "hasNextPage": {
+          "type": "boolean"
+        },
+        "hasPreviousPage": {
+          "type": "boolean"
+        },
+        "isFirstPage": {
+          "type": "boolean"
+        },
+        "isLastPage": {
+          "type": "boolean"
+        },
+        "list": {
+          "type": "array",
+          "items": {
+            "originalRef": "YxInspectionSafeRecordVO",
+            "$ref": "#/definitions/YxInspectionSafeRecordVO"
+          }
+        },
+        "navigateFirstPage": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "navigateLastPage": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "navigatePages": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "navigatepageNums": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "nextPage": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "pageNum": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "pageSize": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "pages": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "prePage": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "size": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "startRow": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "total": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      "title": "PageInfo«YxInspectionSafeRecordVO»"
+    },
+    "PageInfo«巡检内容VO»": {
+      "type": "object",
+      "properties": {
+        "endRow": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "hasNextPage": {
+          "type": "boolean"
+        },
+        "hasPreviousPage": {
+          "type": "boolean"
+        },
+        "isFirstPage": {
+          "type": "boolean"
+        },
+        "isLastPage": {
+          "type": "boolean"
+        },
+        "list": {
+          "type": "array",
+          "items": {
+            "originalRef": "巡检内容VO",
+            "$ref": "#/definitions/巡检内容VO"
+          }
+        },
+        "navigateFirstPage": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "navigateLastPage": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "navigatePages": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "navigatepageNums": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "nextPage": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "pageNum": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "pageSize": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "pages": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "prePage": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "size": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "startRow": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "total": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      "title": "PageInfo«巡检内容VO»"
+    },
+    "PageInfo«巡检地点VO»": {
+      "type": "object",
+      "properties": {
+        "endRow": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "hasNextPage": {
+          "type": "boolean"
+        },
+        "hasPreviousPage": {
+          "type": "boolean"
+        },
+        "isFirstPage": {
+          "type": "boolean"
+        },
+        "isLastPage": {
+          "type": "boolean"
+        },
+        "list": {
+          "type": "array",
+          "items": {
+            "originalRef": "巡检地点VO",
+            "$ref": "#/definitions/巡检地点VO"
+          }
+        },
+        "navigateFirstPage": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "navigateLastPage": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "navigatePages": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "navigatepageNums": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "nextPage": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "pageNum": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "pageSize": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "pages": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "prePage": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "size": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "startRow": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "total": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      "title": "PageInfo«巡检地点VO»"
+    },
+    "PageInfo«巡检异常VO»": {
+      "type": "object",
+      "properties": {
+        "endRow": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "hasNextPage": {
+          "type": "boolean"
+        },
+        "hasPreviousPage": {
+          "type": "boolean"
+        },
+        "isFirstPage": {
+          "type": "boolean"
+        },
+        "isLastPage": {
+          "type": "boolean"
+        },
+        "list": {
+          "type": "array",
+          "items": {
+            "originalRef": "巡检异常VO",
+            "$ref": "#/definitions/巡检异常VO"
+          }
+        },
+        "navigateFirstPage": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "navigateLastPage": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "navigatePages": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "navigatepageNums": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "nextPage": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "pageNum": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "pageSize": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "pages": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "prePage": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "size": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "startRow": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "total": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      "title": "PageInfo«巡检异常VO»"
+    },
+    "PageInfo«巡检计划VO»": {
+      "type": "object",
+      "properties": {
+        "endRow": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "hasNextPage": {
+          "type": "boolean"
+        },
+        "hasPreviousPage": {
+          "type": "boolean"
+        },
+        "isFirstPage": {
+          "type": "boolean"
+        },
+        "isLastPage": {
+          "type": "boolean"
+        },
+        "list": {
+          "type": "array",
+          "items": {
+            "originalRef": "巡检计划VO",
+            "$ref": "#/definitions/巡检计划VO"
+          }
+        },
+        "navigateFirstPage": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "navigateLastPage": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "navigatePages": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "navigatepageNums": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "nextPage": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "pageNum": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "pageSize": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "pages": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "prePage": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "size": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "startRow": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "total": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      "title": "PageInfo«巡检计划VO»"
+    },
+    "PageInfo«巡检计划排班纪录VO»": {
+      "type": "object",
+      "properties": {
+        "endRow": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "hasNextPage": {
+          "type": "boolean"
+        },
+        "hasPreviousPage": {
+          "type": "boolean"
+        },
+        "isFirstPage": {
+          "type": "boolean"
+        },
+        "isLastPage": {
+          "type": "boolean"
+        },
+        "list": {
+          "type": "array",
+          "items": {
+            "originalRef": "巡检计划排班纪录VO",
+            "$ref": "#/definitions/巡检计划排班纪录VO"
+          }
+        },
+        "navigateFirstPage": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "navigateLastPage": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "navigatePages": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "navigatepageNums": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "nextPage": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "pageNum": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "pageSize": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "pages": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "prePage": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "size": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "startRow": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "total": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      "title": "PageInfo«巡检计划排班纪录VO»"
+    },
+    "PageInfo«巡检计划排班纪录分页VO»": {
+      "type": "object",
+      "properties": {
+        "endRow": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "hasNextPage": {
+          "type": "boolean"
+        },
+        "hasPreviousPage": {
+          "type": "boolean"
+        },
+        "isFirstPage": {
+          "type": "boolean"
+        },
+        "isLastPage": {
+          "type": "boolean"
+        },
+        "list": {
+          "type": "array",
+          "items": {
+            "originalRef": "巡检计划排班纪录分页VO",
+            "$ref": "#/definitions/巡检计划排班纪录分页VO"
+          }
+        },
+        "navigateFirstPage": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "navigateLastPage": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "navigatePages": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "navigatepageNums": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "nextPage": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "pageNum": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "pageSize": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "pages": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "prePage": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "size": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "startRow": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "total": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      "title": "PageInfo«巡检计划排班纪录分页VO»"
+    },
+    "PageInfo«巡检计划班次违规VO»": {
+      "type": "object",
+      "properties": {
+        "endRow": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "hasNextPage": {
+          "type": "boolean"
+        },
+        "hasPreviousPage": {
+          "type": "boolean"
+        },
+        "isFirstPage": {
+          "type": "boolean"
+        },
+        "isLastPage": {
+          "type": "boolean"
+        },
+        "list": {
+          "type": "array",
+          "items": {
+            "originalRef": "巡检计划班次违规VO",
+            "$ref": "#/definitions/巡检计划班次违规VO"
+          }
+        },
+        "navigateFirstPage": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "navigateLastPage": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "navigatePages": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "navigatepageNums": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "nextPage": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "pageNum": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "pageSize": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "pages": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "prePage": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "size": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "startRow": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "total": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      "title": "PageInfo«巡检计划班次违规VO»"
+    },
+    "YxInspectionLineVO": {
+      "type": "object",
+      "properties": {
+        "contactPhone": {
+          "type": "string",
+          "description": "联系电话"
+        },
+        "createdTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "创建时间"
+        },
+        "directorId": {
+          "type": "string",
+          "description": "负责人id"
+        },
+        "directorName": {
+          "type": "string",
+          "description": "负责人名称"
+        },
+        "id": {
+          "type": "string",
+          "description": "主键"
+        },
+        "lineName": {
+          "type": "string",
+          "description": "巡检路线名称"
+        },
+        "remarks": {
+          "type": "string",
+          "description": "备注"
+        },
+        "yxInspectionLinePlaces": {
+          "type": "array",
+          "description": "巡检路线关联的点",
+          "items": {
+            "originalRef": "巡检路线关联巡检点YxInspectionLinePlaceVO",
+            "$ref": "#/definitions/巡检路线关联巡检点YxInspectionLinePlaceVO"
+          }
+        }
+      },
+      "title": "YxInspectionLineVO",
+      "description": "巡检路线YxInspectionLineVO"
+    },
+    "YxInspectionMarkDTO": {
+      "type": "object",
+      "required": [
+        "placeCode",
+        "scheduleRecordId"
+      ],
+      "properties": {
+        "geoInfo": {
+          "type": "string",
+          "description": "位置信息"
+        },
+        "markPhoto": {
+          "type": "string",
+          "description": "现场照片"
+        },
+        "markUserId": {
+          "type": "string",
+          "description": "用户id"
+        },
+        "placeCode": {
+          "type": "string",
+          "description": "巡检点code"
+        },
+        "scheduleRecordId": {
+          "type": "string",
+          "description": "班次纪录id"
+        }
+      },
+      "title": "YxInspectionMarkDTO"
+    },
+    "YxInspectionMarkInfo": {
+      "type": "object",
+      "properties": {
+        "markPhoto": {
+          "type": "string",
+          "description": "现场照片"
+        },
+        "markTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "打卡时间"
+        },
+        "markUserId": {
+          "type": "string",
+          "description": "打卡用户id"
+        },
+        "markUserName": {
+          "type": "string",
+          "description": "打卡用户名称"
+        }
+      },
+      "title": "YxInspectionMarkInfo",
+      "description": "巡检打卡/现场照片信息"
+    },
+    "YxInspectionSafeRecordVO": {
+      "type": "object",
+      "properties": {
+        "auditOpinion": {
+          "type": "string",
+          "description": "意见"
+        },
+        "auditResult": {
+          "type": "string",
+          "description": "结果,0:安全|1:误操作"
+        },
+        "auditState": {
+          "type": "string",
+          "description": "状态,0:待审核|1:已处理"
+        },
+        "departmentId": {
+          "type": "string",
+          "description": "部门id"
+        },
+        "departmentName": {
+          "type": "string",
+          "description": "部门名称"
+        },
+        "geoInfo": {
+          "type": "string",
+          "description": "位置信息"
+        },
+        "id": {
+          "type": "string",
+          "description": "主键"
+        },
+        "planId": {
+          "type": "string",
+          "description": "计划id"
+        },
+        "planName": {
+          "type": "string",
+          "description": "计划名称"
+        },
+        "postId": {
+          "type": "string",
+          "description": "岗位id"
+        },
+        "postName": {
+          "type": "string",
+          "description": "岗位名称"
+        },
+        "reportTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "上报时间"
+        },
+        "scheduleRecordId": {
+          "type": "string",
+          "description": "班次纪录id"
+        },
+        "taskName": {
+          "type": "string",
+          "description": "巡检班次/任务名称"
+        },
+        "userId": {
+          "type": "string",
+          "description": "人员id"
+        },
+        "userName": {
+          "type": "string",
+          "description": "人员名称"
+        }
+      },
+      "title": "YxInspectionSafeRecordVO",
+      "description": "巡检安全记录-YxInspectionSafeRecordVO"
+    },
+    "临时排班任务DTO": {
+      "type": "object",
+      "required": [
+        "executeUserIdList",
+        "expireHours",
+        "planId",
+        "postId",
+        "scheduleEndTime",
+        "scheduleStartTime",
+        "taskName"
+      ],
+      "properties": {
+        "completionCondition": {
+          "type": "integer",
+          "format": "int32",
+          "description": "班次任务完成条件：0-任意执行人巡检完成;1-所有执行人巡检完成"
+        },
+        "executeUserIdList": {
+          "type": "array",
+          "description": "巡检人id",
+          "items": {
+            "type": "string"
+          }
+        },
+        "expireHours": {
+          "type": "integer",
+          "format": "int32",
+          "description": "执行结束时间指定小时后任务过期"
+        },
+        "planId": {
+          "type": "string",
+          "description": "计划id"
+        },
+        "postId": {
+          "type": "string",
+          "description": "岗位id"
+        },
+        "remarks": {
+          "type": "string",
+          "description": "备注"
+        },
+        "scheduleEndTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "排班执行截止时间"
+        },
+        "scheduleStartTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "排班执行起始时间"
+        },
+        "taskName": {
+          "type": "string",
+          "description": "任务名称"
+        }
+      },
+      "title": "临时排班任务DTO"
+    },
+    "保存班次任务巡检点巡检结果dto": {
+      "type": "object",
+      "required": [
+        "contentDTOList",
+        "placeId",
+        "scheduleRecordId"
+      ],
+      "properties": {
+        "contentDTOList": {
+          "type": "array",
+          "description": "内容点检结果",
+          "items": {
+            "originalRef": "保存班次任务的内容点检结果dto",
+            "$ref": "#/definitions/保存班次任务的内容点检结果dto"
+          }
+        },
+        "placeId": {
+          "type": "string",
+          "description": "巡检点id"
+        },
+        "scheduleRecordId": {
+          "type": "string",
+          "description": "班次纪录id"
+        }
+      },
+      "title": "保存班次任务巡检点巡检结果dto"
+    },
+    "保存班次任务的内容点检结果dto": {
+      "type": "object",
+      "required": [
+        "abnormal",
+        "contentId",
+        "executeResult"
+      ],
+      "properties": {
+        "abnormal": {
+          "type": "boolean",
+          "description": "是否异常"
+        },
+        "audio": {
+          "type": "string",
+          "description": "巡检录音"
+        },
+        "contentId": {
+          "type": "string",
+          "description": "巡检内容id"
+        },
+        "executeResult": {
+          "type": "string",
+          "description": "巡检结果"
+        },
+        "photo": {
+          "type": "string",
+          "description": "巡检拍照"
+        },
+        "video": {
+          "type": "string",
+          "description": "巡检视频"
+        }
+      },
+      "title": "保存班次任务的内容点检结果dto"
+    },
+    "切换计划状态dto": {
+      "type": "object",
+      "required": [
+        "planId",
+        "planState"
+      ],
+      "properties": {
+        "planId": {
+          "type": "string",
+          "description": "计划id"
+        },
+        "planState": {
+          "type": "string",
+          "description": "变更状态：待提交-1；发布-2；停用-3"
+        }
+      },
+      "title": "切换计划状态dto"
+    },
+    "区域信息": {
+      "type": "object",
+      "properties": {
+        "coordinates": {
+          "type": "array",
+          "description": "区域顶点坐标信息",
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "number",
+                "format": "double"
+              }
+            }
+          }
+        },
+        "type": {
+          "type": "string"
+        }
+      },
+      "title": "区域信息"
+    },
+    "地图标注区域坐标信息": {
+      "type": "object",
+      "properties": {
+        "geometry": {
+          "originalRef": "区域信息",
+          "$ref": "#/definitions/区域信息"
+        },
+        "properties": {
+          "originalRef": "楼层信息",
+          "$ref": "#/definitions/楼层信息"
+        },
+        "type": {
+          "type": "string"
+        }
+      },
+      "title": "地图标注区域坐标信息"
+    },
+    "地图标注点坐标信息": {
+      "type": "object",
+      "properties": {
+        "x": {
+          "type": "number",
+          "format": "double",
+          "description": "x坐标"
+        },
+        "y": {
+          "type": "number",
+          "format": "double",
+          "description": "y坐标"
+        },
+        "z": {
+          "type": "number",
+          "format": "double",
+          "description": "z坐标"
+        }
+      },
+      "title": "地图标注点坐标信息"
+    },
+    "审核异常纪录dto": {
+      "type": "object",
+      "required": [
+        "auditResult",
+        "executeRecordId"
+      ],
+      "properties": {
+        "abnormalLevel": {
+          "type": "string",
+          "description": "异常级别"
+        },
+        "auditResult": {
+          "type": "string",
+          "description": "审核结果.误报:0;问题:1;"
+        },
+        "executeRecordId": {
+          "type": "string",
+          "description": "执行纪录id"
+        },
+        "problemDesc": {
+          "type": "string",
+          "description": "问题描述"
+        }
+      },
+      "title": "审核异常纪录dto"
+    },
+    "审核违规纪录dto": {
+      "type": "object",
+      "required": [
+        "auditResult",
+        "violationId"
+      ],
+      "properties": {
+        "auditResult": {
+          "type": "string",
+          "description": "审核结果.待审核:1;误报:2;确认违规:3"
+        },
+        "handlingOpinions": {
+          "type": "string",
+          "description": "处理意见"
+        },
+        "violationId": {
+          "type": "string",
+          "description": "违规纪录id"
+        }
+      },
+      "title": "审核违规纪录dto"
+    },
+    "巡检任务信息VO": {
+      "type": "object",
+      "properties": {
+        "expireTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "考核时间,即任务失效时间"
+        },
+        "inspectionPlaces": {
+          "type": "string",
+          "description": "任务巡检点（多个、分割）"
+        },
+        "scheduleRecordId": {
+          "type": "string",
+          "description": "班次纪录id"
+        },
+        "scheduleStartTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "下发时间,即任务排班开始时间"
+        },
+        "sendBy": {
+          "type": "string",
+          "description": "下发人"
+        },
+        "state": {
+          "type": "string",
+          "description": "任务状态.已逾期:OVERDUE;可执行:EXECUTABLE;正常处理:NORMAL_EXECUTED;逾期处理:OVERDUE_EXECUTED"
+        },
+        "taskName": {
+          "type": "string",
+          "description": "任务名称"
+        }
+      },
+      "title": "巡检任务信息VO"
+    },
+    "巡检任务执行详情VO": {
+      "type": "object",
+      "properties": {
+        "completionCondition": {
+          "type": "integer",
+          "format": "int32",
+          "description": "班次任务完成条件：0-任意执行人巡检完成;1-所有执行人巡检完成"
+        },
+        "cycleFiled": {
+          "type": "string",
+          "description": "巡检周期：日-DAY；周-WEEK；月-MONTH；年-YEAR"
+        },
+        "departmentName": {
+          "type": "string",
+          "description": "所属部门名称"
+        },
+        "executeUserNameList": {
+          "type": "array",
+          "description": "所有巡检人名称",
+          "items": {
+            "type": "string"
+          }
+        },
+        "frequency": {
+          "type": "integer",
+          "format": "int32",
+          "description": "周期内巡检班次数量"
+        },
+        "hmiUrl": {
+          "type": "string",
+          "description": "巡检线路组态画面访问地址"
+        },
+        "inspectionType": {
+          "type": "string",
+          "description": "巡检类型：日常巡检-1；专业点检-2；精密点检-3；辅助纪录-4；"
+        },
+        "planId": {
+          "type": "string",
+          "description": "巡检计划id"
+        },
+        "postName": {
+          "type": "string",
+          "description": "班次岗位名称"
+        },
+        "scheduleMode": {
+          "type": "string",
+          "description": "排班方式：周期排班-CYCLE；滚动排班-ROLL"
+        },
+        "scheduleRecordId": {
+          "type": "string",
+          "description": "班次纪录id"
+        },
+        "taskName": {
+          "type": "string",
+          "description": "任务名称"
+        },
+        "yxTaskPlaceInfoList": {
+          "type": "array",
+          "description": "计划下巡检点信息",
+          "items": {
+            "originalRef": "执行任务巡检点信息VO",
+            "$ref": "#/definitions/执行任务巡检点信息VO"
+          }
+        }
+      },
+      "title": "巡检任务执行详情VO"
+    },
+    "巡检内容VO": {
+      "type": "object",
+      "required": [
+        "contentCategory",
+        "contentCode",
+        "contentName",
+        "enable",
+        "inspectionModeList",
+        "sortOrder"
+      ],
+      "properties": {
+        "abnormalMustAudio": {
+          "type": "boolean",
+          "description": "异常强制录音"
+        },
+        "abnormalMustVideo": {
+          "type": "boolean",
+          "description": "异常强制视频"
+        },
+        "contentCategory": {
+          "type": "string",
+          "description": "内容分类,数据字典"
+        },
+        "contentCode": {
+          "type": "string",
+          "description": "巡检内容编号"
+        },
+        "contentName": {
+          "type": "string",
+          "description": "内容名称"
+        },
+        "dataOptionList": {
+          "type": "array",
+          "description": "数据选项集合，数据类别为单选则为各个选项的集合，为数值区间为单个开闭区间表达式对应的编号:1：a>x；  2：a≥x； 3：a<x；  4：a≤x；  5：[a,b]；    6：(a,b]；    7：[a,b)；    8：(a,b)；    ",
+          "items": {
+            "type": "string"
+          }
+        },
+        "dataType": {
+          "type": "string",
+          "description": "数据类别：单选-RADIO；数值区间-NUMERICAL_INTERVAL"
+        },
+        "dataVlaueList": {
+          "type": "array",
+          "description": "数据值集合，数据类别为单选则为唯一正常项，为数值区间为开闭区间值集合，前小后大",
+          "items": {
+            "type": "string"
+          }
+        },
+        "enable": {
+          "type": "boolean",
+          "description": "是否启用"
+        },
+        "id": {
+          "type": "string",
+          "description": "主键"
+        },
+        "inspectionBenchmark": {
+          "type": "string",
+          "description": "巡检基准"
+        },
+        "inspectionModeList": {
+          "type": "array",
+          "description": "巡检方法，数据字典",
+          "items": {
+            "type": "string"
+          }
+        },
+        "mustPhotograph": {
+          "type": "boolean",
+          "description": "强制拍照"
+        },
+        "sortOrder": {
+          "type": "number",
+          "format": "double",
+          "description": "排序号"
+        }
+      },
+      "title": "巡检内容VO"
+    },
+    "巡检地点VO": {
+      "type": "object",
+      "required": [
+        "contentList"
+      ],
+      "properties": {
+        "areaOnMapInfo": {
+          "description": "巡检点在地图上的标注面信息",
+          "originalRef": "地图标注区域坐标信息",
+          "$ref": "#/definitions/地图标注区域坐标信息"
+        },
+        "attention": {
+          "type": "string",
+          "description": "注意事项"
+        },
+        "contentList": {
+          "type": "array",
+          "description": "巡检点关联的巡检内容",
+          "items": {
+            "originalRef": "巡检内容VO",
+            "$ref": "#/definitions/巡检内容VO"
+          }
+        },
+        "createdBy": {
+          "type": "string",
+          "description": "创建人id"
+        },
+        "createdByName": {
+          "type": "string",
+          "description": "创建人名称"
+        },
+        "createdTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "创建时间"
+        },
+        "departmentId": {
+          "type": "string",
+          "description": "组织机构id"
+        },
+        "departmentName": {
+          "type": "string",
+          "description": "组织机构名称"
+        },
+        "id": {
+          "type": "string",
+          "description": "主键"
+        },
+        "needMark": {
+          "type": "boolean",
+          "description": "是否打卡"
+        },
+        "needPhoto": {
+          "type": "boolean",
+          "description": "现场拍照"
+        },
+        "placeCode": {
+          "type": "string",
+          "description": "巡检地点编码"
+        },
+        "placeName": {
+          "type": "string",
+          "description": "巡检地点名称"
+        },
+        "placePosition": {
+          "type": "string",
+          "description": "地点位置"
+        },
+        "pointOnMapInfo": {
+          "type": "array",
+          "description": "巡检点在地图上的标注点信息",
+          "items": {
+            "originalRef": "地图标注点坐标信息",
+            "$ref": "#/definitions/地图标注点坐标信息"
+          }
+        },
+        "remarks": {
+          "type": "string",
+          "description": "备注"
+        },
+        "sortOrder": {
+          "type": "number",
+          "format": "double",
+          "description": "排序号"
+        }
+      },
+      "title": "巡检地点VO"
+    },
+    "巡检异常VO": {
+      "type": "object",
+      "properties": {
+        "abnormalLevel": {
+          "type": "string",
+          "description": "异常级别"
+        },
+        "audio": {
+          "type": "string",
+          "description": "巡检录音"
+        },
+        "auditResult": {
+          "type": "string",
+          "description": "审核结果.误报:0;问题:1"
+        },
+        "auditState": {
+          "type": "string",
+          "description": "审核状态.待审核:0;处理中:1;已处理:2"
+        },
+        "contentCategory": {
+          "type": "string",
+          "description": "内容分类,数据字典"
+        },
+        "contentName": {
+          "type": "string",
+          "description": "内容名称"
+        },
+        "departmentName": {
+          "type": "string",
+          "description": "所属部门名称"
+        },
+        "executeDate": {
+          "type": "string",
+          "format": "date-time",
+          "description": "异常时间"
+        },
+        "executeRecordId": {
+          "type": "string",
+          "description": "执行纪录id"
+        },
+        "executeResult": {
+          "type": "string",
+          "description": "巡检结果"
+        },
+        "executeUsername": {
+          "type": "string",
+          "description": "巡检人员姓名"
+        },
+        "inspectionBenchmark": {
+          "type": "string",
+          "description": "巡检基准"
+        },
+        "inspectionMode": {
+          "type": "string",
+          "description": "巡检方法，逗号分隔，数据字典"
+        },
+        "inspectionType": {
+          "type": "string",
+          "description": "巡检类型：日常巡检-1；专业点检-2；精密点检-3；辅助纪录-4；"
+        },
+        "photo": {
+          "type": "string",
+          "description": "巡检照片"
+        },
+        "planName": {
+          "type": "string",
+          "description": "计划名称"
+        },
+        "postName": {
+          "type": "string",
+          "description": "岗位名称,班次岗位"
+        },
+        "problemDesc": {
+          "type": "string",
+          "description": "问题描述"
+        },
+        "taskName": {
+          "type": "string",
+          "description": "任务名称,即班次名"
+        },
+        "video": {
+          "type": "string",
+          "description": "巡检视频"
+        }
+      },
+      "title": "巡检异常VO"
+    },
+    "巡检异常分审核状态统计数量": {
+      "type": "object",
+      "properties": {
+        "auditState": {
+          "type": "string"
+        },
+        "count": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      "title": "巡检异常分审核状态统计数量"
+    },
+    "巡检执行地点信息VO": {
+      "type": "object",
+      "properties": {
+        "executeContentInfoList": {
+          "type": "array",
+          "description": "执行巡检内容信息",
+          "items": {
+            "originalRef": "执行巡检内容信息VO",
+            "$ref": "#/definitions/执行巡检内容信息VO"
+          }
+        },
+        "markInfoList": {
+          "type": "array",
+          "description": "打卡/现场照片信息",
+          "items": {
+            "originalRef": "YxInspectionMarkInfo",
+            "$ref": "#/definitions/YxInspectionMarkInfo"
+          }
+        },
+        "placeId": {
+          "type": "string",
+          "description": "巡检点Id"
+        },
+        "placeName": {
+          "type": "string",
+          "description": "巡检地点名称"
+        },
+        "sortOrder": {
+          "type": "number",
+          "format": "double",
+          "description": "巡检地点排序号"
+        }
+      },
+      "title": "巡检执行地点信息VO"
+    },
+    "巡检计划VO": {
+      "type": "object",
+      "properties": {
+        "contentCategoryList": {
+          "type": "array",
+          "description": "巡检内容分类",
+          "items": {
+            "type": "string"
+          }
+        },
+        "cycleFiled": {
+          "type": "string",
+          "description": "巡检周期：日-DAY；周-WEEK；月-MONTH；年-YEAR"
+        },
+        "departmentId": {
+          "type": "string",
+          "description": "所属部门id"
+        },
+        "departmentName": {
+          "type": "string",
+          "description": "所属部门名称"
+        },
+        "exceptionNotificationUserIdList": {
+          "type": "array",
+          "description": "异常通知用户id",
+          "items": {
+            "type": "string"
+          }
+        },
+        "executeUserList": {
+          "type": "array",
+          "description": "巡检人们姓名",
+          "items": {
+            "type": "string"
+          }
+        },
+        "frequency": {
+          "type": "integer",
+          "format": "int32",
+          "description": "周期内巡检班次数量"
+        },
+        "hmiId": {
+          "type": "string",
+          "description": "巡检线路组态画面id"
+        },
+        "id": {
+          "type": "string",
+          "description": "主键"
+        },
+        "inspectionType": {
+          "type": "string",
+          "description": "巡检类型：日常巡检-1；专业点检-2；精密点检-3；辅助纪录-4；"
+        },
+        "lastExecuteTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "上次巡时间"
+        },
+        "lastExecuteUserList": {
+          "type": "string",
+          "description": "上次巡检人"
+        },
+        "liableUserId": {
+          "type": "string",
+          "description": "责任人用户id"
+        },
+        "liableUsername": {
+          "type": "string",
+          "description": "责任人用户名"
+        },
+        "planCode": {
+          "type": "string",
+          "description": "计划编号"
+        },
+        "planName": {
+          "type": "string",
+          "description": "计划名称"
+        },
+        "planState": {
+          "type": "string",
+          "description": "状态：待提交-1；发布-2；停用-3"
+        },
+        "postId": {
+          "type": "string",
+          "description": "负责岗位id"
+        },
+        "postName": {
+          "type": "string",
+          "description": "负责岗位名称"
+        },
+        "remarks": {
+          "type": "string",
+          "description": "备注"
+        },
+        "scheduleMode": {
+          "type": "string",
+          "description": "排班方式：周期排班-CYCLE；滚动排班-ROLL"
+        },
+        "violationAuditUserIdList": {
+          "type": "array",
+          "description": "违规审核用户id",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "title": "巡检计划VO"
+    },
+    "巡检计划分状态统计": {
+      "type": "object",
+      "properties": {
+        "count": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "planState": {
+          "type": "string"
+        }
+      },
+      "title": "巡检计划分状态统计"
+    },
+    "巡检计划执行纪录统计VO": {
+      "type": "object",
+      "properties": {
+        "abnormal": {
+          "type": "integer",
+          "format": "int64",
+          "description": "异常班次数量"
+        },
+        "normal": {
+          "type": "integer",
+          "format": "int64",
+          "description": "正常班次数量"
+        },
+        "pageInfo": {
+          "description": "分页信息",
+          "originalRef": "PageInfo«巡检计划排班纪录分页VO»",
+          "$ref": "#/definitions/PageInfo«巡检计划排班纪录分页VO»"
+        },
+        "total": {
+          "type": "integer",
+          "format": "int64",
+          "description": "巡检执行总班次"
+        }
+      },
+      "title": "巡检计划执行纪录统计VO"
+    },
+    "巡检计划排班纪录VO": {
+      "type": "object",
+      "properties": {
+        "executeEndTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "实际执行结束时间"
+        },
+        "executeStartTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "实际执行起始时间"
+        },
+        "executeUsersName": {
+          "type": "array",
+          "description": "巡检人名称",
+          "items": {
+            "type": "string"
+          }
+        },
+        "expireTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "任务失效时间，截止时间到失效时间内完成算逾期"
+        },
+        "id": {
+          "type": "string",
+          "description": "班次id"
+        },
+        "planId": {
+          "type": "string",
+          "description": "计划id"
+        },
+        "postName": {
+          "type": "string",
+          "description": "岗位名称"
+        },
+        "remarks": {
+          "type": "string",
+          "description": "备注"
+        },
+        "scheduleEndTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "排班执行截止时间"
+        },
+        "scheduleStartTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "排班执行起始时间"
+        },
+        "taskName": {
+          "type": "string",
+          "description": "任务名称"
+        },
+        "type": {
+          "type": "string",
+          "description": "班次类型；计划班次-0；临时班次-1"
+        }
+      },
+      "title": "巡检计划排班纪录VO"
+    },
+    "巡检计划排班纪录分页VO": {
+      "type": "object",
+      "properties": {
+        "abnormal": {
+          "type": "boolean",
+          "description": "结果是否异常"
+        },
+        "departmentName": {
+          "type": "string",
+          "description": "所属部门名称"
+        },
+        "executeEndTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "实际执行结束时间"
+        },
+        "executeStartTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "实际执行起始时间"
+        },
+        "executeUsersName": {
+          "type": "array",
+          "description": "巡检人名称",
+          "items": {
+            "type": "string"
+          }
+        },
+        "expireTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "任务失效时间，截止时间到失效时间内完成算逾期"
+        },
+        "liableUserName": {
+          "type": "string",
+          "description": "责任人名称"
+        },
+        "postName": {
+          "type": "string",
+          "description": "班次岗位名称"
+        },
+        "scheduleEndTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "排班执行截止时间"
+        },
+        "scheduleRecordId": {
+          "type": "string",
+          "description": "班次纪录id"
+        },
+        "scheduleStartTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "排班执行起始时间"
+        },
+        "taskName": {
+          "type": "string",
+          "description": "任务名称"
+        }
+      },
+      "title": "巡检计划排班纪录分页VO"
+    },
+    "巡检计划排班配置VO": {
+      "type": "object",
+      "properties": {
+        "completionCondition": {
+          "type": "integer",
+          "format": "int32",
+          "description": "班次任务完成条件：0-任意执行人巡检完成;1-所有执行人巡检完成"
+        },
+        "holidaysInclude": {
+          "type": "array",
+          "description": "节假日包含配置,包含周六:includeSaturday;包含周日:includeSunday;包含节假日:includeHoliday;",
+          "items": {
+            "type": "string"
+          }
+        },
+        "id": {
+          "type": "string",
+          "description": "配置id"
+        },
+        "planId": {
+          "type": "string",
+          "description": "计划id"
+        },
+        "planYear": {
+          "type": "integer",
+          "format": "int32",
+          "description": "计划年份"
+        },
+        "scheduleDetails": {
+          "type": "array",
+          "description": "巡检计划排班配置详情",
+          "items": {
+            "originalRef": "巡检计划排班配置详情VO",
+            "$ref": "#/definitions/巡检计划排班配置详情VO"
+          }
+        },
+        "scheduleType": {
+          "type": "string",
+          "description": "排班类型：专人；专岗"
+        }
+      },
+      "title": "巡检计划排班配置VO"
+    },
+    "巡检计划排班配置详情VO": {
+      "type": "object",
+      "properties": {
+        "duration": {
+          "type": "integer",
+          "format": "int32",
+          "description": "滚动排班，单班次持续时长，单位:小时"
+        },
+        "executeEnd": {
+          "type": "string",
+          "description": "本班次执行截止时间，如果任务周期是月/周，则为月/周内的第n天n的字符串。如果计划周期是日，则是格式为HH:mm的字符串"
+        },
+        "executeStart": {
+          "type": "string",
+          "description": "本班次执行起始时间，如果任务周期是月/周，则为月/周内的第n天n的字符串。如果计划周期是日，则是格式为HH:mm的字符串"
+        },
+        "executeUserIdList": {
+          "type": "array",
+          "description": "巡检人们id",
+          "items": {
+            "type": "string"
+          }
+        },
+        "executeUserNameList": {
+          "type": "array",
+          "description": "巡检责任人名称",
+          "items": {
+            "type": "string"
+          }
+        },
+        "expireHours": {
+          "type": "integer",
+          "format": "int32",
+          "description": "任务过期间隔小时数"
+        },
+        "id": {
+          "type": "string",
+          "description": "排班详情id"
+        },
+        "postId": {
+          "type": "string",
+          "description": "岗位id"
+        },
+        "postName": {
+          "type": "string",
+          "description": "岗位名称"
+        },
+        "scheduleSort": {
+          "type": "integer",
+          "format": "int32",
+          "description": "班次号"
+        },
+        "scheduleType": {
+          "type": "string",
+          "description": "排班类型"
+        }
+      },
+      "title": "巡检计划排班配置详情VO"
+    },
+    "巡检计划排班配置详情dto": {
+      "type": "object",
+      "required": [
+        "executeEnd",
+        "executeStart",
+        "executeUserIdList",
+        "expireHours",
+        "scheduleSort"
+      ],
+      "properties": {
+        "duration": {
+          "type": "integer",
+          "format": "int32",
+          "description": "滚动排班，单班次持续时长，单位:小时"
+        },
+        "executeEnd": {
+          "type": "string",
+          "description": "本班次执行截止时间，如果任务周期是月/周，则为月/周内的第n天n的字符串。如果计划周期是日，则是格式为HH:mm的字符串.滚动排班同起始时间时间"
+        },
+        "executeStart": {
+          "type": "string",
+          "description": "本班次执行起始时间，如果任务周期是月/周，则为月/周内的第n天n的字符串。如果计划周期是日，则是格式为HH:mm的字符串。"
+        },
+        "executeUserIdList": {
+          "type": "array",
+          "description": "巡检人id",
+          "items": {
+            "type": "string"
+          }
+        },
+        "expireHours": {
+          "type": "integer",
+          "format": "int32",
+          "description": "执行结束时间指定小时后任务过期"
+        },
+        "id": {
+          "type": "string",
+          "description": "排班详情id"
+        },
+        "postId": {
+          "type": "string",
+          "description": "岗位id"
+        },
+        "scheduleSort": {
+          "type": "integer",
+          "format": "int32",
+          "description": "班次号"
+        }
+      },
+      "title": "巡检计划排班配置详情dto"
+    },
+    "巡检计划提醒设置VO": {
+      "type": "object",
+      "properties": {
+        "planId": {
+          "type": "string",
+          "description": "计划id"
+        },
+        "remindAfterEnd": {
+          "type": "boolean",
+          "description": "是否结束后提醒"
+        },
+        "remindAfterStart": {
+          "type": "boolean",
+          "description": "是否开始后提醒"
+        },
+        "remindBeforeEnd": {
+          "type": "boolean",
+          "description": "是否结束前提醒"
+        },
+        "remindBeforeStart": {
+          "type": "boolean",
+          "description": "是否开始前提醒"
+        },
+        "sendPlatformMessage": {
+          "type": "boolean",
+          "description": "是否站内消息提醒"
+        },
+        "sendTextMessage": {
+          "type": "boolean",
+          "description": "是否短信提醒"
+        }
+      },
+      "title": "巡检计划提醒设置VO"
+    },
+    "巡检计划班次执行纪录VO": {
+      "type": "object",
+      "properties": {
+        "completionCondition": {
+          "type": "integer",
+          "format": "int32",
+          "description": "班次任务完成条件：0-任意执行人巡检完成;1-所有执行人巡检完成"
+        },
+        "cycleFiled": {
+          "type": "string",
+          "description": "巡检周期：日-DAY；周-WEEK；月-MONTH；年-YEAR"
+        },
+        "departmentName": {
+          "type": "string",
+          "description": "所属部门名称"
+        },
+        "executeEndTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "实际执行结束时间"
+        },
+        "executePlaceInfoList": {
+          "type": "array",
+          "description": "巡检执行地点信息",
+          "items": {
+            "originalRef": "巡检执行地点信息VO",
+            "$ref": "#/definitions/巡检执行地点信息VO"
+          }
+        },
+        "executeStartTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "实际执行起始时间"
+        },
+        "executeUsersName": {
+          "type": "array",
+          "description": "巡检人名称",
+          "items": {
+            "type": "string"
+          }
+        },
+        "frequency": {
+          "type": "integer",
+          "format": "int32",
+          "description": "周期内巡检班次数量"
+        },
+        "liableUsername": {
+          "type": "string",
+          "description": "责任人名称"
+        },
+        "postName": {
+          "type": "string",
+          "description": "岗位名称"
+        },
+        "scheduleEndTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "排班执行截止时间"
+        },
+        "scheduleMode": {
+          "type": "string",
+          "description": "排班方式：周期排班-CYCLE；滚动排班-ROLL"
+        },
+        "scheduleStartTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "排班执行起始时间"
+        },
+        "taskName": {
+          "type": "string",
+          "description": "班次任务名称"
+        },
+        "type": {
+          "type": "string",
+          "description": "班次类型；计划班次-0；临时班次-1"
+        }
+      },
+      "title": "巡检计划班次执行纪录VO"
+    },
+    "巡检计划班次违规VO": {
+      "type": "object",
+      "properties": {
+        "auditResult": {
+          "type": "string",
+          "description": "审核结果.待审核:1;误报:2;确认违规:3"
+        },
+        "departmentName": {
+          "type": "string",
+          "description": "所属部门名称"
+        },
+        "handlingOpinions": {
+          "type": "string",
+          "description": "处理意见"
+        },
+        "planName": {
+          "type": "string",
+          "description": "计划名称"
+        },
+        "postName": {
+          "type": "string",
+          "description": "岗位名称"
+        },
+        "taskName": {
+          "type": "string",
+          "description": "任务名称,即班次名"
+        },
+        "violationAuditUserIdList": {
+          "type": "array",
+          "description": "违规审核用户id",
+          "items": {
+            "type": "string"
+          }
+        },
+        "violationId": {
+          "type": "string",
+          "description": "违规纪录id"
+        },
+        "violationReasons": {
+          "type": "string",
+          "description": "违规原因"
+        },
+        "violationTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "违规时间，未做为失效时间，未按时做为提交时间"
+        },
+        "violationType": {
+          "type": "string",
+          "description": "违规类型"
+        },
+        "violationUserName": {
+          "type": "string",
+          "description": "违规人员姓名"
+        }
+      },
+      "title": "巡检计划班次违规VO"
+    },
+    "巡检路线关联巡检点YxInspectionLinePlaceVO": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "主键"
+        },
+        "placeId": {
+          "type": "string",
+          "description": "巡检点id"
+        },
+        "placeName": {
+          "type": "string",
+          "description": "巡检点名称"
+        },
+        "sortOrder": {
+          "type": "number",
+          "format": "double",
+          "description": "排序号"
+        }
+      },
+      "title": "巡检路线关联巡检点YxInspectionLinePlaceVO"
+    },
+    "巡检违规分审核结果统计数量": {
+      "type": "object",
+      "properties": {
+        "auditResult": {
+          "type": "string"
+        },
+        "count": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      "title": "巡检违规分审核结果统计数量"
+    },
+    "我的巡检计划排班纪录VO": {
+      "type": "object",
+      "properties": {
+        "abnormalCount": {
+          "type": "integer",
+          "format": "int32",
+          "description": "异常纪录数量"
+        },
+        "inspectionCompletedCount": {
+          "type": "integer",
+          "format": "int32",
+          "description": "已巡检任务数量"
+        },
+        "unInspectedCount": {
+          "type": "integer",
+          "format": "int32",
+          "description": "待巡检任务数量"
+        },
+        "violationRecordCount": {
+          "type": "integer",
+          "format": "int32",
+          "description": "违规纪录数量"
+        },
+        "yxInspectionTaskInfoVOS": {
+          "type": "array",
+          "description": "待巡检任务信息",
+          "items": {
+            "originalRef": "巡检任务信息VO",
+            "$ref": "#/definitions/巡检任务信息VO"
+          }
+        }
+      },
+      "title": "我的巡检计划排班纪录VO"
+    },
+    "执行任务巡检点下内容信息VO": {
+      "type": "object",
+      "properties": {
+        "abnormal": {
+          "type": "boolean",
+          "description": "是否异常"
+        },
+        "abnormalMustAudio": {
+          "type": "boolean",
+          "description": "异常强制录音"
+        },
+        "abnormalMustVideo": {
+          "type": "boolean",
+          "description": "异常强制视频"
+        },
+        "audio": {
+          "type": "string",
+          "description": "巡检录音"
+        },
+        "contentCategory": {
+          "type": "string",
+          "description": "内容分类,数据字典"
+        },
+        "contentId": {
+          "type": "string",
+          "description": "内容id"
+        },
+        "contentName": {
+          "type": "string",
+          "description": "内容名称"
+        },
+        "dataOptionList": {
+          "type": "array",
+          "description": "数据选项集合，数据类别为单选则为各个选项的集合，为数值区间为单个开闭区间表达式对应的编号:1：a>x；  2：a≥x； 3：a<x；  4：a≤x；  5：[a,b]；    6：(a,b]；    7：[a,b)；    8：(a,b)；    ",
+          "items": {
+            "type": "string"
+          }
+        },
+        "dataType": {
+          "type": "string",
+          "description": "数据类别：单选-RADIO；数值区间-NUMERICAL_INTERVAL"
+        },
+        "dataVlaueList": {
+          "type": "array",
+          "description": "数据值集合，数据类别为单选则为唯一正常项，为数值区间为开闭区间值集合，前小后大",
+          "items": {
+            "type": "string"
+          }
+        },
+        "executeResult": {
+          "type": "string",
+          "description": "巡检结果"
+        },
+        "inspectionBenchmark": {
+          "type": "string",
+          "description": "巡检基准"
+        },
+        "inspectionModeList": {
+          "type": "array",
+          "description": "巡检方法，数据字典",
+          "items": {
+            "type": "string"
+          }
+        },
+        "mustPhotograph": {
+          "type": "boolean",
+          "description": "强制拍照"
+        },
+        "photo": {
+          "type": "string",
+          "description": "巡检拍照"
+        },
+        "sortOrder": {
+          "type": "number",
+          "format": "double",
+          "description": "内容排序号"
+        },
+        "video": {
+          "type": "string",
+          "description": "巡检视频"
+        }
+      },
+      "title": "执行任务巡检点下内容信息VO"
+    },
+    "执行任务巡检点信息VO": {
+      "type": "object",
+      "properties": {
+        "abnormalCount": {
+          "type": "integer",
+          "format": "int32",
+          "description": "巡检点下异常数量"
+        },
+        "attention": {
+          "type": "string",
+          "description": "注意事项"
+        },
+        "departmentName": {
+          "type": "string",
+          "description": "组织机构名称"
+        },
+        "needMark": {
+          "type": "boolean",
+          "description": "是否打卡"
+        },
+        "needPhoto": {
+          "type": "boolean",
+          "description": "现场拍照"
+        },
+        "placeCode": {
+          "type": "string",
+          "description": "巡检地点编码"
+        },
+        "placeId": {
+          "type": "string",
+          "description": "巡检点Id"
+        },
+        "placeName": {
+          "type": "string",
+          "description": "巡检地点名称"
+        },
+        "placePosition": {
+          "type": "string",
+          "description": "地点位置"
+        },
+        "placeState": {
+          "type": "string",
+          "description": "巡检点状态.待检:0;正常:1;异常:2;漏检:3"
+        },
+        "processedContent": {
+          "type": "integer",
+          "format": "int32",
+          "description": "巡检点下已巡检内容数量"
+        },
+        "remarks": {
+          "type": "string",
+          "description": "备注"
+        },
+        "sortOrder": {
+          "type": "number",
+          "format": "double",
+          "description": "巡检地点排序号"
+        },
+        "totalContent": {
+          "type": "integer",
+          "format": "int32",
+          "description": "巡检点下巡检内容总数量"
+        },
+        "yxTaskContentInfoList": {
+          "type": "array",
+          "description": "执行巡检内容信息",
+          "items": {
+            "originalRef": "执行任务巡检点下内容信息VO",
+            "$ref": "#/definitions/执行任务巡检点下内容信息VO"
+          }
+        }
+      },
+      "title": "执行任务巡检点信息VO"
+    },
+    "执行巡检内容信息VO": {
+      "type": "object",
+      "properties": {
+        "abnormal": {
+          "type": "boolean",
+          "description": "是否异常"
+        },
+        "audio": {
+          "type": "string",
+          "description": "巡检录音"
+        },
+        "contentName": {
+          "type": "string",
+          "description": "内容名称"
+        },
+        "executeResult": {
+          "type": "string",
+          "description": "巡检结果"
+        },
+        "executorName": {
+          "type": "string",
+          "description": "巡检人姓名"
+        },
+        "inspectionBenchmark": {
+          "type": "string",
+          "description": "巡检基准"
+        },
+        "photo": {
+          "type": "string",
+          "description": "巡检拍照"
+        },
+        "reportingTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "上报时间"
+        },
+        "sortOrder": {
+          "type": "number",
+          "format": "double",
+          "description": "内容排序号"
+        },
+        "video": {
+          "type": "string",
+          "description": "巡检视频"
+        }
+      },
+      "title": "执行巡检内容信息VO"
+    },
+    "楼层信息": {
+      "type": "object",
+      "properties": {
+        "floorId": {
+          "type": "string"
+        },
+        "floorNo": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        }
+      },
+      "title": "楼层信息"
+    },
+    "添加或修改巡检内容dto": {
+      "type": "object",
+      "required": [
+        "abnormalMustAudio",
+        "abnormalMustVideo",
+        "contentCategory",
+        "contentName",
+        "mustPhotograph",
+        "sortOrder"
+      ],
+      "properties": {
+        "abnormalMustAudio": {
+          "type": "boolean",
+          "description": "异常强制录音"
+        },
+        "abnormalMustVideo": {
+          "type": "boolean",
+          "description": "异常强制视频"
+        },
+        "contentCategory": {
+          "type": "string",
+          "description": "内容分类,数据字典"
+        },
+        "contentName": {
+          "type": "string",
+          "description": "内容名称"
+        },
+        "dataOptionList": {
+          "type": "array",
+          "description": "数据选项集合，数据类别为单选则为各个选项的集合，为数值区间为单个开闭区间表达式对应的编号1：a>x；  2：a≥x； 3：a<x；  4：a≤x；  5：[a,b]；    6：(a,b]；    7：[a,b)；    8：(a,b)；    ",
+          "items": {
+            "type": "string"
+          }
+        },
+        "dataType": {
+          "type": "string",
+          "description": "数据类别：单选-RADIO；数值区间-NUMERICAL_INTERVAL"
+        },
+        "dataVlaueList": {
+          "type": "array",
+          "description": "数据值集合，数据类别为单选则为唯一正常项，为数值区间为开闭区间值集合，前小后大",
+          "items": {
+            "type": "string"
+          }
+        },
+        "id": {
+          "type": "string",
+          "description": "主键"
+        },
+        "inspectionBenchmark": {
+          "type": "string",
+          "description": "巡检基准"
+        },
+        "mustPhotograph": {
+          "type": "boolean",
+          "description": "强制拍照"
+        },
+        "sortOrder": {
+          "type": "number",
+          "format": "double",
+          "description": "排序号"
+        }
+      },
+      "title": "添加或修改巡检内容dto"
+    },
+    "添加或修改巡检地点dto": {
+      "type": "object",
+      "required": [
+        "contentIdList",
+        "placeCode",
+        "placeName"
+      ],
+      "properties": {
+        "areaOnMapInfo": {
+          "description": "巡检点在地图上的标注面信息",
+          "originalRef": "地图标注区域坐标信息",
+          "$ref": "#/definitions/地图标注区域坐标信息"
+        },
+        "attention": {
+          "type": "string",
+          "description": "注意事项"
+        },
+        "contentIdList": {
+          "type": "array",
+          "description": "巡检内容集合",
+          "items": {
+            "type": "string"
+          }
+        },
+        "departmentId": {
+          "type": "string",
+          "description": "组织机构id"
+        },
+        "id": {
+          "type": "string",
+          "description": "主键"
+        },
+        "needMark": {
+          "type": "boolean",
+          "description": "是否打卡"
+        },
+        "needPhoto": {
+          "type": "boolean",
+          "description": "现场拍照"
+        },
+        "placeCode": {
+          "type": "string",
+          "description": "巡检地点编码"
+        },
+        "placeName": {
+          "type": "string",
+          "description": "巡检地点名称"
+        },
+        "placePosition": {
+          "type": "string",
+          "description": "地点位置"
+        },
+        "pointOnMapInfo": {
+          "type": "array",
+          "description": "巡检点在地图上的标注点信息",
+          "items": {
+            "originalRef": "地图标注点坐标信息",
+            "$ref": "#/definitions/地图标注点坐标信息"
+          }
+        },
+        "remarks": {
+          "type": "string",
+          "description": "备注"
+        },
+        "sortOrder": {
+          "type": "number",
+          "format": "double",
+          "description": "排序号"
+        }
+      },
+      "title": "添加或修改巡检地点dto"
+    },
+    "添加或修改巡检计划dto": {
+      "type": "object",
+      "required": [
+        "departmentId",
+        "lineId",
+        "planCode",
+        "planName",
+        "planState"
+      ],
+      "properties": {
+        "cycleFiled": {
+          "type": "string",
+          "description": "巡检周期：日-DAY；周-WEEK；月-MONTH；年-YEAR"
+        },
+        "departmentId": {
+          "type": "string",
+          "description": "所属部门id"
+        },
+        "exceptionNotificationUserIdList": {
+          "type": "array",
+          "description": "异常通知用户id",
+          "items": {
+            "type": "string"
+          }
+        },
+        "frequency": {
+          "type": "integer",
+          "format": "int32",
+          "description": "周期内巡检班次"
+        },
+        "id": {
+          "type": "string",
+          "description": "主键"
+        },
+        "lineId": {
+          "type": "string",
+          "description": "巡检路线id"
+        },
+        "planCode": {
+          "type": "string",
+          "description": "计划编号"
+        },
+        "planName": {
+          "type": "string",
+          "description": "计划名称"
+        },
+        "planState": {
+          "type": "string",
+          "description": "状态：待提交-1；发布-2；停用-3"
+        },
+        "remarks": {
+          "type": "string",
+          "description": "备注"
+        },
+        "scheduleMode": {
+          "type": "string",
+          "description": "排班方式：周期排班-CYCLE；滚动排班-ROLL"
+        },
+        "violationAuditUserIdList": {
+          "type": "array",
+          "description": "违规审核用户id",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "title": "添加或修改巡检计划dto"
+    },
+    "添加或修改巡检计划排班配置vo": {
+      "type": "object",
+      "required": [
+        "planId",
+        "planYear",
+        "scheduleDetails",
+        "scheduleType"
+      ],
+      "properties": {
+        "completionCondition": {
+          "type": "integer",
+          "format": "int32",
+          "description": "班次任务完成条件：0-任意执行人巡检完成;1-所有执行人巡检完成"
+        },
+        "id": {
+          "type": "string",
+          "description": "配置id"
+        },
+        "planId": {
+          "type": "string",
+          "description": "计划id"
+        },
+        "planYear": {
+          "type": "integer",
+          "format": "int32",
+          "description": "计划年份"
+        },
+        "scheduleDetails": {
+          "type": "array",
+          "description": "排班配置详情",
+          "items": {
+            "originalRef": "巡检计划排班配置详情dto",
+            "$ref": "#/definitions/巡检计划排班配置详情dto"
+          }
+        },
+        "scheduleType": {
+          "type": "string",
+          "description": "排班类型：专人；专岗；滚动排班"
+        }
+      },
+      "title": "添加或修改巡检计划排班配置vo"
+    },
+    "添加或修改巡检计划提醒dto": {
+      "type": "object",
+      "properties": {
+        "remindAfterEnd": {
+          "type": "boolean",
+          "description": "是否结束后提醒"
+        },
+        "remindAfterStart": {
+          "type": "boolean",
+          "description": "是否开始后提醒"
+        },
+        "remindBeforeEnd": {
+          "type": "boolean",
+          "description": "是否结束前提醒"
+        },
+        "remindBeforeStart": {
+          "type": "boolean",
+          "description": "是否开始前提醒"
+        },
+        "sendPlatformMessage": {
+          "type": "boolean",
+          "description": "是否站内消息提醒"
+        },
+        "sendTextMessage": {
+          "type": "boolean",
+          "description": "是否短信提醒"
+        }
+      },
+      "title": "添加或修改巡检计划提醒dto"
+    },
+    "添加或修改巡检路线": {
+      "type": "object",
+      "properties": {
+        "contactPhone": {
+          "type": "string",
+          "description": "联系电话"
+        },
+        "directorId": {
+          "type": "string",
+          "description": "负责人"
+        },
+        "id": {
+          "type": "string",
+          "description": "主键id"
+        },
+        "lineName": {
+          "type": "string",
+          "description": "巡检路线名称"
+        },
+        "placeIdList": {
+          "type": "array",
+          "description": "巡检点id集合",
+          "items": {
+            "type": "string"
+          }
+        },
+        "remarks": {
+          "type": "string",
+          "description": "备注"
+        }
+      },
+      "title": "添加或修改巡检路线"
+    },
+    "统一返回结果": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32",
+          "description": "返回代码"
+        },
+        "message": {
+          "type": "string",
+          "description": "失败消息"
+        },
+        "result": {
+          "type": "object",
+          "description": "业务内容"
+        },
+        "success": {
+          "type": "boolean",
+          "description": "成功标志"
+        },
+        "timestamp": {
+          "type": "integer",
+          "format": "int64",
+          "description": "时间戳"
+        }
+      },
+      "title": "统一返回结果"
+    },
+    "统一返回结果«APP巡检审核结果VO»": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32",
+          "description": "返回代码"
+        },
+        "message": {
+          "type": "string",
+          "description": "失败消息"
+        },
+        "result": {
+          "description": "业务内容",
+          "originalRef": "APP巡检审核结果VO",
+          "$ref": "#/definitions/APP巡检审核结果VO"
+        },
+        "success": {
+          "type": "boolean",
+          "description": "成功标志"
+        },
+        "timestamp": {
+          "type": "integer",
+          "format": "int64",
+          "description": "时间戳"
+        }
+      },
+      "title": "统一返回结果«APP巡检审核结果VO»"
+    },
+    "统一返回结果«List«巡检任务信息VO»»": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32",
+          "description": "返回代码"
+        },
+        "message": {
+          "type": "string",
+          "description": "失败消息"
+        },
+        "result": {
+          "type": "array",
+          "description": "业务内容",
+          "items": {
+            "originalRef": "巡检任务信息VO",
+            "$ref": "#/definitions/巡检任务信息VO"
+          }
+        },
+        "success": {
+          "type": "boolean",
+          "description": "成功标志"
+        },
+        "timestamp": {
+          "type": "integer",
+          "format": "int64",
+          "description": "时间戳"
+        }
+      },
+      "title": "统一返回结果«List«巡检任务信息VO»»"
+    },
+    "统一返回结果«List«巡检异常VO»»": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32",
+          "description": "返回代码"
+        },
+        "message": {
+          "type": "string",
+          "description": "失败消息"
+        },
+        "result": {
+          "type": "array",
+          "description": "业务内容",
+          "items": {
+            "originalRef": "巡检异常VO",
+            "$ref": "#/definitions/巡检异常VO"
+          }
+        },
+        "success": {
+          "type": "boolean",
+          "description": "成功标志"
+        },
+        "timestamp": {
+          "type": "integer",
+          "format": "int64",
+          "description": "时间戳"
+        }
+      },
+      "title": "统一返回结果«List«巡检异常VO»»"
+    },
+    "统一返回结果«List«巡检异常分审核状态统计数量»»": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32",
+          "description": "返回代码"
+        },
+        "message": {
+          "type": "string",
+          "description": "失败消息"
+        },
+        "result": {
+          "type": "array",
+          "description": "业务内容",
+          "items": {
+            "originalRef": "巡检异常分审核状态统计数量",
+            "$ref": "#/definitions/巡检异常分审核状态统计数量"
+          }
+        },
+        "success": {
+          "type": "boolean",
+          "description": "成功标志"
+        },
+        "timestamp": {
+          "type": "integer",
+          "format": "int64",
+          "description": "时间戳"
+        }
+      },
+      "title": "统一返回结果«List«巡检异常分审核状态统计数量»»"
+    },
+    "统一返回结果«List«巡检计划分状态统计»»": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32",
+          "description": "返回代码"
+        },
+        "message": {
+          "type": "string",
+          "description": "失败消息"
+        },
+        "result": {
+          "type": "array",
+          "description": "业务内容",
+          "items": {
+            "originalRef": "巡检计划分状态统计",
+            "$ref": "#/definitions/巡检计划分状态统计"
+          }
+        },
+        "success": {
+          "type": "boolean",
+          "description": "成功标志"
+        },
+        "timestamp": {
+          "type": "integer",
+          "format": "int64",
+          "description": "时间戳"
+        }
+      },
+      "title": "统一返回结果«List«巡检计划分状态统计»»"
+    },
+    "统一返回结果«List«巡检计划排班配置详情VO»»": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32",
+          "description": "返回代码"
+        },
+        "message": {
+          "type": "string",
+          "description": "失败消息"
+        },
+        "result": {
+          "type": "array",
+          "description": "业务内容",
+          "items": {
+            "originalRef": "巡检计划排班配置详情VO",
+            "$ref": "#/definitions/巡检计划排班配置详情VO"
+          }
+        },
+        "success": {
+          "type": "boolean",
+          "description": "成功标志"
+        },
+        "timestamp": {
+          "type": "integer",
+          "format": "int64",
+          "description": "时间戳"
+        }
+      },
+      "title": "统一返回结果«List«巡检计划排班配置详情VO»»"
+    },
+    "统一返回结果«List«巡检计划班次违规VO»»": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32",
+          "description": "返回代码"
+        },
+        "message": {
+          "type": "string",
+          "description": "失败消息"
+        },
+        "result": {
+          "type": "array",
+          "description": "业务内容",
+          "items": {
+            "originalRef": "巡检计划班次违规VO",
+            "$ref": "#/definitions/巡检计划班次违规VO"
+          }
+        },
+        "success": {
+          "type": "boolean",
+          "description": "成功标志"
+        },
+        "timestamp": {
+          "type": "integer",
+          "format": "int64",
+          "description": "时间戳"
+        }
+      },
+      "title": "统一返回结果«List«巡检计划班次违规VO»»"
+    },
+    "统一返回结果«List«巡检违规分审核结果统计数量»»": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32",
+          "description": "返回代码"
+        },
+        "message": {
+          "type": "string",
+          "description": "失败消息"
+        },
+        "result": {
+          "type": "array",
+          "description": "业务内容",
+          "items": {
+            "originalRef": "巡检违规分审核结果统计数量",
+            "$ref": "#/definitions/巡检违规分审核结果统计数量"
+          }
+        },
+        "success": {
+          "type": "boolean",
+          "description": "成功标志"
+        },
+        "timestamp": {
+          "type": "integer",
+          "format": "int64",
+          "description": "时间戳"
+        }
+      },
+      "title": "统一返回结果«List«巡检违规分审核结果统计数量»»"
+    },
+    "统一返回结果«PageInfo«YxInspectionLineVO»»": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32",
+          "description": "返回代码"
+        },
+        "message": {
+          "type": "string",
+          "description": "失败消息"
+        },
+        "result": {
+          "description": "业务内容",
+          "originalRef": "PageInfo«YxInspectionLineVO»",
+          "$ref": "#/definitions/PageInfo«YxInspectionLineVO»"
+        },
+        "success": {
+          "type": "boolean",
+          "description": "成功标志"
+        },
+        "timestamp": {
+          "type": "integer",
+          "format": "int64",
+          "description": "时间戳"
+        }
+      },
+      "title": "统一返回结果«PageInfo«YxInspectionLineVO»»"
+    },
+    "统一返回结果«PageInfo«YxInspectionSafeRecordVO»»": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32",
+          "description": "返回代码"
+        },
+        "message": {
+          "type": "string",
+          "description": "失败消息"
+        },
+        "result": {
+          "description": "业务内容",
+          "originalRef": "PageInfo«YxInspectionSafeRecordVO»",
+          "$ref": "#/definitions/PageInfo«YxInspectionSafeRecordVO»"
+        },
+        "success": {
+          "type": "boolean",
+          "description": "成功标志"
+        },
+        "timestamp": {
+          "type": "integer",
+          "format": "int64",
+          "description": "时间戳"
+        }
+      },
+      "title": "统一返回结果«PageInfo«YxInspectionSafeRecordVO»»"
+    },
+    "统一返回结果«PageInfo«巡检内容VO»»": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32",
+          "description": "返回代码"
+        },
+        "message": {
+          "type": "string",
+          "description": "失败消息"
+        },
+        "result": {
+          "description": "业务内容",
+          "originalRef": "PageInfo«巡检内容VO»",
+          "$ref": "#/definitions/PageInfo«巡检内容VO»"
+        },
+        "success": {
+          "type": "boolean",
+          "description": "成功标志"
+        },
+        "timestamp": {
+          "type": "integer",
+          "format": "int64",
+          "description": "时间戳"
+        }
+      },
+      "title": "统一返回结果«PageInfo«巡检内容VO»»"
+    },
+    "统一返回结果«PageInfo«巡检地点VO»»": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32",
+          "description": "返回代码"
+        },
+        "message": {
+          "type": "string",
+          "description": "失败消息"
+        },
+        "result": {
+          "description": "业务内容",
+          "originalRef": "PageInfo«巡检地点VO»",
+          "$ref": "#/definitions/PageInfo«巡检地点VO»"
+        },
+        "success": {
+          "type": "boolean",
+          "description": "成功标志"
+        },
+        "timestamp": {
+          "type": "integer",
+          "format": "int64",
+          "description": "时间戳"
+        }
+      },
+      "title": "统一返回结果«PageInfo«巡检地点VO»»"
+    },
+    "统一返回结果«PageInfo«巡检异常VO»»": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32",
+          "description": "返回代码"
+        },
+        "message": {
+          "type": "string",
+          "description": "失败消息"
+        },
+        "result": {
+          "description": "业务内容",
+          "originalRef": "PageInfo«巡检异常VO»",
+          "$ref": "#/definitions/PageInfo«巡检异常VO»"
+        },
+        "success": {
+          "type": "boolean",
+          "description": "成功标志"
+        },
+        "timestamp": {
+          "type": "integer",
+          "format": "int64",
+          "description": "时间戳"
+        }
+      },
+      "title": "统一返回结果«PageInfo«巡检异常VO»»"
+    },
+    "统一返回结果«PageInfo«巡检计划VO»»": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32",
+          "description": "返回代码"
+        },
+        "message": {
+          "type": "string",
+          "description": "失败消息"
+        },
+        "result": {
+          "description": "业务内容",
+          "originalRef": "PageInfo«巡检计划VO»",
+          "$ref": "#/definitions/PageInfo«巡检计划VO»"
+        },
+        "success": {
+          "type": "boolean",
+          "description": "成功标志"
+        },
+        "timestamp": {
+          "type": "integer",
+          "format": "int64",
+          "description": "时间戳"
+        }
+      },
+      "title": "统一返回结果«PageInfo«巡检计划VO»»"
+    },
+    "统一返回结果«PageInfo«巡检计划排班纪录VO»»": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32",
+          "description": "返回代码"
+        },
+        "message": {
+          "type": "string",
+          "description": "失败消息"
+        },
+        "result": {
+          "description": "业务内容",
+          "originalRef": "PageInfo«巡检计划排班纪录VO»",
+          "$ref": "#/definitions/PageInfo«巡检计划排班纪录VO»"
+        },
+        "success": {
+          "type": "boolean",
+          "description": "成功标志"
+        },
+        "timestamp": {
+          "type": "integer",
+          "format": "int64",
+          "description": "时间戳"
+        }
+      },
+      "title": "统一返回结果«PageInfo«巡检计划排班纪录VO»»"
+    },
+    "统一返回结果«PageInfo«巡检计划排班纪录分页VO»»": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32",
+          "description": "返回代码"
+        },
+        "message": {
+          "type": "string",
+          "description": "失败消息"
+        },
+        "result": {
+          "description": "业务内容",
+          "originalRef": "PageInfo«巡检计划排班纪录分页VO»",
+          "$ref": "#/definitions/PageInfo«巡检计划排班纪录分页VO»"
+        },
+        "success": {
+          "type": "boolean",
+          "description": "成功标志"
+        },
+        "timestamp": {
+          "type": "integer",
+          "format": "int64",
+          "description": "时间戳"
+        }
+      },
+      "title": "统一返回结果«PageInfo«巡检计划排班纪录分页VO»»"
+    },
+    "统一返回结果«PageInfo«巡检计划班次违规VO»»": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32",
+          "description": "返回代码"
+        },
+        "message": {
+          "type": "string",
+          "description": "失败消息"
+        },
+        "result": {
+          "description": "业务内容",
+          "originalRef": "PageInfo«巡检计划班次违规VO»",
+          "$ref": "#/definitions/PageInfo«巡检计划班次违规VO»"
+        },
+        "success": {
+          "type": "boolean",
+          "description": "成功标志"
+        },
+        "timestamp": {
+          "type": "integer",
+          "format": "int64",
+          "description": "时间戳"
+        }
+      },
+      "title": "统一返回结果«PageInfo«巡检计划班次违规VO»»"
+    },
+    "统一返回结果«YxInspectionLineVO»": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32",
+          "description": "返回代码"
+        },
+        "message": {
+          "type": "string",
+          "description": "失败消息"
+        },
+        "result": {
+          "description": "业务内容",
+          "originalRef": "YxInspectionLineVO",
+          "$ref": "#/definitions/YxInspectionLineVO"
+        },
+        "success": {
+          "type": "boolean",
+          "description": "成功标志"
+        },
+        "timestamp": {
+          "type": "integer",
+          "format": "int64",
+          "description": "时间戳"
+        }
+      },
+      "title": "统一返回结果«YxInspectionLineVO»"
+    },
+    "统一返回结果«string»": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32",
+          "description": "返回代码"
+        },
+        "message": {
+          "type": "string",
+          "description": "失败消息"
+        },
+        "result": {
+          "type": "string",
+          "description": "业务内容"
+        },
+        "success": {
+          "type": "boolean",
+          "description": "成功标志"
+        },
+        "timestamp": {
+          "type": "integer",
+          "format": "int64",
+          "description": "时间戳"
+        }
+      },
+      "title": "统一返回结果«string»"
+    },
+    "统一返回结果«巡检任务执行详情VO»": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32",
+          "description": "返回代码"
+        },
+        "message": {
+          "type": "string",
+          "description": "失败消息"
+        },
+        "result": {
+          "description": "业务内容",
+          "originalRef": "巡检任务执行详情VO",
+          "$ref": "#/definitions/巡检任务执行详情VO"
+        },
+        "success": {
+          "type": "boolean",
+          "description": "成功标志"
+        },
+        "timestamp": {
+          "type": "integer",
+          "format": "int64",
+          "description": "时间戳"
+        }
+      },
+      "title": "统一返回结果«巡检任务执行详情VO»"
+    },
+    "统一返回结果«巡检地点VO»": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32",
+          "description": "返回代码"
+        },
+        "message": {
+          "type": "string",
+          "description": "失败消息"
+        },
+        "result": {
+          "description": "业务内容",
+          "originalRef": "巡检地点VO",
+          "$ref": "#/definitions/巡检地点VO"
+        },
+        "success": {
+          "type": "boolean",
+          "description": "成功标志"
+        },
+        "timestamp": {
+          "type": "integer",
+          "format": "int64",
+          "description": "时间戳"
+        }
+      },
+      "title": "统一返回结果«巡检地点VO»"
+    },
+    "统一返回结果«巡检异常VO»": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32",
+          "description": "返回代码"
+        },
+        "message": {
+          "type": "string",
+          "description": "失败消息"
+        },
+        "result": {
+          "description": "业务内容",
+          "originalRef": "巡检异常VO",
+          "$ref": "#/definitions/巡检异常VO"
+        },
+        "success": {
+          "type": "boolean",
+          "description": "成功标志"
+        },
+        "timestamp": {
+          "type": "integer",
+          "format": "int64",
+          "description": "时间戳"
+        }
+      },
+      "title": "统一返回结果«巡检异常VO»"
+    },
+    "统一返回结果«巡检计划VO»": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32",
+          "description": "返回代码"
+        },
+        "message": {
+          "type": "string",
+          "description": "失败消息"
+        },
+        "result": {
+          "description": "业务内容",
+          "originalRef": "巡检计划VO",
+          "$ref": "#/definitions/巡检计划VO"
+        },
+        "success": {
+          "type": "boolean",
+          "description": "成功标志"
+        },
+        "timestamp": {
+          "type": "integer",
+          "format": "int64",
+          "description": "时间戳"
+        }
+      },
+      "title": "统一返回结果«巡检计划VO»"
+    },
+    "统一返回结果«巡检计划执行纪录统计VO»": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32",
+          "description": "返回代码"
+        },
+        "message": {
+          "type": "string",
+          "description": "失败消息"
+        },
+        "result": {
+          "description": "业务内容",
+          "originalRef": "巡检计划执行纪录统计VO",
+          "$ref": "#/definitions/巡检计划执行纪录统计VO"
+        },
+        "success": {
+          "type": "boolean",
+          "description": "成功标志"
+        },
+        "timestamp": {
+          "type": "integer",
+          "format": "int64",
+          "description": "时间戳"
+        }
+      },
+      "title": "统一返回结果«巡检计划执行纪录统计VO»"
+    },
+    "统一返回结果«巡检计划排班配置VO»": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32",
+          "description": "返回代码"
+        },
+        "message": {
+          "type": "string",
+          "description": "失败消息"
+        },
+        "result": {
+          "description": "业务内容",
+          "originalRef": "巡检计划排班配置VO",
+          "$ref": "#/definitions/巡检计划排班配置VO"
+        },
+        "success": {
+          "type": "boolean",
+          "description": "成功标志"
+        },
+        "timestamp": {
+          "type": "integer",
+          "format": "int64",
+          "description": "时间戳"
+        }
+      },
+      "title": "统一返回结果«巡检计划排班配置VO»"
+    },
+    "统一返回结果«巡检计划提醒设置VO»": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32",
+          "description": "返回代码"
+        },
+        "message": {
+          "type": "string",
+          "description": "失败消息"
+        },
+        "result": {
+          "description": "业务内容",
+          "originalRef": "巡检计划提醒设置VO",
+          "$ref": "#/definitions/巡检计划提醒设置VO"
+        },
+        "success": {
+          "type": "boolean",
+          "description": "成功标志"
+        },
+        "timestamp": {
+          "type": "integer",
+          "format": "int64",
+          "description": "时间戳"
+        }
+      },
+      "title": "统一返回结果«巡检计划提醒设置VO»"
+    },
+    "统一返回结果«巡检计划班次执行纪录VO»": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32",
+          "description": "返回代码"
+        },
+        "message": {
+          "type": "string",
+          "description": "失败消息"
+        },
+        "result": {
+          "description": "业务内容",
+          "originalRef": "巡检计划班次执行纪录VO",
+          "$ref": "#/definitions/巡检计划班次执行纪录VO"
+        },
+        "success": {
+          "type": "boolean",
+          "description": "成功标志"
+        },
+        "timestamp": {
+          "type": "integer",
+          "format": "int64",
+          "description": "时间戳"
+        }
+      },
+      "title": "统一返回结果«巡检计划班次执行纪录VO»"
+    },
+    "统一返回结果«巡检计划班次违规VO»": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32",
+          "description": "返回代码"
+        },
+        "message": {
+          "type": "string",
+          "description": "失败消息"
+        },
+        "result": {
+          "description": "业务内容",
+          "originalRef": "巡检计划班次违规VO",
+          "$ref": "#/definitions/巡检计划班次违规VO"
+        },
+        "success": {
+          "type": "boolean",
+          "description": "成功标志"
+        },
+        "timestamp": {
+          "type": "integer",
+          "format": "int64",
+          "description": "时间戳"
+        }
+      },
+      "title": "统一返回结果«巡检计划班次违规VO»"
+    },
+    "统一返回结果«我的巡检计划排班纪录VO»": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32",
+          "description": "返回代码"
+        },
+        "message": {
+          "type": "string",
+          "description": "失败消息"
+        },
+        "result": {
+          "description": "业务内容",
+          "originalRef": "我的巡检计划排班纪录VO",
+          "$ref": "#/definitions/我的巡检计划排班纪录VO"
+        },
+        "success": {
+          "type": "boolean",
+          "description": "成功标志"
+        },
+        "timestamp": {
+          "type": "integer",
+          "format": "int64",
+          "description": "时间戳"
+        }
+      },
+      "title": "统一返回结果«我的巡检计划排班纪录VO»"
+    }
+  }
+}

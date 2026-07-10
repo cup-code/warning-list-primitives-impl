@@ -1,15 +1,19 @@
 <script>
 import { useMutation, useQuery } from "@tanstack/vue-query";
 import { getCurrentInstance, reactive, ref } from "vue";
-import { InspectionPointTableConfig } from "./config";
+import EImportFile from "@/components/EComponents/EImportFile/index.vue";
+import {
+  deleteInspectionPlace,
+  exportInspectionPlace,
+  getInspectionPlaceDetailById,
+  getPlaceAndContentTemplate,
+  importPlaceAndContent,
+  queryInspectionPlaceByPage,
+} from "@/http/inspection/yx-inspection-api";
+import CompanyTree from "@/views/common-ui/CompanyTree.vue";
 import InspectionPointDialog from "./components/InspectionPointDialog.vue";
 import QrcodePrintDialog from "./components/QrcodePrintDialog.vue";
-import CompanyTree from "@/views/common-ui/CompanyTree.vue";
-import {
-  queryInspectionPlaceByPage,
-  deleteInspectionPlace,
-  getInspectionPlaceDetailById,
-} from "@/http/inspection/yx-inspection-api";
+import { InspectionPointTableConfig } from "./config";
 
 export default {
   name: "InspectionPoint",
@@ -17,6 +21,7 @@ export default {
     CompanyTree,
     InspectionPointDialog,
     QrcodePrintDialog,
+    EImportFile,
   },
   setup() {
     const { proxy } = getCurrentInstance();
@@ -46,6 +51,9 @@ export default {
     const printList = ref([]);
     const printDialogVisible = ref(false);
 
+    // 导出相关
+    const exportLoading = ref(false);
+
     // 打印二维码（单条）
     const handlePrintQr = (row) => {
       printList.value = [row];
@@ -65,6 +73,41 @@ export default {
     // 关闭打印弹窗
     const handlePrintDialogClose = () => {
       printDialogVisible.value = false;
+    };
+
+    // 导出巡检点数据
+    const handleExport = async () => {
+      // 空数据检查
+      if (!tableData.value?.length) {
+        proxy.$message.warning("暂无数据可导出");
+        return;
+      }
+
+      exportLoading.value = true;
+      try {
+        const res = await exportInspectionPlace({
+          pageNum: searchForm.pageNum,
+          pageSize: searchForm.pageSize,
+          fuzzyQuery: searchForm.fuzzyQuery,
+        });
+
+        // 处理 blob 响应并触发下载
+        const blob = new Blob([res.data], {
+          type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        });
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `巡检点数据_${Date.now()}.xlsx`;
+        link.click();
+        window.URL.revokeObjectURL(url);
+
+        proxy.$message.success("导出成功");
+      } catch (error) {
+        proxy.$message.error("导出失败");
+      } finally {
+        exportLoading.value = false;
+      }
     };
 
     // 查询列表数据
@@ -106,6 +149,48 @@ export default {
         proxy.$message.error("删除失败");
       },
     });
+
+    // 下载导入模板
+    const downloadingTpl = ref(false);
+    const handleDownloadTemplate = async () => {
+      downloadingTpl.value = true;
+      try {
+        const res = await getPlaceAndContentTemplate();
+        const blob = new Blob([res.data], {
+          type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        });
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `巡检点导入模板_${Date.now()}.xlsx`;
+        link.click();
+        window.URL.revokeObjectURL(url);
+        proxy.$message.success("下载成功");
+      } catch (error) {
+        proxy.$message.error("下载失败，请重试");
+      } finally {
+        downloadingTpl.value = false;
+      }
+    };
+
+    // 批量导入巡检点与巡检项
+    const importing = ref(false);
+    const handleImportData = async (uploadObj) => {
+      importing.value = true;
+      try {
+        const res = await importPlaceAndContent(uploadObj.file);
+        if (res.data?.success) {
+          proxy.$message.success("导入成功");
+          refetch();
+        } else {
+          proxy.$message.error(res.data?.message || "导入失败");
+        }
+      } catch (error) {
+        proxy.$message.error("导入失败，请重试");
+      } finally {
+        importing.value = false;
+      }
+    };
 
     // 搜索
     const searchFn = () => {
@@ -171,6 +256,8 @@ export default {
         pointCode: data.placeCode ?? "",
         needCheckIn: data.needMark ? "是" : "否",
         requirePhoto: data.needPhoto ? "是" : "否",
+        needAllContentDone: data.needAllContentDone ? "是" : "否",
+        contentDefaultNormal: data.contentDefaultNormal ? "是" : "否",
         position: data.placePosition ?? "",
         remarks: data.attention ?? "",
         alarmMinutes: data.alarmMinutes ?? 30,
@@ -268,6 +355,7 @@ export default {
       currentRow,
       printList,
       printDialogVisible,
+      exportLoading,
       treeNodeTap,
       searchFn,
       resetFn,
@@ -280,6 +368,11 @@ export default {
       handlePrintQr,
       handleBatchPrint,
       handlePrintDialogClose,
+      handleExport,
+      downloadingTpl,
+      importing,
+      handleDownloadTemplate,
+      handleImportData,
       pageSizeFn,
       pageCurFn,
     };
@@ -316,11 +409,40 @@ export default {
 
       <!-- 表格区域 -->
       <ECard slot="table">
+        <!-- 新增、导出、下载导入模版、导入数据、批量打印 -->
         <div class="mb-4">
           <EButton type="primary" btnIcon="el-icon-plus" class="mr-2" @click="handleAdd">
             新增
           </EButton>
-          <EButton type="primary" btnIcon="el-icon-printer" @click="handleBatchPrint">
+          <EButton
+            type="primary"
+            btnIcon="el-icon-download"
+            class="mr-2"
+            :loading="exportLoading"
+            @click="handleExport"
+          >
+            导出打印
+          </EButton>
+          <EButton
+            type="default"
+            btnIcon="el-icon-download"
+            class="mr-2"
+            :loading="downloadingTpl"
+            @click="handleDownloadTemplate"
+          >
+            下载导入模版
+          </EButton>
+          <EImportFile class="mr-2" @excelImport="handleImportData">
+            <EButton type="success" btnIcon="el-icon-upload2" :loading="importing">
+              导入数据
+            </EButton>
+          </EImportFile>
+          <EButton
+            type="primary"
+            class="ml-2"
+            btnIcon="el-icon-printer"
+            @click="handleBatchPrint"
+          >
             批量打印
           </EButton>
         </div>

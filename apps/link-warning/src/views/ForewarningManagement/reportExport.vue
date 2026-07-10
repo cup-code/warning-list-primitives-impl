@@ -1,12 +1,14 @@
 <script>
+import { getSpecifiedModule } from "@/http/companyConfig/companyConfig-api";
 import { getScreenData } from "@/http/videoStat/screenData";
 import { getWarningTypeList, machineList } from "@/http/videoWarning/warning-api";
-import { getSpecifiedModule } from "@/http/companyConfig/companyConfig-api";
 import ReportForm from "./components/ReportExport/ReportForm.vue";
 import ReportPreview from "./components/ReportExport/ReportPreview.vue";
 import {
+  getCurrentTitle,
   getCurrentWeekNumber,
   getCurrentYear,
+  getDefaultReportTitle,
   getWeekDateStr,
   getWeekRange,
 } from "./test/dateUtils";
@@ -55,6 +57,8 @@ export default {
         headerText: "",
         advertText: null,
       },
+      timeTitle: "",
+      defaultReportTitle: "视频智能运营平台管理周报",
     };
   },
   computed: {
@@ -128,6 +132,9 @@ export default {
     },
 
     async getScreenData() {
+      console.log(this.searchForm);
+      this.timeTitle = getCurrentTitle(this.searchForm.timeType);
+      this.defaultReportTitle = getDefaultReportTitle(this.searchForm.timeType);
       const res = await getScreenData(this.searchForm);
       this.screenData = res.data.result;
 
@@ -220,6 +227,7 @@ export default {
         <ReportPreview
           ref="reportPreview"
           :report-title="formData.reportTitle"
+          :default-report-title="defaultReportTitle"
           :report-summary="formData.reportSummary"
           :show-table="formData.showTable"
           :current-year="currentYear"
@@ -239,6 +247,7 @@ export default {
           :header-logo="reportConfig.headerLogo"
           :header-text="reportConfig.headerText"
           :chart-data="screenData"
+          :time-title="timeTitle"
         />
       </div>
     </ECard>

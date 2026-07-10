@@ -85,6 +85,7 @@ export default defineConfig(env => ({
       // 确保使用完整版的 Vue
       'process.env.RUNTIME_ENV': JSON.stringify(process.env.NODE_ENV),
       'process.env.TASK': JSON.stringify(process.env.TASK),
+      'videojs': 'window.videojs',
     },
     include: transpileDependencies,
   },
@@ -161,7 +162,7 @@ export default defineConfig(env => ({
     externals: {
       // 'pdfjs-dist': 'pdfjsLib', // 已改为使用本地 npm 包，不再使用 CDN
       // 'vue-pdf': 'VuePdf',
-      'cesium': 'Cesium',
+      // 'cesium': 'Cesium',
       'monaco-editor': 'monaco',
     },
   },
@@ -222,6 +223,10 @@ export default defineConfig(env => ({
     postcss: {
       plugins: [['tailwindcss', { config: './tailwind.config.cjs' }], ['autoprefixer']],
     },
+    // 关掉 rsbuild 内置 lightningcss-loader：它与 css-loader 6.11 + vue-loader 15 在处理
+    // 纯 <style lang="css"> 的 Vue SFC（如 vue-echarts）时不兼容，css-loader 抛
+    // "Invalid ident is provided by referenced loader"。回退到已配置的 postcss(autoprefixer) 链。
+    lightningcssLoader: false,
     rspack: (config, { env }) => {
       // if (env !== 'production') {
       //   config.cache = {
@@ -267,13 +272,13 @@ export default defineConfig(env => ({
         },
       })
 
-    // ============ PDF.js Worker 配置 ============
+      // ============ PDF.js Worker 配置 ============
       // 解决 worker-loader 与 rspack 的兼容性问题
       // 使用 NormalModuleReplacementPlugin 将 worker-loader! 替换为 worker-rspack-loader!
 
       config.plugins.push(
         new rspack.NormalModuleReplacementPlugin(
-          /^worker-loader\?.*!.*pdf\.worker\.js$/,
+          /^worker-loader\?[^\n\r!\u2028\u2029]*!.*pdf\.worker\.js$/,
           (resource) => {
             // 提取 worker-loader! 后面的实际文件路径
             const match = resource.request.match(/worker-loader\?.*!(.+)$/)
@@ -281,8 +286,8 @@ export default defineConfig(env => ({
               // 替换为 worker-rspack-loader，保持相同的配置参数
               resource.request = `worker-rspack-loader?filename=js/[name].[contenthash].worker.js&esModule=false!${match[1]}`
             }
-          }
-        )
+          },
+        ),
       )
 
       // 配置 worker-rspack-loader 处理规则
@@ -358,152 +363,152 @@ export default defineConfig(env => ({
         maxAsyncRequests: 15,
         maxInitialRequests: 10,
         cacheGroups: {
-            // ============ 完整版分包策略 ============
-            // 2. Element UI - 单独打包
-            elementUI: {
-              name: 'chunk-element-ui',
-              test: /[\\/]node_modules[\\/]element-ui[\\/]/,
-              priority: 45,
-              chunks: 'all',
-              enforce: true,
-            },
-
-            // 3. 图表库 - ECharts相关
-            charts: {
-              name: 'chunk-charts',
-              test: /[\\/]node_modules[\\/](echarts|vue-echarts)[\\/]/,
-              priority: 40,
-              chunks: 'all',
-              enforce: true,
-            },
-
-            // 4. 编辑器相关 - Monaco Editor
-            editor: {
-              name: 'chunk-editor',
-              test: /[\\/]node_modules[\\/]monaco-editor[\\/]/,
-              priority: 35,
-              chunks: 'all',
-              enforce: true,
-            },
-
-            // 5. BPMN流程相关
-            bpmn: {
-              name: 'chunk-bpmn',
-              test: /[\\/]node_modules[\\/](bpmn-js|kaka-bpmn)[\\/]/,
-              priority: 30,
-              chunks: 'all',
-              enforce: true,
-            },
-
-            // 6. 地图相关 - Mapbox GL
-            map: {
-              name: 'chunk-map',
-              test: /[\\/]node_modules[\\/](mapbox-gl|@mapbox)[\\/]/,
-              priority: 25,
-              chunks: 'all',
-              enforce: true,
-            },
-
-            // 6.5. Luckysheet 已改为按需加载（通过 loadLuckysheet），不需要代码分割
-            // luckysheet: {
-            //   name: "chunk-luckysheet",
-            //   test: /[\\/]node_modules[\\/]luckysheet[\\/]/,
-            //   priority: 24,
-            //   chunks: "all",
-            //   enforce: true,
-            // },
-
-            // 6.6. 3D地图 - Jsmap
-            jsmap: {
-              name: 'chunk-jsmap',
-              test: /[\\/]node_modules[\\/]link-jsmap-package[\\/]/,
-              priority: 23,
-              chunks: 'all',
-              enforce: true,
-            },
-
-            // 7. PDF相关
-            // pdf: {
-            //   name: 'chunk-pdf',
-            //   test: /[\\/]node_modules[\\/](pdfjs-dist|vue-pdf)[\\/]/,
-            //   priority: 20,
-            //   chunks: 'all',
-            //   enforce: true,
-            // },
-
-            // 9. 业务模块 - 按功能域拆分
-            safety: {
-              name: 'chunk-safety',
-              test: /[\\/]src[\\/]views[\\/](accidentManage|majorHazard|safeProductionTarget|safetyInvestment|specialEquipment|specialOperation)[\\/]/,
-              priority: 10,
-              chunks: 'all',
-              minChunks: 1,
-              reuseExistingChunk: true,
-            },
-
-            emergency: {
-              name: 'chunk-emergency',
-              test: /[\\/]src[\\/]views[\\/](emergency|contingencyManage|fireControl)[\\/]/,
-              priority: 10,
-              chunks: 'all',
-              minChunks: 1,
-              reuseExistingChunk: true,
-            },
-
-            equipment: {
-              name: 'chunk-equipment',
-              test: /[\\/]src[\\/]views[\\/](eam|equipment|dev)[\\/]/,
-              priority: 10,
-              chunks: 'all',
-              minChunks: 1,
-              reuseExistingChunk: true,
-            },
-
-            visualization: {
-              name: 'chunk-visualization',
-              test: /[\\/]src[\\/]views[\\/](visualizationCenter|cesium3d|maps)[\\/]/,
-              priority: 10,
-              chunks: 'all',
-              minChunks: 1,
-              reuseExistingChunk: true,
-            },
-
-            components: {
-              name: 'chunk-components',
-              test: /[\\/]src[\\/]components[\\/]/,
-              minChunks: 2,
-              priority: 10,
-              reuseExistingChunk: true,
-            },
-
-            // 10. 其他第三方库
-            vendor: {
-              name: 'chunk-vendor',
-              test: /[\\/]node_modules[\\/]/,
-              priority: 5,
-              chunks: 'all',
-              maxSize: 300000,
-              enforce: true,
-            },
-
-            async: {
-              name: 'chunk-async',
-              chunks: 'async',
-              minChunks: 1,
-              priority: 1,
-              reuseExistingChunk: true,
-            },
-
-            // 11. 公共业务代码
-            views: {
-              name: 'chunk-views',
-              test: /[\\/]src[\\/]views[\\/]/,
-              minChunks: 1,
-              priority: 5,
-              reuseExistingChunk: true,
-              chunks: 'async',
-            },
+          // ============ 完整版分包策略 ============
+          // 2. Element UI - 单独打包
+          elementUI: {
+            name: 'chunk-element-ui',
+            test: /[\\/]node_modules[\\/]element-ui[\\/]/,
+            priority: 45,
+            chunks: 'all',
+            enforce: true,
           },
+
+          // 3. 图表库 - ECharts相关
+          charts: {
+            name: 'chunk-charts',
+            test: /[\\/]node_modules[\\/](echarts|vue-echarts)[\\/]/,
+            priority: 40,
+            chunks: 'all',
+            enforce: true,
+          },
+
+          // 4. 编辑器相关 - Monaco Editor
+          editor: {
+            name: 'chunk-editor',
+            test: /[\\/]node_modules[\\/]monaco-editor[\\/]/,
+            priority: 35,
+            chunks: 'all',
+            enforce: true,
+          },
+
+          // 5. BPMN流程相关
+          bpmn: {
+            name: 'chunk-bpmn',
+            test: /[\\/]node_modules[\\/](bpmn-js|kaka-bpmn)[\\/]/,
+            priority: 30,
+            chunks: 'all',
+            enforce: true,
+          },
+
+          // 6. 地图相关 - Mapbox GL
+          map: {
+            name: 'chunk-map',
+            test: /[\\/]node_modules[\\/](mapbox-gl|@mapbox)[\\/]/,
+            priority: 25,
+            chunks: 'all',
+            enforce: true,
+          },
+
+          // 6.5. Luckysheet 已改为按需加载（通过 loadLuckysheet），不需要代码分割
+          // luckysheet: {
+          //   name: "chunk-luckysheet",
+          //   test: /[\\/]node_modules[\\/]luckysheet[\\/]/,
+          //   priority: 24,
+          //   chunks: "all",
+          //   enforce: true,
+          // },
+
+          // 6.6. 3D地图 - Jsmap
+          jsmap: {
+            name: 'chunk-jsmap',
+            test: /[\\/]node_modules[\\/]link-jsmap-package[\\/]/,
+            priority: 23,
+            chunks: 'all',
+            enforce: true,
+          },
+
+          // 7. PDF相关
+          // pdf: {
+          //   name: 'chunk-pdf',
+          //   test: /[\\/]node_modules[\\/](pdfjs-dist|vue-pdf)[\\/]/,
+          //   priority: 20,
+          //   chunks: 'all',
+          //   enforce: true,
+          // },
+
+          // 9. 业务模块 - 按功能域拆分
+          safety: {
+            name: 'chunk-safety',
+            test: /[\\/]src[\\/]views[\\/](accidentManage|majorHazard|safeProductionTarget|safetyInvestment|specialEquipment|specialOperation)[\\/]/,
+            priority: 10,
+            chunks: 'all',
+            minChunks: 1,
+            reuseExistingChunk: true,
+          },
+
+          emergency: {
+            name: 'chunk-emergency',
+            test: /[\\/]src[\\/]views[\\/](emergency|contingencyManage|fireControl)[\\/]/,
+            priority: 10,
+            chunks: 'all',
+            minChunks: 1,
+            reuseExistingChunk: true,
+          },
+
+          equipment: {
+            name: 'chunk-equipment',
+            test: /[\\/]src[\\/]views[\\/](eam|equipment|dev)[\\/]/,
+            priority: 10,
+            chunks: 'all',
+            minChunks: 1,
+            reuseExistingChunk: true,
+          },
+
+          visualization: {
+            name: 'chunk-visualization',
+            test: /[\\/]src[\\/]views[\\/](visualizationCenter|cesium3d|maps)[\\/]/,
+            priority: 10,
+            chunks: 'all',
+            minChunks: 1,
+            reuseExistingChunk: true,
+          },
+
+          components: {
+            name: 'chunk-components',
+            test: /[\\/]src[\\/]components[\\/]/,
+            minChunks: 2,
+            priority: 10,
+            reuseExistingChunk: true,
+          },
+
+          // 10. 其他第三方库
+          vendor: {
+            name: 'chunk-vendor',
+            test: /[\\/]node_modules[\\/]/,
+            priority: 5,
+            chunks: 'all',
+            maxSize: 300000,
+            enforce: true,
+          },
+
+          async: {
+            name: 'chunk-async',
+            chunks: 'async',
+            minChunks: 1,
+            priority: 1,
+            reuseExistingChunk: true,
+          },
+
+          // 11. 公共业务代码
+          views: {
+            name: 'chunk-views',
+            test: /[\\/]src[\\/]views[\\/]/,
+            minChunks: 1,
+            priority: 5,
+            reuseExistingChunk: true,
+            chunks: 'async',
+          },
+        },
       },
     },
   },

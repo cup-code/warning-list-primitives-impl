@@ -8,7 +8,12 @@ import { getTenantDictListMap } from "@/http/safe-production/dict-manage-api";
 import { login, loginByOa } from "@/http/user-api";
 import { asyncRoutes, resetRouter } from "@/router/index";
 import { initRouter, setPermissionTreeData, setStorage } from "@/utils";
-import { setAuthToken, setSessionAlive, getAuthToken } from "@/utils/tab-session";
+import {
+  clearSession,
+  getAuthToken,
+  setAuthToken,
+  setSessionAlive,
+} from "@/utils/tab-session";
 import ChangePasswordDialog from "./changePasswordDialog";
 
 export default {
@@ -54,7 +59,7 @@ export default {
     if (this.urlParams.tenantCode && this.urlParams.userToken) {
       this.loading = true;
       // 先清空local等内容
-      sessionStorage.clear();
+      clearSession();
       this.$store.dispatch("user/logout"); // 清空全局状态
       loginByOa(this.urlParams)
         .then((res) => {
@@ -86,7 +91,7 @@ export default {
           this.loading = true;
           const form = this.form;
           // 1、先清空sessionStorage（不影响其他标签页）
-          sessionStorage.clear();
+          clearSession();
           this.$store.dispatch("user/logout"); // 清空全局状态
           // 2、再登录
           login(form.username, form.password)

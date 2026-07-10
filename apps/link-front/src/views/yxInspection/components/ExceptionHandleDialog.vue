@@ -32,6 +32,19 @@ export default {
       problemDesc: "",
     });
 
+    watch(
+      () => props.info,
+      (newVal) => {
+        if (newVal) {
+          console.log(newVal);
+          form.auditResult = newVal.auditResult || "";
+          form.abnormalLevel = newVal.abnormalLevel || "";
+          form.problemDesc = newVal.problemDesc || "";
+        }
+      },
+      { immediate: true, deep: true }
+    );
+
     // 弹窗标题
     const dialogTitle = computed(() => {
       return props.dialogType === "audit" ? "审核巡检异常记录" : "异常详情";
@@ -42,6 +55,26 @@ export default {
 
     // 是否为问题类型（审核模式）
     const isProblem = computed(() => form.auditResult === "1");
+
+    /// 是否已处理（auditState: 0=待审核, 1=处理中, 2=已处理）
+    const isProcessed = computed(() => props.info.auditState === "2");
+
+    // 审核结果文本
+    const auditResultText = computed(() => {
+      const result = props.info.auditResult;
+      if (result === "0") return "误报";
+      if (result === "1") return "问题";
+      if (result === "2") return "安全隐患";
+      return "-";
+    });
+
+    // 异常级别文本
+    const abnormalLevelText = computed(() => {
+      const level = props.info.abnormalLevel;
+      if (level === "1") return "一般";
+      if (level === "3") return "紧急";
+      return "-";
+    });
 
     // filePrefix 前缀（用于图片、视频、音频URL）
     const filePrefix = computed(() => {
@@ -120,9 +153,9 @@ export default {
     // 初始化表单
     const initForm = () => {
       Object.assign(form, {
-        auditResult: "",
-        abnormalLevel: "",
-        problemDesc: "",
+        auditResult: props.info.auditResult || "",
+        abnormalLevel: props.info.abnormalLevel || "",
+        problemDesc: props.info.problemDesc || "",
       });
     };
 
@@ -168,6 +201,9 @@ export default {
       dialogTitle,
       isReadonly,
       isProblem,
+      isProcessed,
+      auditResultText,
+      abnormalLevelText,
       rules,
       filePrefix,
       photoList,
@@ -194,28 +230,57 @@ export default {
       <!-- 只读信息区域：两列布局 -->
       <el-row :gutter="20">
         <el-col :span="12">
-          <el-form-item label="计划名称">
-            <el-input :value="info.planName || '-'" disabled />
+          <el-form-item label="计划名称：">
+            <span class="detail-text">{{ info.planName || "-" }}</span>
           </el-form-item>
         </el-col>
         <el-col :span="12">
-          <el-form-item label="巡检岗位">
-            <el-input :value="info.inspectionPost || info.postName || '-'" disabled />
+          <el-form-item label="巡检岗位：">
+            <span class="detail-text">{{
+              info.inspectionPost || info.postName || "-"
+            }}</span>
           </el-form-item>
         </el-col>
       </el-row>
       <el-row :gutter="20">
         <el-col :span="12">
-          <el-form-item label="巡检人员">
-            <el-input :value="info.inspector || info.executeUsername || '-'" disabled />
+          <el-form-item label="巡检人员：">
+            <span class="detail-text">{{
+              info.inspector || info.executeUsername || "-"
+            }}</span>
           </el-form-item>
         </el-col>
         <el-col :span="12">
-          <el-form-item label="异常时间">
-            <el-input
-              :value="formatExceptionTime(info.exceptionTime || info.executeDate)"
-              disabled
-            />
+          <el-form-item label="异常时间：">
+            <span class="detail-text">{{
+              formatExceptionTime(info.exceptionTime || info.executeDate)
+            }}</span>
+          </el-form-item>
+        </el-col>
+      </el-row>
+
+      <!-- 巡检信息 -->
+      <el-row :gutter="20">
+        <el-col :span="12">
+          <el-form-item label="巡检点：">
+            <span class="detail-text">{{ info.placeName || "-" }}</span>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="巡检位置：">
+            <span class="detail-text">{{ info.placePosition || "-" }}</span>
+          </el-form-item>
+        </el-col>
+      </el-row>
+      <el-row :gutter="20">
+        <el-col :span="12">
+          <el-form-item label="巡检内容：">
+            <span class="detail-text">{{ info.contentName || "-" }}</span>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="巡检标准：">
+            <span class="detail-text">{{ info.inspectionBenchmark || "-" }}</span>
           </el-form-item>
         </el-col>
       </el-row>
@@ -277,19 +342,43 @@ export default {
         />
       </el-form-item>
 
-      <!-- 审核表单（仅 audit 模式显示） -->
-      <template v-if="!isReadonly">
+      <!-- 已处理状态：只读回显审核信息 -->
+      <!-- <template v-if="isProcessed">
+        <el-form-item label="审核结果：">
+          <span class="detail-text">{{ auditResultText }}</span>
+        </el-form-item> -->
+
+      <!-- 审核结果为"问题"时显示异常级别和问题描述 -->
+      <!-- <template v-if="info.auditResult === '1'">
+          <el-form-item label="异常级别：">
+            <span class="detail-text">{{ abnormalLevelText }}</span>
+          </el-form-item>
+
+          <el-form-item label="问题描述：">
+            <span class="detail-text">{{ info.problemDesc || "-" }}</span>
+          </el-form-item>
+        </template>
+      </template> -->
+
+      <!-- 审核表单（仅 audit 模式且未处理状态显示） -->
+      <template v-if="isProcessed || dialogType === 'audit'">
         <el-form-item label="审核结果" prop="auditResult" required>
-          <el-radio-group v-model="form.auditResult">
+          <el-radio-group
+            v-model="form.auditResult"
+            :disabled="isProcessed && dialogType === 'view'"
+          >
             <el-radio label="0">误报</el-radio>
             <el-radio label="1">有效</el-radio>
           </el-radio-group>
         </el-form-item>
 
         <!-- 选择"问题"时动态显示 -->
-        <template v-if="isProblem">
+        <template v-if="form.auditResult === '1'">
           <el-form-item label="异常级别" prop="abnormalLevel">
-            <el-radio-group v-model="form.abnormalLevel">
+            <el-radio-group
+              v-model="form.abnormalLevel"
+              :disabled="isProcessed && dialogType === 'view'"
+            >
               <el-radio label="1">一般</el-radio>
               <el-radio label="3">紧急</el-radio>
             </el-radio-group>
@@ -301,6 +390,7 @@ export default {
               type="textarea"
               :rows="3"
               placeholder="请输入问题描述"
+              :disabled="isProcessed && dialogType === 'view'"
             />
           </el-form-item>
         </template>
@@ -318,10 +408,10 @@ export default {
 
     <span slot="footer" class="dialog-footer">
       <el-button @click="handleClose" size="small">{{
-        isReadonly ? "关 闭" : "取 消"
+        isReadonly || isProcessed ? "关 闭" : "取 消"
       }}</el-button>
       <el-button
-        v-if="!isReadonly"
+        v-if="!isReadonly && !isProcessed"
         type="primary"
         :loading="loading"
         @click="handleConfirm"
@@ -334,6 +424,11 @@ export default {
 </template>
 
 <style lang="scss" scoped>
+.detail-text {
+  color: #606266;
+  line-height: 32px;
+}
+
 .media-list {
   display: flex;
   flex-wrap: wrap;

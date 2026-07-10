@@ -61,11 +61,11 @@ export default {
                 dangerouslyUseHTMLString: true,
                 duration: 20000,
                 showClose: true,
-                message: data.msg,
+                message: data.message,
               })
             }
             else {
-              this.$message.error(data.msg)
+              this.$message.error(data.message)
             }
             this.visible = false
           })

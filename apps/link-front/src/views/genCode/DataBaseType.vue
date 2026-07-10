@@ -40,16 +40,17 @@ export default {
         },
         this.searchForm,
       )
-      getDataBaseListFn(params).then(({ data }) => {
-        if (data && data.success) {
-          this.dataList = data.page.list
-          this.total = data.page.count
-        }
-        else {
-          this.$message.error(data.msg)
-        }
-        this.loading = false
-      })
+      getDataBaseListFn(params)
+        .then(({ data }) => {
+          this.loading = false
+          if (data && data.success) {
+            this.dataList = data.page.list
+            this.total = data.page.count
+          }
+        })
+        .catch(() => {
+          this.loading = false
+        })
     },
     // 每页数
     sizeChangeHandle(val) {
@@ -110,19 +111,24 @@ export default {
         cancelButtonText: '取消',
         type: 'warning',
         showClose: false,
-      }).then(() => {
-        this.loading = true
-        delDataBaseFn(ids).then(({ data }) => {
-          this.loading = false
-          if (data && data.success) {
-            this.$message.success(data.msg)
-            this.refreshList()
-          }
-          else {
-            this.$message.error(data.msg)
-          }
-        })
       })
+        .then(() => {
+          this.loading = true
+          delDataBaseFn(ids)
+            .then(({ data }) => {
+              this.loading = false
+              if (data && data.success) {
+                this.$message.success(data.message)
+                this.refreshList()
+              }
+            })
+            .catch(() => {
+              this.loading = false
+            })
+        })
+        .catch(() => {
+          this.loading = false
+        })
     },
     // 查看详情
     detail(row) {
@@ -143,20 +149,11 @@ export default {
 </script>
 
 <template>
-  <div class="page-container">
-    <ECard type="search">
-      <el-form
-        ref="searchForm"
-        inline
-        :model="searchForm"
-        @submit.native.prevent
-      >
+  <KyTreeTable ref="treeTable" :isShowLeft="false">
+    <ECard slot="search" type="search" noneBottom>
+      <el-form ref="searchForm" inline :model="searchForm" @submit.native.prevent>
         <el-form-item prop="type">
-          <el-select
-            v-model="searchForm.type"
-            placeholder="请选择"
-            style="width: 100%"
-          >
+          <el-select v-model="searchForm.type" placeholder="请选择" style="width: 100%">
             <el-option
               v-for="item in $dictUtils.getDictList('db_type')"
               :key="item.id"
@@ -166,10 +163,7 @@ export default {
           </el-select>
         </el-form-item>
         <el-form-item>
-          <el-button
-            type="primary"
-            @click="refreshList"
-          >
+          <el-button type="primary" @click="refreshList">
             查询
           </el-button>
           <el-button @click="resetSearch">
@@ -179,13 +173,9 @@ export default {
       </el-form>
     </ECard>
 
-    <ECard>
+    <ECard slot="table">
       <div class="card-cell">
-        <el-button
-          type="primary"
-          icon="el-icon-plus"
-          @click="add()"
-        >
+        <el-button type="primary" icon="el-icon-plus" @click="add()">
           新建
         </el-button>
         <el-button
@@ -207,17 +197,8 @@ export default {
           删除
         </el-button>
         <el-button-group class="pull-right">
-          <el-tooltip
-            effect="dark"
-            content="刷新"
-            placement="top"
-            class="item"
-          >
-            <el-button
-              type="default"
-              icon="el-icon-refresh"
-              @click="refreshList()"
-            />
+          <el-tooltip effect="dark" content="刷新" placement="top" class="item">
+            <el-button type="default" icon="el-icon-refresh" @click="refreshList()" />
           </el-tooltip>
         </el-button-group>
       </div>
@@ -242,40 +223,20 @@ export default {
           <template slot-scope="scope">
             <el-tabs>
               <el-tab-pane label="表字段物理类型">
-                <el-table
-                  style="width: 100%"
-                  :data="scope.row.genTableFieldTypeList"
-                >
-                  <el-table-column
-                    prop="label"
-                    label="标签"
-                  />
-                  <el-table-column
-                    prop="value"
-                    label="值"
-                  />
-                  <el-table-column
-                    prop="sort"
-                    label="排序"
-                  />
+                <el-table style="width: 100%" :data="scope.row.genTableFieldTypeList">
+                  <el-table-column prop="label" label="标签" />
+                  <el-table-column prop="value" label="值" />
+                  <el-table-column prop="sort" label="排序" />
                 </el-table>
               </el-tab-pane>
             </el-tabs>
           </template>
         </el-table-column>
-        <el-table-column
-          label="数据库类型"
-          prop="type"
-          sortable="custom"
-        >
+        <el-table-column label="数据库类型" prop="type" sortable="custom">
           <template slot-scope="scope">
             <!-- <el-link  type="primary" :underline="false" v-if="hasPermission('sys:menu:edit')" @click="edit(scope.row.id)">{{scope.row.name}}</el-link> -->
-            <el-link
-              type="primary"
-              :underline="false"
-              @click="view(scope.row.id)"
-            >
-              {{ $dictUtils.getDictLabel('db_type', scope.row.type) }}
+            <el-link type="primary" :underline="false" @click="view(scope.row.id)">
+              {{ $dictUtils.getDictLabel("db_type", scope.row.type) }}
             </el-link>
             <!-- <span v-else>{{scope.row.name}}</span> -->
           </template>
@@ -317,7 +278,7 @@ export default {
       </el-table>
     </ECard>
 
-    <ECard type="footer">
+    <ECard slot="page" type="footer">
       <el-pagination
         style="text-align: right"
         :current-page="pageNo"
@@ -330,11 +291,8 @@ export default {
       />
     </ECard>
 
-    <gen-data-base-type-form
-      ref="genDataBaseTypeForm"
-      @refreshDataList="refreshList"
-    />
-  </div>
+    <gen-data-base-type-form slot="dialog" ref="genDataBaseTypeForm" @refreshDataList="refreshList" />
+  </KyTreeTable>
 </template>
 
 <style lang="scss" scoped>

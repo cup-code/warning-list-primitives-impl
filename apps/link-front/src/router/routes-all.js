@@ -54,6 +54,7 @@ export default [
     component: () => import('@/views/proEnv/sameTime3/emissionPermit.vue'),
   },
 
+
   // 培训考试  begin
   // 在线考试
   {
@@ -164,7 +165,7 @@ export default [
       meta: {
         title: '计划详情',
       },
-    },{
+    }, {
       path: 'yxInspectionRecordDetail/:id', // 智能巡检V0.3 巡检记录详情
       name: 'yxInspectionRecordDetail',
       component: () => import('@/views/yxInspection/InspectionRecordDetail'),
@@ -185,6 +186,15 @@ export default [
       component: () => import('@/views/dev/stationManagement/stationInfo'),
       meta: {
         title: '站点信息',
+      },
+    },
+    //巡检报告
+    {
+      path: '/yxInspection/inspectionReport',
+      name: 'inspectionReport',
+      component: () => import('@/views/yxInspection/InspectionReport.vue'),
+      meta: {
+        title: '巡检报告',
       },
     },
     // {
@@ -539,6 +549,46 @@ export default [
         title: '预警详情',
       },
     }],
+  },
+  // 智能巡检V0.3
+  {
+    path: '/yxInspection',
+    component: Layout,
+    hidden: true,
+    meta: {
+      title: '智能巡检',
+      icon: 'el-icon-video-camera-solid',
+    },
+    children: [
+      {
+        path: 'exceptionRecord',
+        name: 'ExceptionRecord',
+        component: () => import('@/views/yxInspection/ExceptionRecord'),
+        meta: {
+          title: '异常记录',
+        },
+      },
+      {
+        path: 'urgentRecord',
+        name: 'UrgentRecord',
+        component: () => import('@/views/yxInspection/UrgentRecord'),
+        meta: {
+          title: '紧急记录',
+        },
+      },
+      {
+        path: 'terminalList',
+        name: 'TerminalList',
+        component: () => import('@/views/yxInspection/TerminalList'),
+        meta: { title: '终端列表' },
+      },
+      {
+        path: 'inspectionMeeting',
+        name: 'InspectionMeeting',
+        component: () => import('@/views/yxInspection/InspectionMeeting.vue'),
+        meta: { title: '远程指导' },
+      },
+    ],
   },
   // 组态
   {

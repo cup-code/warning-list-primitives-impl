@@ -38,7 +38,6 @@ export default antfu({
       argsIgnorePattern: '^_',
     }],
     'unused-imports/no-unused-imports': 'error',
-    'no-used-vars': 'warn',
     // ========== 其他规则 ==========
     'curly': 'off',
     'node/prefer-global/process': 'off',

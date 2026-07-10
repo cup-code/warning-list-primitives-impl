@@ -1,4 +1,3 @@
-import linkSdk from 'link-sdk'
 import qs from 'qs'
 import {
   axiosParams,
@@ -6,8 +5,6 @@ import {
   createAxiosFromStore,
   createFormDataAxios,
 } from '../common/utils'
-
-const { downloadFile } = linkSdk.axiosUtil
 
 function getFilenameFromContentDisposition(contentDisposition) {
   if (!contentDisposition)
@@ -95,13 +92,16 @@ export function cameraList(params) {
 export function exportCameraList(params) {
   const paramsStr = qs.stringify(params)
   const connectUrl = `videoCamera/exportCamera?${paramsStr}`
-  return downloadFile({ url: connectUrl, method: 'get' })
+  return downloadFileAsPromise({ url: connectUrl, method: 'get', name: '摄像头列表.xlsx' })
 }
 
 // 摄像头-模板下载
 export function downloadCameraTemplate() {
-  const connectUrl = `videoCamera/getCameraTemplate`
-  return downloadFile({ url: connectUrl, method: 'post' })
+  return downloadFileAsPromise({
+    url: 'videoCamera/getCameraTemplate',
+    method: 'post',
+    name: '摄像头导入模板.xlsx',
+  })
 }
 
 // 摄像头-excel导入
@@ -237,6 +237,68 @@ export function aiAuditSkillList(params) {
 }
 
 /**
+ * @param {object} params - 模型复判技能配置（全局）查询参数
+ * @param {number} params.pageNum - 页码（必填）
+ * @param {number} params.pageSize - 显示数（必填）
+ * @param {string} [params.skillName] - 技能名称（可选）
+ * @param {string} [params.skillPrompt] - 技能提示词（可选）
+ * @param {string} [params.skillWords] - 技能关键词（可选）
+ */
+// 查询模型复判技能配置（全局）
+export function videoModelSkillGlobalQuery(params) {
+  return axiosParams('get', `videoModelSkillGlobal/query`, params)
+}
+
+/**
+ * @param {object} params - 删除模型复判技能配置（全局）参数
+ * @param {string} params.id - 配置ID
+ */
+// 删除模型复判技能配置（全局）
+export function deleteVideoModelSkillGlobal(params) {
+  return axiosParams('post', `videoModelSkillGlobal/delete`, params)
+}
+
+/**
+ * @param {object} params - 模型复判技能配置（全局）DTO
+ */
+// 添加/修改模型复判技能配置（全局）
+export function saveOrUpdateVideoModelSkillGlobal(params) {
+  const axios = createAxiosFromStore()
+  return axiosPost(axios, `videoModelSkillGlobal/saveOrUpdate`, params)
+}
+
+/**
+ * @param {object} params - 模型复判技能配置（租户）查询参数
+ * @param {number} params.pageNum - 页码（必填）
+ * @param {number} params.pageSize - 显示数（必填）
+ * @param {string} [params.skillName] - 技能名称（可选）
+ * @param {string} [params.skillPrompt] - 技能提示词（可选）
+ * @param {string} [params.skillWords] - 技能关键词（可选）
+ */
+// 查询模型复判技能配置（租户）
+export function videoModelSkillTenantQuery(params) {
+  return axiosParams('get', `videoModelSkillTenant/query`, params)
+}
+
+/**
+ * @param {object} params - 删除模型复判技能配置（租户）参数
+ * @param {string} params.id - 配置ID
+ */
+// 删除模型复判技能配置（租户）
+export function deleteVideoModelSkillTenant(params) {
+  return axiosParams('post', `videoModelSkillTenant/delete`, params)
+}
+
+/**
+ * @param {object} params - 模型复判技能配置（租户）DTO
+ */
+// 添加/修改模型复判技能配置（租户）
+export function saveOrUpdateVideoModelSkillTenant(params) {
+  const axios = createAxiosFromStore()
+  return axiosPost(axios, `videoModelSkillTenant/saveOrUpdate`, params)
+}
+
+/**
  * @param {object} params - 关注预警参数
  * @param {string} params.alarmId - 预警ID
  * @param {number} params.isAttention - 是否关注 1:关注 0:取消关注
@@ -283,7 +345,7 @@ export function exportWarningData(params) {
   const paramsStr = qs.stringify(params)
   console.log(paramsStr)
   const connectUrl = `videoAlarm/exportAlarm?${paramsStr}`
-  return downloadFile({ url: connectUrl, method: 'get' })
+  return downloadFileAsPromise({ url: connectUrl, method: 'get', name: '预警数据.xlsx' })
 }
 
 // 统计分析导出接口

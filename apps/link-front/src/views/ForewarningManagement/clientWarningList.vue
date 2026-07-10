@@ -9,7 +9,7 @@ import {
   exportWarningData,
   getWarningTypeList,
 } from "@/http/videoWarning/warning-api";
-import { delStorageItem, getStorageItem, setStorageItem } from "@/utils/storage";
+import { delStorageItem, safeGetStorageItem, safeSetStorageItem } from "@/utils/storage";
 import BatchDeal from "./components/batchDeal.vue";
 import CheckGroup from "./components/checkGroup.vue";
 import List from "./components/list.vue";
@@ -54,16 +54,16 @@ export default {
       delStorageItem("clientWarningListLayout");
     };
 
-    const layout = ref(getStorageItem("clientWarningListLayout") || "card");
+    const layout = ref(safeGetStorageItem("clientWarningListLayout") || "card");
     const form = ref(
-      getStorageItem("clientWarningListFilter") || {
+      safeGetStorageItem("clientWarningListFilter") || {
         pageNum: 1,
         pageSize: 12,
         // customerStatus: ["0", "1"],
       }
     );
     const customerStatus = ref("1");
-    const showMore = ref(getStorageItem("isClientChecked") || true);
+    const showMore = ref(safeGetStorageItem("isClientChecked") || true);
     const detailInfo = ref({});
     const total = ref(0);
     const tableData = ref([]);
@@ -79,6 +79,7 @@ export default {
     const { refetch, isLoading } = useQuery({
       queryKey: ["clientWarningList", form.value],
       queryFn: () => clientWarningList(form.value),
+      enabled: false, // 手动触发，防止在 onMounted 处理路由参数之前发起请求
       onSuccess: ({ data }) => {
         const { result } = data || {};
         if (data?.success) {
@@ -123,7 +124,7 @@ export default {
       if (value) {
         if (key === "layout") {
           layout.value = value;
-          setStorageItem("clientWarningListLayout", value);
+          safeSetStorageItem("clientWarningListLayout", value);
         }
         if (key === "alarmDate") {
           form.value.alarmDateStart = value ? proxy.$formatDate(value[0]) : "";
@@ -135,7 +136,7 @@ export default {
         delete form.value[key];
       }
 
-      setStorageItem("clientWarningListFilter", form.value);
+      safeSetStorageItem("clientWarningListFilter", form.value);
       console.log(form.value, "form.value");
       refetch();
     };
@@ -143,38 +144,37 @@ export default {
     const init = async () => {
       const query = proxy.$route.query;
       // 重置表单为默认值，避免重复初始化
-      const defaultForm = getStorageItem("clientWarningListFilter") || {
+      const cachedFilter = safeGetStorageItem("clientWarningListFilter");
+      const defaultForm = cachedFilter || {
         pageNum: 1,
         pageSize: 12,
       };
-      console.log(getStorageItem("clientWarningListFilter"), "getStorageItem");
-      alarmDate.value = getStorageItem("clientWarningListFilter")?.alarmDateEnd
-        ? [
-            getStorageItem("clientWarningListFilter").alarmDateStart,
-            getStorageItem("clientWarningListFilter").alarmDateEnd,
-          ]
+      console.log(cachedFilter, "safeGetStorageItem");
+      alarmDate.value = cachedFilter?.alarmDateEnd
+        ? [cachedFilter.alarmDateStart, cachedFilter.alarmDateEnd]
         : [];
       // 处理查询参数
       if (Object.keys(query).length > 0) {
         Object.keys(query).forEach((key) => {
           if (key === "timeType" && query.timeType !== undefined) {
             const now = moment();
-            defaultForm.alarmDateEnd = now.format("YYYY-MM-DD HH:mm:ss");
-
             // 根据时间类型设置开始时间
             const timeTypeMap = {
               0: now.clone().startOf("date"),
-              1: now.clone().startOf("week").add(1, "day"),
+              1: now.clone().startOf("week"),
               2: now.clone().startOf("month"),
             };
 
+            // 先验证 timeType 是否有效，有效时才设置完整日期范围
             if (timeTypeMap[query.timeType]) {
+              defaultForm.alarmDateEnd = now.format("YYYY-MM-DD HH:mm:ss");
               defaultForm.alarmDateStart = timeTypeMap[query.timeType].format(
                 "YYYY-MM-DD HH:mm:ss"
               );
               // 更新日期选择器的值
               alarmDate.value = [defaultForm.alarmDateStart, defaultForm.alarmDateEnd];
             }
+            // 无效的 timeType 值被忽略，不设置任何日期范围
           } else if (key === "departmentName") {
             defaultForm.departmentId = departmentList.value.find((item) => {
               return item.departmentName === query[key];
@@ -201,8 +201,31 @@ export default {
         await init();
       } else {
         // 如果没有 query 参数，从缓存恢复搜索条件
-        const cachedFilter = getStorageItem("clientWarningListFilter");
+        const cachedFilter = safeGetStorageItem("clientWarningListFilter");
         if (cachedFilter) {
+          // 验证缓存的 departmentId 是否有效
+          if (cachedFilter.departmentId) {
+            const deptExists = departmentList.value.some(
+              (item) => item.id === cachedFilter.departmentId
+            );
+            if (!deptExists) {
+              delete cachedFilter.departmentId;
+            }
+          }
+
+          // 验证缓存的 customerStatus 是否有效
+          if (cachedFilter.customerStatus && cachedFilter.customerStatus.length > 0) {
+            const validStatusCodes = proxy.$dictUtils
+              .getDictList("CustomerStatus")
+              .map((item) => item.dictCode);
+            cachedFilter.customerStatus = cachedFilter.customerStatus.filter((code) =>
+              validStatusCodes.includes(code)
+            );
+            if (cachedFilter.customerStatus.length === 0) {
+              delete cachedFilter.customerStatus;
+            }
+          }
+
           form.value = { ...cachedFilter };
           // 恢复日期选择器的值
           if (cachedFilter.alarmDateStart && cachedFilter.alarmDateEnd) {
@@ -268,7 +291,7 @@ export default {
       setTimeout(() => {
         proxy.$refs.treeTable.setTableHeight();
       }, 200);
-      setStorageItem("isClientChecked", showMore.value);
+      safeSetStorageItem("isClientChecked", showMore.value);
     };
 
     return {
@@ -535,7 +558,7 @@ export default {
           </el-button>
           <el-button icon="el-icon-refresh-right" @click="resetFn"> 重置 </el-button>
           <el-button type="text" style="margin-left: 8px" @click="toggleMore">
-            {{ showMore == true ? "收起" : "高级筛选" }}
+            {{ showMore === true ? "收起" : "高级筛选" }}
             <i :class="showMore ? 'el-icon-arrow-up' : 'el-icon-arrow-down'" />
           </el-button>
         </el-form-item>

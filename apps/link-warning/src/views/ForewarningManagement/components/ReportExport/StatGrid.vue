@@ -1,20 +1,24 @@
 <script>
 export default {
-  name: 'StatGrid',
+  name: "StatGrid",
   props: {
     actualList: {
       type: Array,
       required: true,
       default: () => [],
     },
+    timeTitle: {
+      type: String,
+      required: true,
+    },
   },
-}
+};
 </script>
 
 <template>
   <div class="table-container">
     <div class="mb-4 py-2 box-border text-lg font-semibold">
-      本周报告预警实况
+      {{ timeTitle }}报告预警实况
     </div>
     <div
       class="flex flex-wrap justify-between items-stretch p-3 mx-auto w-full bg-white rounded-md"

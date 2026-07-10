@@ -1,31 +1,35 @@
 <script>
-import { getDeviceListByPid, getRealDataById } from "@/http/dev/manage-api";
-import { getAllProduct } from "@/http/dev/product-api";
+import { getDeviceListByPid, getRealDataById } from '@/http/dev/manage-api'
+import { getAllProduct } from '@/http/dev/product-api'
 
 export default {
   props: {
     selectData: {
       type: Array,
       default: () => {
-        return [];
+        return []
       },
     },
     title: {
       type: String,
       default: () => {
-        return "绑定点位";
+        return '绑定点位'
       },
     },
     limit: {
       type: Number,
       default: 999999,
     },
+    autoSelectFirst: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
       dataListAllSelections: [], // 所有选中的数据包含跨页数据
       dataListSelections: [],
-      idKey: "id", // 标识列表数据中每一行的唯一键的名称(需要按自己的数据改一下)
+      idKey: 'id', // 标识列表数据中每一行的唯一键的名称(需要按自己的数据改一下)
       dataList: [], // 测点列表
       total: 0,
       loading: false,
@@ -33,185 +37,209 @@ export default {
       sForm: {
         page: 1,
         pageSize: 10,
-        productType: "",
-        deviceId: "",
-        ioName: "",
-        ioCode: "",
+        productType: '',
+        deviceId: '',
+        ioName: '',
+        ioCode: '',
       },
       productList: [], // 产品类型列表
       deviceList: [], // 终端列表
-    };
+    }
   },
   methods: {
-    init() {
-      this.visible = true;
-      this.getAllProduct();
-      this.$nextTick(() => {
-        this.dataListAllSelections = JSON.parse(JSON.stringify(this.selectData));
-        this.$refs.sForm.resetFields();
-        this.dataList = [];
-      });
+    async init() {
+      this.visible = true
+      await this.$nextTick()
+      this.dataListAllSelections = JSON.parse(JSON.stringify(this.selectData))
+      this.$refs.sForm.resetFields()
+      this.deviceList = []
+      this.dataList = []
+      this.total = 0
+
+      const productList = await this.getAllProduct()
+      if (!this.autoSelectFirst)
+        return
+
+      const firstProduct = productList[0]
+      if (!firstProduct)
+        return
+
+      this.sForm.productType = firstProduct.id
+      const deviceList = await this.getDeviceList(firstProduct.id)
+      const firstDevice = deviceList[0]
+      if (!firstDevice)
+        return
+
+      this.sForm.deviceId = firstDevice.id
+      this.search()
     },
     getAllProduct() {
-      getAllProduct().then(({ data }) => {
-        this.productList = data.result || [];
-      });
+      return getAllProduct().then(({ data }) => {
+        this.productList = data.result || []
+        return this.productList
+      })
     },
     getDeviceList(pid) {
-      if (!pid) return;
-      getDeviceListByPid(pid).then(({ data }) => {
-        this.deviceList = data.result || [];
-      });
+      if (!pid) {
+        this.deviceList = []
+        return Promise.resolve([])
+      }
+      return getDeviceListByPid(pid).then(({ data }) => {
+        this.deviceList = data.result || []
+        return this.deviceList
+      })
     },
     getTemplateRow(index, row) {
       // 获取选中数据
-      this.dataListSelections = [row];
+      this.dataListSelections = [row]
       this.$nextTick(() => {
-        this.changePageCoreRecordData();
-      });
+        this.changePageCoreRecordData()
+      })
     },
     // 设置选中的方法
     setSelectRow() {
       if (!this.dataListAllSelections || this.dataListAllSelections.length <= 0) {
-        this.$refs.pointTable.clearSelection();
-        return;
+        this.$refs.pointTable.clearSelection()
+        return
       }
       // 标识当前行的唯一键的名称
-      const idKey = this.idKey;
-      const selectAllIds = [];
+      const idKey = this.idKey
+      const selectAllIds = []
       this.dataListAllSelections.forEach((row) => {
-        selectAllIds.push(row[idKey]);
-      });
-      this.$refs.pointTable.clearSelection();
+        selectAllIds.push(row[idKey])
+      })
+      this.$refs.pointTable.clearSelection()
       for (let i = 0; i < this.dataList.length; i++) {
         if (selectAllIds.includes(this.dataList[i][idKey])) {
           // 设置选中，记住table组件需要使用ref="table"
-          this.$refs.pointTable.toggleRowSelection(this.dataList[i], true);
+          this.$refs.pointTable.toggleRowSelection(this.dataList[i], true)
         }
       }
     },
     // 记忆选择核心方法
     changePageCoreRecordData() {
       // 标识当前行的唯一键的名称
-      const idKey = this.idKey;
-      const that = this;
+      const idKey = this.idKey
+      const that = this
       // 如果总记忆中还没有选择的数据，那么就直接取当前页选中的数据，不需要后面一系列计算
       if (this.dataListAllSelections.length <= 0) {
         this.dataListSelections.forEach((row) => {
-          that.dataListAllSelections.push(row);
-        });
-        return;
+          that.dataListAllSelections.push(row)
+        })
+        return
       }
       // 总选择里面的key集合
-      const selectAllIds = [];
+      const selectAllIds = []
       this.dataListAllSelections.forEach((row) => {
-        selectAllIds.push(row[idKey]);
-      });
-      const selectIds = [];
+        selectAllIds.push(row[idKey])
+      })
+      const selectIds = []
       // 获取当前页选中的id
       this.dataListSelections.forEach((row) => {
-        selectIds.push(row[idKey]);
+        selectIds.push(row[idKey])
         // 如果总选择里面不包含当前页选中的数据，那么就加入到总选择集合里
         if (!selectAllIds.includes(row[idKey])) {
-          that.dataListAllSelections.push(row);
+          that.dataListAllSelections.push(row)
         }
-      });
-      const noSelectIds = [];
+      })
+      const noSelectIds = []
       // 得到当前页没有选中的id
       this.dataList.forEach((row) => {
         if (!selectIds.includes(row[idKey])) {
-          noSelectIds.push(row[idKey]);
+          noSelectIds.push(row[idKey])
         }
-      });
+      })
       noSelectIds.forEach((id) => {
         if (selectAllIds.includes(id)) {
           for (let i = 0; i < that.dataListAllSelections.length; i++) {
             if (that.dataListAllSelections[i][idKey] === id) {
               // 如果总选择中有未被选中的，那么就删除这条
-              that.dataListAllSelections.splice(i, 1);
-              break;
+              that.dataListAllSelections.splice(i, 1)
+              break
             }
           }
         }
-      });
+      })
     },
     del(tag) {
-      this.dataListAllSelections.splice(this.dataListAllSelections.indexOf(tag), 1);
+      this.dataListAllSelections.splice(this.dataListAllSelections.indexOf(tag), 1)
       this.$nextTick(() => {
-        this.setSelectRow();
-      });
+        this.setSelectRow()
+      })
     },
     // 获取数据列表
     refreshList() {
-      this.loading = true;
+      this.loading = true
       getRealDataById(this.sForm.productType, this.sForm.deviceId, this.sForm)
         .then(({ data }) => {
-          this.loading = false;
+          this.loading = false
           if (data.success && data.result) {
             if (data.result.list && data.result.list.length) {
               data.result.list.forEach((item) => {
-                item.deviceId = this.sForm.deviceId; // 给测点数据加上终端id，保存的时候使用
-                item.deviceName = this.deviceList.find((item) => {
-                  return item.id === this.sForm.deviceId;
-                }).name;
-              });
+                item.deviceId = this.sForm.deviceId // 给测点数据加上终端id，保存的时候使用
+                const currentDevice = this.deviceList.find((device) => {
+                  return device.id === this.sForm.deviceId
+                })
+                item.deviceName = currentDevice ? currentDevice.name : ''
+              })
             }
-            this.dataList = data.result.list;
-            this.total = data.result.total;
-          } else {
-            this.$message.error(data.message || "查询测点失败");
+            this.dataList = data.result.list
+            this.total = data.result.total
+          }
+          else {
+            this.$message.error(data.message || '查询测点失败')
           }
           this.$nextTick(() => {
-            this.setSelectRow();
-          });
+            this.setSelectRow()
+          })
         })
-        .catch((err) => {
-          this.loading = false;
-          this.$message.error("查询测点失败");
-        });
+        .catch((_err) => {
+          this.loading = false
+          this.$message.error('查询测点失败')
+        })
     },
     // 多选
     selectionChangeHandle(val) {
-      this.dataListSelections = val;
+      this.dataListSelections = val
       this.$nextTick(() => {
-        this.changePageCoreRecordData();
-      });
+        this.changePageCoreRecordData()
+      })
     },
     search() {
-      this.sForm.page = 1;
-      this.refreshList();
+      this.sForm.page = 1
+      this.refreshList()
     },
     handleNodeClick(data) {
-      this.sForm.departmentId = data.id;
-      this.refreshList();
+      this.sForm.departmentId = data.id
+      this.refreshList()
     },
     // 每页数
     sizeChangeHandle(val) {
-      this.sForm.pageSize = val;
-      this.sForm.page = 1;
-      this.refreshList();
+      this.sForm.pageSize = val
+      this.sForm.page = 1
+      this.refreshList()
       this.$nextTick(() => {
-        this.changePageCoreRecordData();
-      });
+        this.changePageCoreRecordData()
+      })
     },
     // 当前页
     currentChangeHandle(val) {
-      this.sForm.page = val;
-      this.refreshList();
+      this.sForm.page = val
+      this.refreshList()
       this.$nextTick(() => {
-        this.changePageCoreRecordData();
-      });
+        this.changePageCoreRecordData()
+      })
     },
     doSubmit() {
       if (this.limit < this.dataListAllSelections.length) {
-        this.$message.error(`你最多只能选择${this.limit}个测点`);
-        return;
+        this.$message.error(`你最多只能选择${this.limit}个测点`)
+        return
       }
-      this.visible = false;
-      this.$emit("doSubmit", this.dataListAllSelections);
+      this.visible = false
+      this.$emit('doSubmit', this.dataListAllSelections)
     },
   },
-};
+}
 </script>
 
 <template>
@@ -328,7 +356,17 @@ export default {
             <el-table-column type="index" label="序号" width="50" />
             <el-table-column label="测点名称" prop="name" align="center" />
             <el-table-column label="测点编号" prop="code" align="center" />
-            <el-table-column label="测点值" prop="value" align="center" />
+            <el-table-column label="测点值" prop="value" align="center">
+              <template slot-scope="props">
+                <span>{{
+                  props.row.value
+                    ? typeof props.row.value === "number"
+                      ? props.row.value.toFixed(2)
+                      : Number(props.row.value).toFixed(2)
+                    : "--"
+                }}</span>
+              </template>
+            </el-table-column>
             <el-table-column label="测点类型" prop="type" align="center">
               <template slot-scope="props">
                 <span>{{ $dictUtils.getDictLabel("output_type", props.row.type) }}</span>

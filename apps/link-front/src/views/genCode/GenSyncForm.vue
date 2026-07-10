@@ -22,7 +22,7 @@ export default {
         if (valid) {
           synchDbFn(this.inputForm.id, this.inputForm.isForce).then(({ data }) => {
             if (data && data.success) {
-              this.$message.success(data.msg)
+              this.$message.success(data.message)
               this.visible = false
               this.$emit('refreshDataList')
             }

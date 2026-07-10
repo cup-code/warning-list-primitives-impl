@@ -1,15 +1,18 @@
 <script>
+import { getSpecifiedModule } from '@/http/companyConfig/companyConfig-api'
 import { getScreenData } from '@/http/videoStat/screenData'
 import { getWarningTypeList, machineList } from '@/http/videoWarning/warning-api'
 import ReportForm from './components/ReportExport/ReportForm.vue'
 import ReportPreview from './components/ReportExport/ReportPreview.vue'
 import {
+  getCurrentTitle,
   getCurrentWeekNumber,
   getCurrentYear,
+  getDefaultReportTitle,
   getWeekDateStr,
   getWeekRange,
 } from './test/dateUtils'
-import { exportToPDF, initLogoPath } from './test/pdfExport'
+import { exportToPDF } from './test/pdfExport'
 import {
   generateActualList,
   generateReportText,
@@ -49,7 +52,13 @@ export default {
       cameraNumber: 0,
       cameraSkillNumber: 0,
       machineNumber: 0,
-      logoConfig: {},
+      reportConfig: {
+        headerLogo: '',
+        headerText: '',
+        advertText: null,
+      },
+      timeTitle: '',
+      defaultReportTitle: '视频智能运营平台管理周报',
     }
   },
   computed: {
@@ -63,7 +72,15 @@ export default {
       return getWeekDateStr(this.searchForm)
     },
     getText() {
-      return generateReportText(this.cameraNumber, this.cameraSkillNumber)
+      if (this.reportConfig.advertText === null) {
+        return generateReportText(this.cameraNumber, this.cameraSkillNumber)
+      }
+      return this.reportConfig.advertText
+        .replace('cameraNumber', this.cameraNumber)
+        .replace('cameraSkillNumber', this.cameraSkillNumber)
+    },
+    showAdvert() {
+      return this.reportConfig.advertText === null || this.reportConfig.advertText !== ''
     },
   },
   watch: {
@@ -78,12 +95,23 @@ export default {
     },
   },
   mounted() {
-    this.logoConfig = initLogoPath()
+    this.getReportConfig()
     this.getCameraNumber()
     this.getSkillList()
     this.getScreenData()
   },
   methods: {
+    async getReportConfig() {
+      const companyId = JSON.parse(sessionStorage.getItem('user')).companyId
+      const res = await getSpecifiedModule(companyId, 'VideoManagement')
+      if (res.data.success) {
+        res.data.result.forEach((item) => {
+          if (item.item in this.reportConfig) {
+            this.reportConfig[item.item] = item.value
+          }
+        })
+      }
+    },
     // 表单字段更新
     updateFormField({ field, value }) {
       this.formData[field] = value
@@ -104,6 +132,9 @@ export default {
     },
 
     async getScreenData() {
+      console.log(this.searchForm)
+      this.timeTitle = getCurrentTitle(this.searchForm.timeType)
+      this.defaultReportTitle = getDefaultReportTitle(this.searchForm.timeType)
       const res = await getScreenData(this.searchForm)
       this.screenData = res.data.result
 
@@ -155,18 +186,11 @@ export default {
       try {
         this.$message({ message: '正在生成PDF，请稍候...', type: 'info' })
         const element = this.$refs.reportPreview.$refs.printBox
-
-        const imagePaths = [
-          this.logoConfig.logoPath,
-          this.logoConfig.topRightLogo,
-          this.logoConfig.footerLogo,
-          this.logoConfig.rightLabel,
-          this.logoConfig.leftLogo,
-        ]
+        const headerElement = this.$refs.reportPreview.$refs.reportHeader
 
         const result = await exportToPDF(
           element,
-          imagePaths,
+          headerElement,
           `预警报告_${new Date().toLocaleDateString()}.pdf`,
         )
 
@@ -205,6 +229,7 @@ export default {
         <ReportPreview
           ref="reportPreview"
           :report-title="formData.reportTitle"
+          :default-report-title="defaultReportTitle"
           :report-summary="formData.reportSummary"
           :show-table="formData.showTable"
           :current-year="currentYear"
@@ -220,7 +245,11 @@ export default {
           :camera-alarm-rank="cameraAlarmRank"
           :alarm-level-rank="alarmLevelRank"
           :get-text="getText"
+          :show-advert="showAdvert"
+          :header-logo="reportConfig.headerLogo"
+          :header-text="reportConfig.headerText"
           :chart-data="screenData"
+          :time-title="timeTitle"
         />
       </div>
     </ECard>

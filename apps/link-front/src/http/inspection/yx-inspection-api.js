@@ -1,9 +1,11 @@
 import {
-  axiosParams,
-  axiosPost,
   axiosDelete,
   axiosGet,
+  axiosParams,
+  axiosPost,
+  axiosUpload,
   createAxiosFromStore,
+  createFormDataAxios,
 } from '../common/utils'
 
 /**
@@ -49,6 +51,22 @@ export function deleteYxInspectionContent(contentId) {
 }
 
 /**
+ * 下载巡检项导入模板
+ */
+export function getContentTemplate() {
+  return axiosParams('POST', `/yx/inspectionContent/getContentTemplate`, {}, { responseType: 'blob' })
+}
+
+/**
+ * 批量导入巡检项
+ * @param {File} file - Excel 文件
+ */
+export function importContent(file) {
+  const axios = createFormDataAxios()
+  return axiosUpload(axios, `/yx/inspectionContent/importContent`, { file })
+}
+
+/**
  * 保存或修改巡检地点
  * @param {object} data - 巡检地点数据
  * @param {string} [data.id] - 主键（修改时必传）
@@ -64,7 +82,7 @@ export function deleteYxInspectionContent(contentId) {
  * @param {number} [data.sortOrder] - 排序号
  * @param {object} [data.areaOnMapInfo] - 巡检点在地图上的标注面信息
  * @param {object} [data.areaOnMapInfo.geometry] - 区域信息
- * @param {array} [data.areaOnMapInfo.geometry.coordinates] - 区域顶点坐标信息
+ * @param {Array} [data.areaOnMapInfo.geometry.coordinates] - 区域顶点坐标信息
  * @param {string} [data.areaOnMapInfo.geometry.type] - 类型
  * @param {object} [data.areaOnMapInfo.properties] - 楼层信息
  * @param {string} [data.areaOnMapInfo.properties.floorId] - 楼层ID
@@ -73,7 +91,7 @@ export function deleteYxInspectionContent(contentId) {
  * @param {string} [data.areaOnMapInfo.properties.name] - 名称
  * @param {string} [data.areaOnMapInfo.properties.type] - 类型
  * @param {string} [data.areaOnMapInfo.type] - 类型
- * @param {array} [data.pointOnMapInfo] - 巡检点在地图上的标注点信息
+ * @param {Array} [data.pointOnMapInfo] - 巡检点在地图上的标注点信息
  * @param {number} [data.pointOnMapInfo[].x] - x坐标
  * @param {number} [data.pointOnMapInfo[].y] - y坐标
  * @param {number} [data.pointOnMapInfo[].z] - z坐标
@@ -111,6 +129,29 @@ export function getInspectionPlaceDetailById(placeId) {
 export function deleteInspectionPlace(placeId) {
   const axios = createAxiosFromStore()
   return axiosDelete(axios, `/yx/inspectionPlace/delete/${placeId}`)
+}
+
+/**
+ * 导出巡检点数据
+ * @param {object} params - 导出参数
+ * @param {number} params.pageNum - 页码（必填）
+ * @param {number} params.pageSize - 显示数（必填）
+ * @param {string} [params.departmentId] - 组织机构id
+ * @param {string} [params.fuzzyQuery] - 点位名称/编号模糊查询
+ * @param {boolean} [params.isPage] - 是否分页
+ */
+export function exportInspectionPlace(params) {
+  const axios = createAxiosFromStore()
+  const queryStr = Object.keys(params)
+    .filter(key => params[key] !== null && params[key] !== undefined && params[key] !== '')
+    .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`)
+    .join('&')
+  const url = `/yx/inspectionPlace/exportPlace${queryStr ? `?${queryStr}` : ''}`
+  return axios.request({
+    url,
+    method: 'get',
+    responseType: 'blob',
+  })
 }
 
 /**
@@ -206,7 +247,7 @@ export function saveOrUpdateLine(data) {
  * @returns {string} result.list[].contactPhone - 联系电话
  * @returns {string} result.list[].remarks - 备注
  * @returns {string} result.list[].createdTime - 创建时间
- * @returns {array} result.list[].yxInspectionLinePlaces - 巡检路线关联的点
+ * @returns {Array} result.list[].yxInspectionLinePlaces - 巡检路线关联的点
  * @returns {string} result.list[].yxInspectionLinePlaces[].id - 主键
  * @returns {string} result.list[].yxInspectionLinePlaces[].placeId - 巡检点id
  * @returns {string} result.list[].yxInspectionLinePlaces[].placeName - 巡检点名称
@@ -227,7 +268,7 @@ export function queryLine(params) {
  * @returns {string} result.contactPhone - 联系电话
  * @returns {string} result.remarks - 备注
  * @returns {string} result.createdTime - 创建时间
- * @returns {array} result.yxInspectionLinePlaces - 巡检路线关联的点
+ * @returns {Array} result.yxInspectionLinePlaces - 巡检路线关联的点
  * @returns {string} result.yxInspectionLinePlaces[].id - 主键
  * @returns {string} result.yxInspectionLinePlaces[].placeId - 巡检点id
  * @returns {string} result.yxInspectionLinePlaces[].placeName - 巡检点名称
@@ -563,7 +604,7 @@ export function queryTaskDetails(params) {
  * @param {object} data - 巡检结果数据
  * @param {string} data.placeId - 巡检点id
  * @param {string} data.scheduleRecordId - 班次纪录id
- * @param {array} data.contentDTOList - 内容结果列表
+ * @param {Array} data.contentDTOList - 内容结果列表
  * @param {string} data.contentDTOList[].contentId - 内容id
  * @param {string} data.contentDTOList[].executeResult - 执行结果
  * @param {boolean} data.contentDTOList[].abnormal - 是否异常
@@ -829,7 +870,7 @@ export function getKnowledgeBasePage(params) {
     pageSize: params.pageSize,
     resourceName: params.title,
     resourceType: params.category,
-    enable: params.enabled
+    enable: params.enabled,
   })
 }
 
@@ -855,4 +896,196 @@ export function deleteKnowledgeBase(id) {
 export function saveOrUpdateKnowledgeBase(data) {
   const axios = createAxiosFromStore()
   return axiosPost(axios, `/yx/inspectionKnowledge/saveOrUpdate`, data)
+}
+
+// ==================== AI智能体模块 ====================
+
+/**
+ * 获取AI智能体回答（阿里千问）
+ * @param {object} params - 请求参数
+ * @param {string} [params.cId] - 会话id（可选，用于保持上下文）
+ * @param {string} params.q - 提问语句（必填）
+ * @returns {Promise<object>} 返回AI回答结果
+ * @returns {string} result.answer - 答案
+ * @returns {string} result.conversationId - 会话id
+ * @returns {string} result.localFuncName - 本地方法名称
+ * @returns {string} result.localOutput - 本地方法输出
+ */
+export function getAiAgentAnswer(params, config = {}) {
+  return axiosParams('post', `/agent/aliBlGen`, params, config)
+}
+
+/**
+ * 更新巡检记录的总结信息
+ * @param {object} params - 参数
+ * @param {string} params.scheduleRecordId - 任务班次id
+ * @param {string} params.summary - 总结信息
+ * @returns {Promise<object>} 统一返回结果
+ */
+export function updateRecordSummary(params) {
+  return axiosParams('post', `/yx/inspectionPlanScheduleRecord/updateRecordSummary`, params)
+}
+
+// ==================== 终端设备管理 ====================
+
+/**
+ * 分页查询终端
+ * @param {object} params - 查询参数
+ * @param {number} params.pageNum - 页码
+ * @param {number} params.pageSize - 每页条数
+ * @param {string} [params.serialNumber] - 序列号
+ * @param {string} [params.productModel] - 产品型号
+ * @returns {Promise<object>}
+ */
+export function queryTerminal(params) {
+  return axiosParams('get', `/yx/inspectionTerminal/query`, params)
+}
+
+/**
+ * 新增/编辑终端
+ * @param {object} data - 终端数据
+ * @returns {Promise<object>}
+ */
+export function saveOrUpdateTerminal(data) {
+  const axios = createAxiosFromStore()
+  return axiosPost(axios, `/yx/inspectionTerminal/saveOrUpdate`, data)
+}
+
+/**
+ * 删除终端
+ * @param {string} id - 终端ID
+ * @returns {Promise<object>}
+ */
+export function deleteTerminal(id) {
+  const axios = createAxiosFromStore()
+  return axiosPost(axios, `/yx/inspectionTerminal/delete/${id}`)
+}
+
+// ==================== 巡检报告总结模块 ====================
+
+/**
+ * 查询巡检报告总结
+ * @param {object} params - 查询参数
+ * @param {string} params.startDate - 开始时间（必填）
+ * @param {string} params.endDate - 结束时间（必填）
+ * @returns {Promise<object>} 统一返回结果，result 为 YxInspectionReportArchive
+ * @returns {string} result.id - UUID主键
+ * @returns {string} result.title - 报告标题
+ * @returns {string} result.summary - 报告总结
+ * @returns {string} result.type - 类型
+ * @returns {string} result.startDate - 开始时间
+ * @returns {string} result.endDate - 结束时间
+ * @returns {string} result.createdBy - 创建人id
+ * @returns {string} result.createdTime - 创建时间
+ * @returns {string} result.updatedBy - 更新人id
+ * @returns {string} result.updatedTime - 更新时间
+ * @returns {boolean} result.deleted - 已删除
+ */
+export function queryReportArchive(params) {
+  return axiosParams('get', `/yx/inspectionPlanScheduleRecord/queryReportArchive`, params)
+}
+
+/**
+ * 保存巡检报告总结
+ * @param {object} data - 报告数据
+ * @param {string} [data.startDate] - 开始时间
+ * @param {string} [data.endDate] - 结束时间
+ * @param {string} [data.title] - 报告标题
+ * @param {string} [data.summary] - 报告总结
+ * @param {string} [data.type] - 时间范围类型（日|周|月|自定义）
+ * @param {boolean} [data.containChart] - 包含图表
+ * @param {boolean} [data.containDetail] - 包含明细
+ * @returns {Promise<object>} 统一返回结果
+ */
+export function saveReportArchive(data) {
+  const axios = createAxiosFromStore()
+  return axiosPost(axios, `/yx/inspectionPlanScheduleRecord/saveReportArchive`, data)
+}
+
+/**
+ * 分页查询报告归档列表
+ * @param {object} params - 查询参数
+ * @param {number} params.pageNum - 页码（必填）
+ * @param {number} params.pageSize - 每页条数（必填）
+ * @param {string} [params.title] - 报告名称
+ * @param {string} [params.reportTimeStart] - 报告时间开始
+ * @param {string} [params.reportTimeEnd] - 报告时间结束
+ * @returns {Promise<object>} PageInfo«YxInspectionReportArchiveVO»
+ */
+export function queryPageReportArchive(params) {
+  return axiosParams('get', `/yx/inspectionPlanScheduleRecord/queryPageReportArchive`, params)
+}
+
+/**
+ * 删除报告归档
+ * @param {string} id - 归档记录ID
+ * @returns {Promise<object>} 统一返回结果
+ */
+export function deleteReportArchive(id) {
+  const axios = createAxiosFromStore()
+  return axiosDelete(axios, `/yx/inspectionPlanScheduleRecord/deleteReportArchive/${id}`)
+}
+
+/**
+ * 下载巡检点和巡检项整体导入模板
+ */
+export function getPlaceAndContentTemplate() {
+  return axiosParams('POST', `/yx/inspectionPlace/getPlaceAndContentTemplate`, {}, { responseType: 'blob' })
+}
+
+/**
+ * 巡检点和巡检项整体导入
+ * @param {File} file - Excel 文件
+ */
+export function importPlaceAndContent(file) {
+  const axios = createFormDataAxios()
+  return axiosUpload(axios, `/yx/inspectionPlace/importPlaceAndContent`, { file })
+}
+
+/**
+ * 保存巡检点的测点(IO点)绑定（全量替换）
+ * @param {string} placeId - 巡检点id
+ * @param {Array<{deviceId:string, ioId:string}>} dtoList - 绑定项列表
+ */
+export function savePlaceBindIo(placeId, dtoList) {
+  const axios = createAxiosFromStore()
+  return axiosPost(axios, `/yx/placeBindIo/save/${placeId}`, dtoList)
+}
+
+/**
+ * 查询指定巡检点绑定的所有测点(IO点)
+ * @param {string} placeId - 巡检点id
+ */
+export function getAllIoByPlaceId(placeId) {
+  const axios = createAxiosFromStore()
+  return axiosGet(axios, `/yx/placeBindIo/getAllIoByPlaceId/${placeId}`)
+}
+
+/**
+ * 解除某条测点绑定
+ * @param {string} id - 绑定信息id
+ */
+export function deletePlaceBindIo(id) {
+  const axios = createAxiosFromStore()
+  return axiosDelete(axios, `/yx/placeBindIo/delete/${id}`)
+}
+
+/**
+ * 获取绑定测点的实时数据
+ * @param {string} bindId - 绑定信息id
+ */
+export function getPlaceBindIoRealTrend(bindId) {
+  const axios = createAxiosFromStore()
+  return axiosGet(axios, `/yx/placeBindIo/realTrend/${bindId}`)
+}
+
+/**
+ * 获取绑定测点指定时间段的历史趋势
+ * @param {string} bindId - 绑定信息id
+ * @param {object} params
+ * @param {number} params.startDate - 起始毫秒时间戳
+ * @param {number} params.endDate - 终止毫秒时间戳
+ */
+export function getPlaceBindIoHistoryTrend(bindId, { startDate, endDate }) {
+  return axiosParams('get', `/yx/placeBindIo/historyTrend/${bindId}`, { startDate, endDate })
 }

@@ -2,6 +2,7 @@
 import { mapState } from 'vuex'
 import setting from '@/components/UserCenter/setting'
 import { editUser } from '@/http/manage-api'
+import { clearSession } from '@/utils/tab-session'
 
 export default {
   components: {
@@ -88,7 +89,7 @@ export default {
     // 清空所有，重新登录
     restartFn() {
       // 清空storage（仅清除当前标签页，不影响其他标签页）
-      sessionStorage.clear()
+      clearSession()
 
       // 清空全局状态
       this.$store.dispatch('user/logout')

@@ -8,13 +8,18 @@
  * lifecycle via Vuex — but session cannot survive a page refresh.
  *
  * All sessionStorage calls are wrapped in try-catch for SecurityError.
+ * Namespace prefix is handled by the global wrapper in storage-namespace.js.
  */
 
+import { clearNamespacedSession, clearNamespacedStorage } from '@/utils/storage-namespace'
 import store from '@/store'
 
 const TK_KEY = 'tk'
 const AUTH_TOKEN_KEY = 'authToken'
 const ALIVE_KEY = 'isAlive'
+
+// localStorage keys to PRESERVE on logout (tenant-level config, not user-specific).
+const PRESERVE_KEYS = ['globalData', 'setting']
 
 function safeGet(key) {
   try {
@@ -30,13 +35,6 @@ function safeSet(key, value) {
     sessionStorage.setItem(key, value)
   }
   catch (e) { /* sessionStorage unavailable (cross-origin iframe) */ }
-}
-
-function safeClear() {
-  try {
-    sessionStorage.clear()
-  }
-  catch (e) { /* ignore */ }
 }
 
 // --- iframe detection ---
@@ -119,8 +117,31 @@ export function getSessionAlive() {
 // --- Session Lifecycle ---
 
 export function clearSession() {
+  // 1. Save tenant-level data before clearing
+  const saved = {}
+  try {
+    PRESERVE_KEYS.forEach((key) => {
+      const val = localStorage.getItem(key)
+      if (val !== null) saved[key] = val
+    })
+  }
+  catch (e) { /* ignore */ }
+
+  // 2. Clear all session + storage
   store.dispatch('user/logout')
-  safeClear()
+  try {
+    clearNamespacedSession()
+    clearNamespacedStorage()
+  }
+  catch (e) { /* ignore */ }
+
+  // 3. Restore tenant-level data
+  try {
+    Object.keys(saved).forEach((key) => {
+      localStorage.setItem(key, saved[key])
+    })
+  }
+  catch (e) { /* ignore */ }
 }
 
 /**

@@ -297,9 +297,10 @@ export function processExecutionList({ taskDetailsList = [], selectedPlanId = nu
       const processedContent = place.processedContent || 0;
       const pct = totalContent > 0 ? Math.round((processedContent / totalContent) * 100) : 0;
 
+      // Status logic: abnormal → critical (red), completed → completed (green), pending → in_progress (cyan)
       let status = "in_progress";
-      if (task.isOvertime) {
-        status = "warning";
+      if (place.abnormal) {
+        status = "critical";
       } else if (pct === 100) {
         status = "completed";
       }

@@ -40,7 +40,7 @@ export default {
     const vm = getCurrentInstance().proxy
     const queryClient = useQueryClient()
     const filePrefix = ref(
-      JSON.parse(localStorage.getItem('globalData')).minioFilePrefix,
+      JSON.parse(localStorage.getItem('globalData'))?.minioFilePrefix || '',
     )
     const {
       detailForm,

@@ -1,51 +1,52 @@
 <script>
-import ImageSelect from '@/components/ImageSelect'
+import ImageSelect from "@/components/ImageSelect";
 import {
   getSpecifiedModule,
   setSpecifiedModule,
-} from '@/http/companyConfig/companyConfig-api.js'
-import { upLoadImg } from '@/http/manage-api'
+} from "@/http/companyConfig/companyConfig-api.js";
+import { upLoadImg } from "@/http/manage-api";
 
 export default {
-  name: 'VideoManagement',
+  name: "VideoManagement",
   components: {
     ImageSelect,
   },
   props: {
     companyId: {
       type: String,
-      default: '',
+      default: "",
     },
     itemCode: {
       type: String,
-      default: '',
+      default: "",
     },
   },
   data() {
     return {
       colorList: [
         {
-          name: '一级',
-          value: '#FB0000',
+          name: "一级",
+          value: "#FB0000",
         },
         {
-          name: '二级',
-          value: '#FFF305',
+          name: "二级",
+          value: "#FFF305",
         },
         {
-          name: '三级',
-          value: '#0BD700',
+          name: "三级",
+          value: "#0BD700",
         },
         {
-          name: '四级',
-          value: '#08A1EE',
+          name: "四级",
+          value: "#08A1EE",
         },
       ],
       videoManagement: {
         isAutoRefresh: false,
         autoRefreshTime: 1,
-        warningLogo: '',
-        warningTitle: '',
+        warningLogo: "",
+        warningTitle: "",
+        CarouselDataType: 0,
         trendPeriod: 1,
         typePeriod: 1,
         handlePeriod: 1,
@@ -53,92 +54,89 @@ export default {
         orgPeriod: 1,
         devicePeriod: 1,
         alarmLevelColor: {},
-        videoPublicIpPort: '',
+        videoPublicIpPort: "",
         isNotification: false,
+        headerLogo: "",
+        headerText: "",
+        advertText:
+          "易见 Ai 一体机不仅是「监控工具」，更是您的「安全管理助手」，cameraNumber路摄像头覆盖全场景、cameraSkillNumber项技能精准识别风险、实时推送缩短响应时间。助力您持续优化安全管理。",
       },
-      filePrefix: '',
-    }
+      filePrefix: "",
+    };
   },
   created() {
-    this.getPrefix()
+    this.getPrefix();
   },
   mounted() {
-    this.getModule()
+    this.getModule();
   },
   methods: {
     colorChangeEvt(index, value) {
-      this.colorList[index].value = value
-      this.videoManagement.alarmLevelColor[index + 1] = value
-      console.log(this.videoManagement.alarmLevelColor)
+      this.colorList[index].value = value;
+      this.videoManagement.alarmLevelColor[index + 1] = value;
+      console.log(this.videoManagement.alarmLevelColor);
     },
     getModule() {
       getSpecifiedModule(this.companyId, this.itemCode).then(({ data }) => {
         if (data.success) {
-          if (this.itemCode === 'VideoManagement') {
+          if (this.itemCode === "VideoManagement") {
             data.result.forEach((res) => {
-              this.videoManagement[res.item] = res.value
+              this.videoManagement[res.item] = res.value;
 
-              if (res.item === 'alarmLevelColor') {
+              if (res.item === "alarmLevelColor") {
                 this.colorList = this.colorList.map((item, index) => {
-                  item.value = res.value[index + 1]
-                  return item
-                })
+                  item.value = res.value[index + 1];
+                  return item;
+                });
               }
-            })
+            });
           }
         }
-      })
+      });
     },
     /* 图片选择回调 */
     fileChangeEvt(file) {
       if (file) {
-        upLoadImg(file, 'USER_ICON_PATH', false).then(({ data }) => {
+        upLoadImg(file, "USER_ICON_PATH", false).then(({ data }) => {
           if (data.success) {
-            this.videoManagement.warningLogo = data.result
+            this.videoManagement.warningLogo = data.result;
+          } else {
+            this.$message.warning(data.message || "上传失败");
           }
-          else {
-            this.$message.warning(data.message || '上传失败')
-          }
-        })
-      }
-      else {
-        this.videoManagement.warningLogo = ''
+        });
+      } else {
+        this.videoManagement.warningLogo = "";
       }
     },
     sumbit(formName) {
-      const dtoList = []
+      const dtoList = [];
       for (const key in this.videoManagement) {
         dtoList.push({
           item: key,
           value: this.videoManagement[key],
-        })
+        });
       }
       this.$refs[formName].validate((valid) => {
         if (valid) {
           setSpecifiedModule(this.companyId, this.itemCode, dtoList).then(({ data }) => {
             this.$message({
               message: data.message,
-              type: 'success',
-            })
-          })
+              type: "success",
+            });
+          });
+        } else {
+          console.log("error submit!!");
+          return false;
         }
-        else {
-          console.log('error submit!!')
-          return false
-        }
-      })
+      });
     },
   },
-}
+};
 </script>
 
 <template>
-  <div>
-    <el-form
-      ref="videoManagement"
-      :model="videoManagement"
-      label-width="200px"
-    >
+  <div class="video-management">
+    <el-form ref="videoManagement" :model="videoManagement" label-width="200px">
       <el-row>
         <el-col :span="20">
           <el-form-item label="是否自动刷新驾驶舱:" prop="isAutoRefresh">
@@ -183,33 +181,31 @@ export default {
         </el-col>
       </el-row>
       <el-row>
+        <el-col :span="20">
+          <el-form-item label="设置驾驶舱轮播数据:" prop="CarouselDataType">
+            <el-radio-group v-model="videoManagement.CarouselDataType">
+              <el-radio :label="0"> 最近10条关注信息 </el-radio>
+              <el-radio :label="1"> 最近10条预警信息 </el-radio>
+            </el-radio-group>
+          </el-form-item>
+        </el-col>
+      </el-row>
+      <el-row>
         <el-col :span="10">
           <el-form-item label="设置默认预警趋势时间周期:" prop="defaultPeriod">
             <el-radio-group v-model="videoManagement.trendPeriod">
-              <el-radio :label="0">
-                日
-              </el-radio>
-              <el-radio :label="1">
-                周
-              </el-radio>
-              <el-radio :label="2">
-                月
-              </el-radio>
+              <el-radio :label="0"> 日 </el-radio>
+              <el-radio :label="1"> 周 </el-radio>
+              <el-radio :label="2"> 月 </el-radio>
             </el-radio-group>
           </el-form-item>
         </el-col>
         <el-col :span="10">
           <el-form-item label="设置默认预警类型排名时间周期:" prop="defaultPeriod">
             <el-radio-group v-model="videoManagement.typePeriod">
-              <el-radio :label="0">
-                日
-              </el-radio>
-              <el-radio :label="1">
-                周
-              </el-radio>
-              <el-radio :label="2">
-                月
-              </el-radio>
+              <el-radio :label="0"> 日 </el-radio>
+              <el-radio :label="1"> 周 </el-radio>
+              <el-radio :label="2"> 月 </el-radio>
             </el-radio-group>
           </el-form-item>
         </el-col>
@@ -218,30 +214,18 @@ export default {
         <el-col :span="10">
           <el-form-item label="设置默认预警处理情况时间周期:" prop="defaultPeriod">
             <el-radio-group v-model="videoManagement.handlePeriod">
-              <el-radio :label="0">
-                日
-              </el-radio>
-              <el-radio :label="1">
-                周
-              </el-radio>
-              <el-radio :label="2">
-                月
-              </el-radio>
+              <el-radio :label="0"> 日 </el-radio>
+              <el-radio :label="1"> 周 </el-radio>
+              <el-radio :label="2"> 月 </el-radio>
             </el-radio-group>
           </el-form-item>
         </el-col>
         <el-col :span="10">
           <el-form-item label="设置默认预警等级占比时间周期:" prop="defaultPeriod">
             <el-radio-group v-model="videoManagement.levelPeriod">
-              <el-radio :label="0">
-                日
-              </el-radio>
-              <el-radio :label="1">
-                周
-              </el-radio>
-              <el-radio :label="2">
-                月
-              </el-radio>
+              <el-radio :label="0"> 日 </el-radio>
+              <el-radio :label="1"> 周 </el-radio>
+              <el-radio :label="2"> 月 </el-radio>
             </el-radio-group>
           </el-form-item>
         </el-col>
@@ -250,30 +234,18 @@ export default {
         <el-col :span="10">
           <el-form-item label="设置默认组织预警排名时间周期:" prop="defaultPeriod">
             <el-radio-group v-model="videoManagement.orgPeriod">
-              <el-radio :label="0">
-                日
-              </el-radio>
-              <el-radio :label="1">
-                周
-              </el-radio>
-              <el-radio :label="2">
-                月
-              </el-radio>
+              <el-radio :label="0"> 日 </el-radio>
+              <el-radio :label="1"> 周 </el-radio>
+              <el-radio :label="2"> 月 </el-radio>
             </el-radio-group>
           </el-form-item>
         </el-col>
         <el-col :span="10">
           <el-form-item label="设置默认设备预警排名时间周期:" prop="defaultPeriod">
             <el-radio-group v-model="videoManagement.devicePeriod">
-              <el-radio :label="0">
-                日
-              </el-radio>
-              <el-radio :label="1">
-                周
-              </el-radio>
-              <el-radio :label="2">
-                月
-              </el-radio>
+              <el-radio :label="0"> 日 </el-radio>
+              <el-radio :label="1"> 周 </el-radio>
+              <el-radio :label="2"> 月 </el-radio>
             </el-radio-group>
           </el-form-item>
         </el-col>
@@ -317,14 +289,52 @@ export default {
           </el-form-item>
         </el-col>
       </el-row>
+      <el-row>
+        <el-col :span="20">
+          <el-form-item label="页眉logo文字:" prop="headerLogo">
+            <el-input
+              v-model="videoManagement.headerLogo"
+              style="width: 300px"
+              clearable
+              placeholder="请输入页眉logo文字"
+            />
+          </el-form-item>
+          <el-form-item label="页眉右侧文字:" prop="headerText">
+            <el-input
+              v-model="videoManagement.headerText"
+              style="width: 300px"
+              clearable
+              placeholder="请输入页眉右侧文字"
+            />
+          </el-form-item>
+        </el-col>
+      </el-row>
+      <el-row>
+        <el-col :span="20">
+          <el-form-item label="设置广告词:" prop="advertText">
+            <el-input
+              v-model="videoManagement.advertText"
+              type="textarea"
+              :rows="4"
+              style="width: 500px"
+              clearable
+            />
+          </el-form-item>
+        </el-col>
+      </el-row>
     </el-form>
 
     <el-row justify="end">
       <el-col class="flex pl-52 mt-5">
-        <el-button type="primary" @click="sumbit('videoManagement')">
-          保存
-        </el-button>
+        <el-button type="primary" @click="sumbit('videoManagement')"> 保存 </el-button>
       </el-col>
     </el-row>
   </div>
 </template>
+
+<style scoped lang="scss">
+.video-management {
+  overflow-y: auto;
+  max-height: calc(80vh - 60px);
+}
+</style>

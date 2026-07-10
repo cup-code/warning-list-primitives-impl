@@ -3,116 +3,113 @@ import {
   delJavaTypeFn,
   getJavaTypeDetailFn,
   getJavaTypeListFn,
-} from '@/http/safe-production/genCode/java-type-api'
-import GenJavaTypeForm from './GenJavaTypeForm'
+} from "@/http/safe-production/genCode/java-type-api";
+import GenJavaTypeForm from "./GenJavaTypeForm";
 
 export default {
-  name: 'genJavaTypeList',
+  name: "genJavaTypeList",
   components: {
     GenJavaTypeForm,
   },
   data() {
     return {
       searchForm: {
-        label: '',
-        value: '',
+        label: "",
+        value: "",
       },
       dataList: [],
       pageNo: 1,
       pageSize: 10,
       total: 0,
-      orderBy: '',
+      orderBy: "",
       dataListSelections: [],
       loading: false,
-    }
+    };
   },
   mounted() {
-    this.refreshList()
+    this.refreshList();
   },
   methods: {
     // 获取数据列表
     refreshList() {
-      this.loading = true
+      this.loading = true;
       const params = Object.assign(
         {
           pageNo: this.pageNo,
           pageSize: this.pageSize,
           orderBy: this.orderBy,
         },
-        this.searchForm,
-      )
+        this.searchForm
+      );
       getJavaTypeListFn(params).then(({ data }) => {
         if (data && data.success) {
-          this.dataList = data.page.list
-          this.total = data.page.count
+          this.dataList = data.page.list;
+          this.total = data.page.count;
+        } else {
+          this.$message.error(data.message);
         }
-        else {
-          this.$message.error(data.msg)
-        }
-        this.loading = false
-      })
+        this.loading = false;
+      });
     },
     // 每页数
     sizeChangeHandle(val) {
-      this.pageSize = val
-      this.pageNo = 1
-      this.refreshList()
+      this.pageSize = val;
+      this.pageNo = 1;
+      this.refreshList();
     },
     // 当前页
     currentChangeHandle(val) {
-      this.pageNo = val
-      this.refreshList()
+      this.pageNo = val;
+      this.refreshList();
     },
     // 多选
     selectionChangeHandle(val) {
-      this.dataListSelections = val
+      this.dataListSelections = val;
     },
     // 排序
     sortChangeHandle(obj) {
-      if (obj.order === 'ascending') {
-        this.orderBy = `${obj.prop} asc`
+      if (obj.order === "ascending") {
+        this.orderBy = `${obj.prop} asc`;
+      } else if (obj.order === "descending") {
+        this.orderBy = `${obj.prop} desc`;
+      } else {
+        this.orderBy = "";
       }
-      else if (obj.order === 'descending') {
-        this.orderBy = `${obj.prop} desc`
-      }
-      else {
-        this.orderBy = ''
-      }
-      this.refreshList()
+      this.refreshList();
     },
     // 新增
     add() {
-      this.$refs.genJavaTypeForm.init('add', '')
+      this.$refs.genJavaTypeForm.init("add", "");
     },
     // 修改
     edit(id) {
-      id
-        = id
-          || this.dataListSelections.map((item) => {
-            return item.id
-          })[0]
-      this.$refs.genJavaTypeForm.init('edit', id)
+      id =
+        id ||
+        this.dataListSelections.map((item) => {
+          return item.id;
+        })[0];
+      this.$refs.genJavaTypeForm.init("edit", id);
     },
     // 查看
     view(id) {
-      this.$refs.genJavaTypeForm.init('view', id)
+      this.$refs.genJavaTypeForm.init("view", id);
     },
     // 删除
     del(id) {
-      const ids
-        = id
-          || this.dataListSelections
-            .map((item) => {
-              return item.id
-            })
-            .join(',')
-      this.$confirm('\u786E\u5B9A\u5220\u9664\u6240\u9009\u9879\u5417?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning',
+      const ids =
+        id ||
+        this.dataListSelections
+          .map((item) => {
+            return item.id;
+          })
+          .join(",");
+      this.$confirm("\u786E\u5B9A\u5220\u9664\u6240\u9009\u9879\u5417?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
         showClose: false,
       }).then(() => {
-        this.loading = true
+        this.loading = true;
         // this.$http({
         //   url: '/gen/genCustomObj/deleteAll',
         //   method: 'delete',
@@ -121,86 +118,54 @@ export default {
         //   }
         // })
         delJavaTypeFn(ids).then(({ data }) => {
-          this.loading = false
+          this.loading = false;
           if (data && data.success) {
-            this.$message.success(data.msg)
-            this.refreshList()
+            this.$message.success(data.message);
+            this.refreshList();
+          } else {
+            this.$message.error(data.message);
           }
-          else {
-            this.$message.error(data.msg)
-          }
-        })
-      })
+        });
+      });
     },
     // 查看详情
     detail(row) {
       getJavaTypeDetailFn(row.id).then(({ data }) => {
         this.dataList.forEach((item, index) => {
           if (item.id === row.id) {
-            item.genCustomFieldList = data.genCustomObj.genCustomFieldList
+            item.genCustomFieldList = data.genCustomObj.genCustomFieldList;
           }
-        })
-      })
+        });
+      });
     },
     resetSearch() {
-      this.$refs.searchForm.resetFields()
-      this.refreshList()
+      this.$refs.searchForm.resetFields();
+      this.refreshList();
     },
   },
-}
+};
 </script>
 
 <template>
-  <div class="page">
-    <ECard type="search">
-      <el-form
-        ref="searchForm"
-        inline
-        :model="searchForm"
-        @submit.native.prevent
-      >
+  <KyTreeTable ref="treeTable" :isShowLeft="false">
+    <ECard slot="search" type="search" noneBottom>
+      <el-form ref="searchForm" inline :model="searchForm" @submit.native.prevent>
         <el-form-item prop="label">
-          <el-input
-            v-model="searchForm.label"
-            placeholder="标签"
-            clearable
-          />
+          <el-input v-model="searchForm.label" placeholder="标签" clearable />
         </el-form-item>
         <el-form-item prop="value">
-          <el-input
-            v-model="searchForm.value"
-            placeholder="完整类名"
-            clearable
-          />
+          <el-input v-model="searchForm.value" placeholder="完整类名" clearable />
         </el-form-item>
         <el-form-item>
-          <EButton
-            icon="search"
-            type="primary"
-            @click="refreshList"
-          >
-            查询
-          </EButton>
-          <EButton
-            icon="sync"
-            plain
-            @click="resetSearch"
-          >
-            重置
-          </EButton>
+          <EButton icon="search" type="primary" @click="refreshList"> 查询 </EButton>
+          <EButton icon="sync" plain @click="resetSearch"> 重置 </EButton>
         </el-form-item>
       </el-form>
     </ECard>
 
-    <ECard>
+    <ECard slot="table">
       <div class="card-ell">
-        <el-button
-          type="primary"
-          icon="el-icon-plus"
-          @click="add()"
-        >
-          新建
-        </el-button>
+        <el-button type="primary" icon="el-icon-plus" @click="add()"> 新建 </el-button>
         <el-button
           type="success"
           icon="el-icon-edit-outline"
@@ -220,17 +185,8 @@ export default {
           删除
         </el-button>
         <el-button-group class="pull-right">
-          <el-tooltip
-            effect="dark"
-            content="刷新"
-            placement="top"
-            class="item"
-          >
-            <el-button
-              type="default"
-              icon="el-icon-refresh"
-              @click="refreshList()"
-            />
+          <el-tooltip effect="dark" content="刷新" placement="top" class="item">
+            <el-button type="default" icon="el-icon-refresh" @click="refreshList()" />
           </el-tooltip>
         </el-button-group>
       </div>
@@ -255,15 +211,8 @@ export default {
           <template slot-scope="scope">
             <el-tabs v-if="scope.row.type === '0'">
               <el-tab-pane label="java字段">
-                <el-table
-                  style="width: 100%"
-                  :data="scope.row.genCustomFieldList"
-                >
-                  <el-table-column
-                    prop="name"
-                    show-overflow-tooltip
-                    label="java属性"
-                  />
+                <el-table style="width: 100%" :data="scope.row.genCustomFieldList">
+                  <el-table-column prop="name" show-overflow-tooltip label="java属性" />
                   <el-table-column
                     prop="remarks"
                     show-overflow-tooltip
@@ -282,11 +231,7 @@ export default {
         >
           <template slot-scope="scope">
             <!-- <el-link  type="primary" :underline="false" v-if="hasPermission('sys:menu:edit')" @click="edit(scope.row.id)">{{scope.row.label}}</el-link> -->
-            <el-link
-              type="primary"
-              :underline="false"
-              @click="view(scope.row.id)"
-            >
+            <el-link type="primary" :underline="false" @click="view(scope.row.id)">
               {{ scope.row.label }}
             </el-link>
             <!-- <span v-else>{{scope.row.label}}</span> -->
@@ -356,7 +301,7 @@ export default {
       <el-row> </el-row>
     </div> -->
 
-    <ECard type="footer">
+    <ECard slot="page" type="footer">
       <el-pagination
         style="text-align: right"
         :current-page="pageNo"
@@ -368,17 +313,11 @@ export default {
         @current-change="currentChangeHandle"
       />
     </ECard>
-    <gen-java-type-form
-      ref="genJavaTypeForm"
-      @refreshDataList="refreshList"
-    />
-  </div>
+    <gen-java-type-form slot="dialog" ref="genJavaTypeForm" @refreshDataList="refreshList" />
+  </KyTreeTable>
 </template>
 
 <style lang="scss" scoped>
-.page {
-  padding: 10px;
-}
 .pull-right {
   float: right;
 }

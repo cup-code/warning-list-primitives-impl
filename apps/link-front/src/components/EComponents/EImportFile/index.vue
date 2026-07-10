@@ -1,27 +1,28 @@
 <script>
-import { getAuthToken } from '@/utils/tab-session'
+import { getAuthToken } from "@/utils/tab-session";
+
 export default {
-  name: 'EImportFile',
+  name: "EImportFile",
   data() {
     return {
       uploadLimit: {
         header: {
           Authorization: getAuthToken(),
-          clientChannel: 'WEB',
+          clientChannel: "WEB",
         },
         accept: [
-          'application/vnd.ms-excel',
-          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+          "application/vnd.ms-excel",
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         ],
       },
-    }
+    };
   },
   methods: {
     excelImport(file) {
-      this.$emit('excelImport', file)
+      this.$emit("excelImport", file);
     },
   },
-}
+};
 </script>
 
 <template>

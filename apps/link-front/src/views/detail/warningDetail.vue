@@ -43,7 +43,7 @@ export default {
 
     // 文件前缀
     const filePrefix = ref(
-      JSON.parse(localStorage.getItem('globalData')).minioFilePrefix,
+      JSON.parse(localStorage.getItem('globalData'))?.minioFilePrefix || '',
     )
 
     // 预警等级列表
@@ -422,6 +422,27 @@ export default {
         return
       }
 
+      // 已有标注图片时，直接用已有图片绘制 canvas，跳过上传
+      const detailForms = vm.$store.state.detailInfo.detailForms
+      if (detailForms?.alarmPicAnnotation) {
+        img.src = annotationPic.value
+        img.onload = () => {
+          ctx.clearRect(0, 0, canvasEl.width, canvasEl.height)
+          ctx.drawImage(img, 0, 0, canvasEl.width, canvasEl.height)
+          url.value = annotationPic.value
+        }
+        img.onerror = () => {
+          ctx.fillStyle = '#f5f5f5'
+          ctx.fillRect(0, 0, canvasEl.width, canvasEl.height)
+          ctx.fillStyle = '#f00'
+          ctx.font = '24px Arial'
+          ctx.textAlign = 'center'
+          ctx.fillText('标注图片加载失败', canvasEl.width / 2, canvasEl.height / 2)
+        }
+        return
+      }
+
+      // 无标注图片时，绘制原始图片 + 标注框并上传
       img.src = picture.value
 
       img.onload = () => {
@@ -469,8 +490,6 @@ export default {
         ctx.textAlign = 'center'
         ctx.fillText('图片加载失败', canvasEl.width / 2, canvasEl.height / 2)
       }
-
-      // 注意：不要在图片 onload 之前生成 base64，否则会得到空白图
     }
 
     const getVideo = (url, type) => {

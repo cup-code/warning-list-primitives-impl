@@ -53,11 +53,11 @@ export default {
           saveShowTypeFn(this.inputForm).then(({ data }) => {
             if (data && data.success) {
               this.visible = false
-              this.$message.success(data.msg)
+              this.$message.success(data.message)
               this.$emit('refreshDataList')
             }
             else {
-              this.$message.error(data.msg)
+              this.$message.error(data.message)
             }
             this.loading = false
           })

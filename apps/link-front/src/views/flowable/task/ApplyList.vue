@@ -208,8 +208,8 @@ export default {
 </script>
 
 <template>
-  <div class="page-container">
-    <ECard type="search">
+  <KyTreeTable ref="treeTable" :isShowLeft="false">
+    <ECard slot="search" type="search" noneBottom>
       <el-form
         ref="searchForm"
         size="small"
@@ -257,7 +257,7 @@ export default {
       </el-form>
     </ECard>
 
-    <ECard>
+    <ECard slot="table">
       <div class="card-cell">
         <el-button-group class="pull-right">
           <el-tooltip
@@ -403,7 +403,7 @@ export default {
       </el-table>
     </ECard>
 
-    <ECard type="footer">
+    <ECard slot="page" type="footer">
       <el-pagination
         style="text-align: right"
         :current-page="pageNo"
@@ -417,7 +417,7 @@ export default {
       />
     </ECard>
 
-    <el-dialog
+    <el-dialog slot="dialog"
       title="查看流程历史"
       :close-on-click-modal="true"
       :visible.sync="visible"
@@ -433,8 +433,8 @@ export default {
       />
     </el-dialog>
 
-    <urge-form ref="urgeForm" />
-  </div>
+    <urge-form slot="dialog" ref="urgeForm" />
+  </KyTreeTable>
 </template>
 
 <style lang="scss" scoped>

@@ -1,14 +1,14 @@
 <script>
 export default {
-  name: 'ReportTable',
+  name: "ReportTable",
   props: {
     title: {
       type: String,
-      default: '',
+      default: "",
     },
     subtitle: {
       type: String,
-      default: '',
+      default: "",
     },
     columns: {
       type: Array,
@@ -26,34 +26,34 @@ export default {
     },
     width: {
       type: String,
-      default: '100%',
+      default: "100%",
     },
     headerBgColor: {
       type: String,
-      default: '#2986c7',
+      default: "#2986c7",
     },
     headerTextColor: {
       type: String,
-      default: '#fff',
+      default: "#fff",
     },
     subtitleBgColor: {
       type: String,
-      default: '#f5f6fa',
+      default: "#f5f6fa",
     },
     subtitleTextColor: {
       type: String,
-      default: '#333',
+      default: "#333",
     },
     columnHeaderBgColor: {
       type: String,
-      default: '#e5e6eb',
+      default: "#e5e6eb",
     },
     columnHeaderTextColor: {
       type: String,
-      default: '#333',
+      default: "#333",
     },
   },
-}
+};
 </script>
 
 <template>
@@ -107,11 +107,7 @@ export default {
           :key="index"
           style="text-align: center; border-top: 1px solid #e5e6eb"
         >
-          <td
-            v-for="column in columns"
-            :key="column.key"
-            style="padding: 8px 0"
-          >
+          <td v-for="column in columns" :key="column.key" style="padding: 8px 0">
             {{ row[column.key] }}
           </td>
         </tr>

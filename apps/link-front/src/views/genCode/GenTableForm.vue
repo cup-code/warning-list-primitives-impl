@@ -20,7 +20,7 @@ export default {
   },
   data() {
     return {
-      config: '',
+      config: {},
       dictList: {},
       tableList: [],
       dataListSelections: [],
@@ -452,7 +452,7 @@ export default {
         this.dictList = data.page.list
       })
       getQueryConfigFn().then(({ data }) => {
-        this.config = data.config
+        this.config = data.config || {}
         this.tableList = data.tableList
       })
       getTreetFn()
@@ -960,7 +960,7 @@ export default {
         if (valid && valid2) {
           saveContentFn(this.inputForm).then(({ data }) => {
             if (data && data.success) {
-              this.$message.success(data.msg)
+              this.$message.success(data.message)
               this.visible = false
               this.$emit('refreshDataList')
             }

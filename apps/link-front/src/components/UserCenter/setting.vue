@@ -1,6 +1,7 @@
 <script>
 import { mapState } from "vuex";
 import { editPhoneCode, editUserPhone, editUserPw } from "@/http/manage-api";
+import { clearSession } from "@/utils/tab-session";
 import { getUserQrCode } from "@/http/user-api";
 import { $checkPhone } from "@/utils/validate";
 
@@ -191,7 +192,7 @@ export default {
     // 清空所有，重新登录
     restartFn() {
       // 清空storage（仅清除当前标签页的sessionStorage，不影响其他标签页）
-      sessionStorage.clear();
+      clearSession();
 
       // 清空全局状态
       this.$store.dispatch("user/logout");
@@ -232,11 +233,14 @@ export default {
       <el-row align="middle" type="flex">
         <el-col :span="3" class="title"> 智能巡检登录二维码 </el-col>
         <el-col :span="18" class="desc">
-          <img
+          <el-image
             v-if="qrCodeBase64"
             :src="qrCodeBase64"
+            :preview-src-list="[qrCodeBase64]"
+            fit="contain"
+            class="inspection-login-qrcode"
             alt="登录二维码"
-            style="height: 100px"
+            title="点击预览"
           />
           <span v-else>暂无二维码</span>
         </el-col>
@@ -352,6 +356,17 @@ export default {
     }
     .btns {
       text-align: center;
+    }
+  }
+
+  .inspection-login-qrcode {
+    height: 100px;
+    width: 100px;
+    cursor: pointer;
+
+    ::v-deep .el-image__inner {
+      height: 100px;
+      width: 100px;
     }
   }
 }

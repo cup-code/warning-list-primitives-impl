@@ -102,6 +102,17 @@ export default {
         xAxis: {
           type: 'category',
           data: data?.map(item => item.alarmType || '') || [],
+          axisTick: {
+            alignWithLabel: true,
+          },
+          axisLabel: {
+            interval: 0,
+            showMinLabel: true,
+            showMaxLabel: true,
+            formatter(value) {
+              return value
+            },
+          },
         },
         series: [
           {
@@ -172,7 +183,7 @@ export default {
       ]
       const color = ['#FF4500', '#fc8452', '#fac858', '#0069b9']
 
-      const alarmLevelData = level.map((item, index) => {
+      const alarmLevelData = level.map((item) => {
         return {
           name: item.name,
           value: data[item?.value] || 0,

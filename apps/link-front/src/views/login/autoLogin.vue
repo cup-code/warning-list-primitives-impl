@@ -11,7 +11,7 @@ import {
   setPermissionTreeData,
   setStorage,
 } from '@/utils'
-import { setAuthToken, setTenantToken, setSessionAlive } from '@/utils/tab-session'
+import { setAuthToken, setTenantToken, setSessionAlive, clearSession } from '@/utils/tab-session'
 
 export default {
   components: {
@@ -69,7 +69,7 @@ export default {
       const token = btoa(`${form.username}:${form.password}`)
 
       // 1、先清空sessionStorage（不影响其他标签页）
-      sessionStorage.clear()
+      clearSession()
       this.$store.dispatch('user/logout') // 清空全局状态
 
       // 2、再登录

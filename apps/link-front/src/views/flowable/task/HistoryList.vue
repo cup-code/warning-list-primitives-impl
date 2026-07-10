@@ -175,8 +175,8 @@ export default {
 </script>
 
 <template>
-  <div class="page-container">
-    <ECard type="search">
+  <KyTreeTable ref="treeTable" :isShowLeft="false">
+    <ECard slot="search" type="search" noneBottom>
       <el-form
         ref="searchForm"
         size="small"
@@ -222,7 +222,7 @@ export default {
         </el-form-item>
       </el-form>
     </ECard>
-    <ECard>
+    <ECard slot="table">
       <div class="card-cell">
         <el-button-group>
           <el-tooltip
@@ -338,7 +338,7 @@ export default {
         </el-table-column>
       </el-table>
     </ECard>
-    <ECard type="footer">
+    <ECard slot="page" type="footer">
       <el-pagination
         style="text-align: right"
         :current-page="pageNo"
@@ -351,7 +351,7 @@ export default {
         @current-change="currentChangeHandle"
       />
     </ECard>
-  </div>
+  </KyTreeTable>
 </template>
 
 <style lang="scss" scoped>

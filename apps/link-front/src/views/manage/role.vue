@@ -3,11 +3,11 @@ import {
   deleteRole,
   getAllRoles,
   getChangeRole,
-} from '@/http/safe-production/role-manage-api'
-import AllDepartmentTree from '@/views/common-ui/AllDepartmentTree.vue'
-import GlobalDepartmentTree from '@/views/common-ui/GlobalDepartmentTree'
-import AuthForm from './form/role/AuthForm'
-import RoleUserList from './form/role/RoleUserList'
+} from "@/http/safe-production/role-manage-api";
+import AllDepartmentTree from "@/views/common-ui/AllDepartmentTree.vue";
+import GlobalDepartmentTree from "@/views/common-ui/GlobalDepartmentTree";
+import AuthForm from "./form/role/AuthForm.vue";
+import RoleUserList from "./form/role/RoleUserList";
 
 export default {
   components: {
@@ -18,180 +18,172 @@ export default {
   },
   data() {
     return {
-      companyId: '',
+      companyId: "",
       searchForm: {
         pageNum: 1,
         pageSize: 10,
-        companyId: '',
-        fuzzyQuery: '',
-        departmentId: '',
+        companyId: "",
+        fuzzyQuery: "",
+        departmentId: "",
       },
       moreEButton: [
         {
-          type: 'text',
-          icon: 'check',
-          size: 'mini',
-          props: 'check',
-          text: '查看',
+          type: "text",
+          icon: "check",
+          size: "mini",
+          props: "check",
+          text: "查看",
           disabled: false,
         },
         {
-          type: 'text',
-          icon: 'check',
-          size: 'mini',
-          props: 'checkRole',
-          text: '查看人员',
+          type: "text",
+          icon: "check",
+          size: "mini",
+          props: "checkRole",
+          text: "查看人员",
           disabled: false,
         },
         {
-          type: 'text',
-          icon: 'setting',
-          size: 'mini',
-          props: 'setRole',
-          text: '设为默认角色',
+          type: "text",
+          icon: "setting",
+          size: "mini",
+          props: "setRole",
+          text: "设为默认角色",
           disabled: false,
         },
       ],
       tableData: [],
       total: 0,
       rightVisible: false,
-      roleUserTitle: '',
+      roleUserTitle: "",
       loading: false,
-    }
+    };
   },
   created() {
-    this.companyId = this.$store.state.user.user.companyId
+    this.companyId = this.$store.state.user.user.companyId;
   },
   mounted() {
-    this.refreshList()
+    this.refreshList();
   },
   methods: {
     // 获取数据列表
     refreshList() {
-      this.loading = true
+      this.loading = true;
       getAllRoles(this.searchForm).then((res) => {
         // console.log(res)
-        const resD = res.data
-        const msg = resD.message
-        this.loading = false
+        const resD = res.data;
+        const msg = resD.message;
+        this.loading = false;
         if (resD.success) {
-          this.tableData = resD.result.list
-          this.total = resD.result.total
+          this.tableData = resD.result.list;
+          this.total = resD.result.total;
+        } else {
+          this.$message.error(msg || "查询角色失败");
         }
-        else {
-          this.$message.error(msg || '查询角色失败')
-        }
-      })
+      });
     },
     // 点击部门树的item
     treeNodeTap(v) {
       // 记录部门id
-      if (v.onlyTreeUse)
-        return
-      this.searchForm.pageNum = 1
-      this.searchForm.departmentId = v.id
-      this.refreshList()
+      if (v.onlyTreeUse) return;
+      this.searchForm.pageNum = 1;
+      this.searchForm.departmentId = v.id;
+      this.refreshList();
     },
     // 每页数
     sizeChangeHandle(val) {
-      this.searchForm.pageSize = val
-      this.searchForm.pageNum = 1
-      this.refreshList()
+      this.searchForm.pageSize = val;
+      this.searchForm.pageNum = 1;
+      this.refreshList();
     },
     // 当前页
     currentChangeHandle(val) {
-      this.searchForm.pageNum = val
-      this.refreshList()
+      this.searchForm.pageNum = val;
+      this.refreshList();
     },
     // 删除
     del(id) {
-      this.$confirm(`确定删除?`, '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning',
+      this.$confirm(`确定删除?`, "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
       }).then(() => {
-        this.loading = true
+        this.loading = true;
         deleteRole(id).then(({ data }) => {
-          this.loading = false
+          this.loading = false;
           if (data && data.success) {
             this.$message.success({
               dangerouslyUseHTMLString: true,
               message: data.message,
-            })
-            this.refreshList()
+            });
+            this.refreshList();
+          } else {
+            this.$message.error(data.message);
           }
-          else {
-            this.$message.error(data.message)
-          }
-        })
-      })
+        });
+      });
     },
     // 更改默认角色
     changeRole(id) {
-      this.$confirm(`确定设为默认角色?`, '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning',
+      this.$confirm(`确定设为默认角色?`, "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
       }).then(() => {
-        this.loading = true
+        this.loading = true;
         getChangeRole(id).then(({ data }) => {
-          this.loading = false
+          this.loading = false;
           if (data && data.success) {
             this.$message.success({
               dangerouslyUseHTMLString: true,
               message: data.message,
-            })
-            this.refreshList()
+            });
+            this.refreshList();
+          } else {
+            this.$message.error(data.message);
           }
-          else {
-            this.$message.error(data.message)
-          }
-        })
-      })
+        });
+      });
     },
     search() {
-      this.searchForm.pageNum = 1
-      this.refreshList()
+      this.searchForm.pageNum = 1;
+      this.refreshList();
     },
     showUserWithRole(row) {
-      this.rightVisible = true
-      this.roleUserTitle = row.roleName
+      this.rightVisible = true;
+      this.roleUserTitle = row.roleName;
       this.$nextTick(() => {
-        this.$refs.roleUserList.refreshList(row.id)
-      })
+        this.$refs.roleUserList.refreshList(row.id);
+      });
     },
     closeRight() {
-      this.rightVisible = false
+      this.rightVisible = false;
     },
     // 新增
     add() {
-      this.$refs.authForm.init('add', '')
+      this.$refs.authForm.init("add", "");
     },
     showAuthView(row) {
-      this.$refs.authForm.init('view', row.id, row)
-      this.roleUserTitle = row.roleName
+      this.$refs.authForm.init("view", row.id, row);
+      this.roleUserTitle = row.roleName;
     },
     showAuthEdit(row) {
-      this.$refs.authForm.init('edit', row.id, row)
-      this.roleUserTitle = row.roleName
+      this.$refs.authForm.init("edit", row.id, row);
+      this.roleUserTitle = row.roleName;
     },
     // 重置
     resetButton() {
-      this.searchForm.companyId = ''
-      this.searchForm.departmentId = ''
-      this.searchForm.fuzzyQuery = ''
-      this.search()
+      this.searchForm.companyId = "";
+      this.searchForm.departmentId = "";
+      this.searchForm.fuzzyQuery = "";
+      this.search();
     },
   },
-}
+};
 </script>
 
 <template>
-  <KyTreeTable
-    ref="treeTable"
-    treeWidth="200"
-    tableHeight="270"
-  >
+  <KyTreeTable ref="treeTable" treeWidth="200" tableHeight="270">
     <!-- 左侧树 -->
     <!--    <GlobalDepartmentTree slot="tree" @treeNodeTap="treeNodeTap" :companyId="companyId" /> -->
     <AllDepartmentTree
@@ -200,11 +192,7 @@ export default {
       :hasResponsible="false"
       @treeNodeTap="treeNodeTap"
     />
-    <ECard
-      slot="search"
-      noneBottom
-      type="search"
-    >
+    <ECard slot="search" noneBottom type="search">
       <el-form
         ref="searchForm"
         size="mini"
@@ -212,10 +200,7 @@ export default {
         :model="searchForm"
         @submit.native.prevent
       >
-        <el-form-item
-          prop="fuzzyQuery"
-          label="角色名"
-        >
+        <el-form-item prop="fuzzyQuery" label="角色名">
           <el-input
             v-model="searchForm.fuzzyQuery"
             size="mini"
@@ -224,12 +209,7 @@ export default {
           />
         </el-form-item>
         <el-form-item>
-          <el-button
-            type="primary"
-            size="mini"
-            icon="el-icon-search"
-            @click="search"
-          >
+          <el-button type="primary" size="mini" icon="el-icon-search" @click="search">
             查询
           </el-button>
           <el-button
@@ -264,11 +244,7 @@ export default {
         size="small"
         :header-cell-style="{ background: 'var(--ky-head-color)' }"
       >
-        <el-table-column
-          type="index"
-          label="序号"
-          width="50"
-        />
+        <el-table-column type="index" label="序号" width="50" />
         <el-table-column
           align="center"
           prop="roleName"
@@ -276,10 +252,9 @@ export default {
           label="角色名称"
         >
           <template slot-scope="scope">
-            <span
-              class="check"
-              @click="showAuthView(scope.row)"
-            >{{ scope.row.roleName }}</span>
+            <span class="check" @click="showAuthView(scope.row)">{{
+              scope.row.roleName
+            }}</span>
           </template>
         </el-table-column>
         <el-table-column
@@ -296,15 +271,10 @@ export default {
           min-width="120px"
           label="责任组织"
         />
-        <el-table-column
-          align="center"
-          prop="enable"
-          min-width="100px"
-          label="状态"
-        >
+        <el-table-column align="center" prop="enable" min-width="100px" label="状态">
           <template slot-scope="scope">
             <el-tag :type="scope.row.enable ? 'success' : 'danger'">
-              {{ scope.row.enable ? '启用' : '禁用' }}
+              {{ scope.row.enable ? "启用" : "禁用" }}
             </el-tag>
           </template>
         </el-table-column>
@@ -316,7 +286,7 @@ export default {
         >
           <template slot-scope="scope">
             <el-tag :type="scope.row.defaultFlag ? 'success' : 'danger'">
-              {{ scope.row.defaultFlag ? '是' : '否' }}
+              {{ scope.row.defaultFlag ? "是" : "否" }}
             </el-tag>
           </template>
         </el-table-column>
@@ -361,10 +331,7 @@ export default {
         </el-table-column>
       </el-table>
     </ECard>
-    <ECard
-      slot="page"
-      type="footer"
-    >
+    <ECard slot="page" type="footer">
       <el-pagination
         :current-page="searchForm.pageNum"
         :page-sizes="[10, 20, 50, 100]"
@@ -385,10 +352,7 @@ export default {
       :visible.sync="rightVisible"
       direction="rtl"
     >
-      <role-user-list
-        ref="roleUserList"
-        @closeRight="closeRight"
-      />
+      <role-user-list ref="roleUserList" @closeRight="closeRight" />
     </el-dialog>
     <AuthForm
       slot="dialog"

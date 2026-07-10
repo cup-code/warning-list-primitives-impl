@@ -54,8 +54,14 @@ export function setStorage(key, data, time) {
     const cacheExpireDate = new Date() - 1 + time * 1000
     const cacheVal = { val: data, exp: cacheExpireDate }
     localStorage.setItem(key, JSON.stringify(cacheVal)) // 存入缓存值
+    return true
   }
-  catch (e) { }
+  catch (e) {
+    if (e instanceof DOMException && e.name === 'QuotaExceededError') {
+      console.warn('[storage] Quota exceeded for key:', key)
+    }
+    return false
+  }
 }
 
 // 获取localStorage(加上失效时间判断)

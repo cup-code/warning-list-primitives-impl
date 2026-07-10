@@ -1,46 +1,47 @@
 <script setup>
-import { ref, reactive, onMounted, onUnmounted, computed, watch } from "vue";
-import { useRouter } from "vue-router/composables";
-import store from "@/store";
 import dayjs from "dayjs";
+import { computed, onMounted, onUnmounted, reactive, ref, watch } from "vue";
+import { useRoute, useRouter } from "vue-router/composables";
+import { getSpecifiedModule } from "@/http/companyConfig/companyConfig-api.js";
 import {
-  queryInspectionSummary,
   countAbnormalByState,
+  queryInspectionSummary,
 } from "@/http/inspection/yx-inspection-api.js";
-
-// 导入模块化数据处理函数
-import {
-  STAFF_STATUS,
-  POINT_STATUS,
-  processStaffList,
-  calculateStaffStats,
-  processTaskStatus,
-  processMapPoints,
-  processExecutionList,
-  processAbnormalPoints,
-  processOvertimeTasks,
-  processTaskOptions,
-  parseGeoInfo,
-} from "./composables/useInspectionData.js";
+import store from "@/store";
 
 // 导入子组件
 import {
+  AbnormalPanel,
+  CenterTopBar,
   DashboardHeader,
+  MapPanel,
+  PersonnelPanel,
+  ProgressPanel,
   TaskStatusPanel,
   ViolationPanel,
-  PersonnelPanel,
-  CenterTopBar,
-  MapPanel,
-  BottomStats,
-  ProgressPanel,
-  AbnormalPanel,
 } from "./components/overview/index.js";
 
+// 导入模块化数据处理函数
+import {
+  calculateStaffStats,
+  processAbnormalPoints,
+  processExecutionList,
+  processMapPoints,
+  processOvertimeTasks,
+  processStaffList,
+  processTaskOptions,
+  processTaskStatus,
+} from "./composables/useInspectionData.js";
+
 const router = useRouter();
-const mapPanelRef = ref(null);
+const route = useRoute();
 
 // 加载状态
 const loading = ref(false);
+
+// 地图默认定位（公司配置）
+const mapDefaultCenter = ref([113.264385, 23.129112]);
+const mapDefaultZoom = ref(14);
 
 // 总览数据（新接口数据）
 const summaryData = ref({
@@ -64,16 +65,13 @@ const routerList = ref([]);
 const isFullscreen = ref(false);
 const userInfo = computed(() => store.state.user?.user || {});
 
-// 判断是否为大屏首页（登录后直接进入的页面）
+// 当前路由路径（如 /afterLoginMenu、菜单进入的其它 path）
+const currentRoutePath = computed(() => route.path);
+
+// 判断是否为大屏首页（开屏路由 + 用户开屏配置为本页组件，见 permission.js /afterLoginMenu）
 const isBigScreenHome = computed(() => {
-  const storedUser = sessionStorage.getItem("user");
-  if (!storedUser) return false;
-  try {
-    const user = JSON.parse(storedUser);
-    return user.afterLoginMenu === "views/yxInspection/InspectionOverview";
-  } catch {
-    return false;
-  }
+  if (currentRoutePath.value !== "/afterLoginMenu") return false;
+  return true;
 });
 
 // 巡检任务选项（从taskDetailsList生成巡检计划列表）
@@ -250,12 +248,37 @@ async function fetchAbnormalStats() {
   }
 }
 
+// 获取公司易巡默认定位配置
+async function fetchMapDefaultCenter() {
+  const companyId = JSON.parse(sessionStorage.getItem("user") || "{}")?.companyId;
+  if (!companyId) return;
+
+  try {
+    const { data } = await getSpecifiedModule(companyId, "YixunSetting");
+    if (data.success && data.result) {
+      const config = {};
+      data.result.forEach((item) => {
+        config[item.item] = item.value;
+      });
+      const lng = Number(config.longitude);
+      const lat = Number(config.latitude);
+      const zoom = Number(config.zoom);
+      if (lng && lat && !isNaN(lng) && !isNaN(lat)) {
+        mapDefaultCenter.value = [lng, lat];
+        mapDefaultZoom.value = zoom && !isNaN(zoom) ? zoom : 14;
+      }
+    }
+  } catch (e) {
+    console.error("获取地图默认定位失败:", e);
+  }
+}
+
 // 刷新所有数据
 async function refreshAllData() {
   loading.value = true;
   try {
-    // 调用新的总览接口
-    await fetchInspectionSummary();
+    // 并行获取总览数据和地图默认定位
+    await Promise.all([fetchInspectionSummary(), fetchMapDefaultCenter()]);
 
     // 其他独立接口
     await Promise.all([fetchAbnormalStats()]);
@@ -291,7 +314,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="inspection-dashboard">
+  <div :class="isBigScreenHome ? 'inspection-dashboard-large' : 'inspection-dashboard'">
     <!-- Header -->
     <DashboardHeader
       :user-name="userInfo.fullName || '用户'"
@@ -331,6 +354,8 @@ onUnmounted(() => {
           ref="mapPanelRef"
           :points="mapPoints"
           :focused-point-id="focusedPointId"
+          :default-center="mapDefaultCenter"
+          :default-zoom="mapDefaultZoom"
           @point-focus="
             (pointId) => {
               /* 地图点击不反向设置用户ID */
@@ -349,8 +374,9 @@ onUnmounted(() => {
   </div>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 /* ===== 基础样式 ===== */
+
 .inspection-dashboard {
   --bg-primary: #0b1120;
   --bg-panel: #111b2e;
@@ -369,14 +395,42 @@ onUnmounted(() => {
   --progress-bg: #1a2740;
 
   background: var(--bg-primary);
-  min-height: calc(100vh - 120px);
   padding: 0;
   padding-bottom: 12px;
   font-family: "Geist", "Inter", -apple-system, sans-serif;
   color: var(--text-primary);
   position: relative;
   overflow: hidden;
-  min-height: calc(-45px + 100vh);
+  min-height: calc(100vh - 45px);
+  display: flex;
+  flex-direction: column;
+}
+
+.inspection-dashboard-large {
+  --bg-primary: #0b1120;
+  --bg-panel: #111b2e;
+  --bg-panel-header: #0d1829;
+  --accent-cyan: #00d4ff;
+  --accent-green: #00e396;
+  --accent-red: #ff4560;
+  --accent-yellow: #ffd93d;
+  --accent-orange: #ff8c42;
+  --accent-blue: #4a90d9;
+  --text-primary: #ffffff;
+  --text-secondary: #8b9dc3;
+  --text-muted: #4a5f85;
+  --border-accent: #00d4ff;
+  --border-dim: #1e3050;
+  --progress-bg: #1a2740;
+
+  background: var(--bg-primary);
+  padding: 0;
+  padding-bottom: 12px;
+  font-family: "Geist", "Inter", -apple-system, sans-serif;
+  color: var(--text-primary);
+  position: relative;
+  overflow: hidden;
+  min-height: calc(100vh);
   display: flex;
   flex-direction: column;
 }

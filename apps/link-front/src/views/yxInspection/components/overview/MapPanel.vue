@@ -12,6 +12,14 @@ const props = defineProps({
     type: String,
     default: null,
   },
+  defaultCenter: {
+    type: Array,
+    default: () => [113.264385, 23.129112],
+  },
+  defaultZoom: {
+    type: Number,
+    default: 14,
+  },
 });
 
 const emit = defineEmits(["point-focus"]);
@@ -62,8 +70,8 @@ function initMap() {
 
   // 计算地图中心点
   const points = props.points;
-  const defaultCenter = [113.264385, 23.129112];
-  let center = defaultCenter;
+  let center = props.defaultCenter;
+  let zoom = props.defaultZoom;
 
   if (points.length > 0) {
     const avgLng = points.reduce((sum, p) => sum + p.lng, 0) / points.length;
@@ -75,9 +83,10 @@ function initMap() {
 
   // 创建地图实例
   mapInstance.value = new window.AMap.Map(mapContainerId, {
-    zoom: 14,
+    zoom: zoom,
     center: center,
-    viewMode: "2D",
+    viewMode: "3D",
+    terrain: true,
     mapStyle: "amap://styles/dark",
     scrollWheel: true,
     dragEnable: true,

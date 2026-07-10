@@ -200,13 +200,13 @@ export default {
             if (data && data.success) {
               this.$message.success({
                 dangerouslyUseHTMLString: true,
-                message: data.msg,
+                message: data.message,
               })
               this.visible = false
               this.$emit('refreshDataList')
             }
             else {
-              this.$message.error(data.msg)
+              this.$message.error(data.message)
             }
           })
         }

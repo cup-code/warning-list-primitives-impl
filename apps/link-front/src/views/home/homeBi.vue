@@ -16,7 +16,7 @@ export default {
   },
   created() {
     this.title
-      = JSON.parse(localStorage.getItem('globalData')).appSystemName || '两山智联云'
+      = JSON.parse(localStorage.getItem('globalData'))?.appSystemName || '两山智联云'
     // 获取登录用户拥有的路由权限
     this.routerList = JSON.parse(sessionStorage.getItem('routerList') || '[]')
     if (this.routerList.length >= 6) {

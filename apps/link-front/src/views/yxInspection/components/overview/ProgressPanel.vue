@@ -232,6 +232,10 @@ function getProgressColor(status) {
   background: var(--accent-cyan, #00d4ff);
 }
 
+.status-icon.critical {
+  background: var(--accent-red, #ff4560);
+}
+
 .td-name {
   flex: 1;
   font-size: 12px;

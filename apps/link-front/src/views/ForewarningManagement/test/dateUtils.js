@@ -64,7 +64,7 @@ export function getCurrentWeekDates() {
 
 function formatDate(date) {
   if (date === 'week') {
-    return moment().startOf('week').add(1, 'day').format('YYYY-MM-DD HH:mm:ss')
+    return moment().startOf('week').format('YYYY-MM-DD HH:mm:ss')
   }
   else {
     return moment().startOf(date).format('YYYY-MM-DD HH:mm:ss')
@@ -89,4 +89,20 @@ export function getWeekRange(type, val = []) {
     alarmDateEnd: moment().format('YYYY-MM-DD 23:59:59'),
     alarmDateStart: formatDate(typeMap[type]),
   }
+}
+
+export function getCurrentTitle(type) {
+  const typeMap = { 0: '今日', 1: '本周', 2: '本月' }
+  // custom / undefined 统一兜底为「本时段」
+  return typeMap[type] || '本时段'
+}
+
+/**
+ * 获取报告大标题（H1）的默认值，后缀随时间类型变化
+ * @param {number|string} type - 0=今日 1=本周 2=本月 custom/undefined=自定义
+ * @returns {string} 例：视频智能运营平台管理周报
+ */
+export function getDefaultReportTitle(type) {
+  const suffixMap = { 0: '日报', 1: '周报', 2: '月报' }
+  return `视频智能运营平台管理${suffixMap[type] || '运营报告'}`
 }

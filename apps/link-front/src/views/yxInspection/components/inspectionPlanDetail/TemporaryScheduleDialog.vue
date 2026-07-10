@@ -1,11 +1,12 @@
 <script>
+import { saveTemporaryScheduleRecord } from "@/http/inspection/yx-inspection-api";
 import {
-  saveTemporaryScheduleRecord,
-} from '@/http/inspection/yx-inspection-api'
-import { getAllPostByDepartFn, getUsersByPostFn } from '@/http/safe-production/post-manage-api'
+  getAllPostByDepartFn,
+  getUsersByPostFn,
+} from "@/http/safe-production/post-manage-api";
 
 export default {
-  name: 'TemporaryScheduleDialog',
+  name: "TemporaryScheduleDialog",
   props: {
     planBaseInfo: Object,
   },
@@ -16,85 +17,91 @@ export default {
       postList: [],
       users: [],
       inputForm: {
-        planId: '',
-        taskName: '',
-        scheduleStartTime: '',
-        scheduleEndTime: '',
+        planId: "",
+        taskName: "",
+        scheduleStartTime: "",
+        scheduleEndTime: "",
         expireHours: 0,
         completionCondition: 0,
         executeUserIdList: [],
-        postId: '',
-        remarks: '',
+        postId: "",
+        remarks: "",
       },
       dataRule: {
-        taskName: [{ required: true, message: '任务名称不能为空', trigger: 'blur' }],
-        scheduleStartTime: [{ required: true, message: '开始时间不能为空', trigger: 'change' }],
-        scheduleEndTime: [{ required: true, message: '结束时间不能为空', trigger: 'change' }],
-        postId: [{ required: true, message: '排班岗位不能为空', trigger: 'change' }],
-        executeUserIdList: [{ required: true, message: '巡检人不能为空', trigger: 'change' }],
-        expireHours: [{ required: true, message: '过期时间不能为空', trigger: 'blur' }],
+        taskName: [{ required: true, message: "任务名称不能为空", trigger: "blur" }],
+        scheduleStartTime: [
+          { required: true, message: "开始时间不能为空", trigger: "change" },
+        ],
+        scheduleEndTime: [
+          { required: true, message: "结束时间不能为空", trigger: "change" },
+        ],
+        postId: [{ required: true, message: "排班岗位不能为空", trigger: "change" }],
+        executeUserIdList: [
+          { required: true, message: "巡检人不能为空", trigger: "change" },
+        ],
+        expireHours: [{ required: true, message: "过期时间不能为空", trigger: "blur" }],
       },
-    }
+    };
   },
   methods: {
     init(planId) {
-      this.visible = true
+      this.visible = true;
       this.inputForm = {
         planId,
-        taskName: '',
-        scheduleStartTime: '',
-        scheduleEndTime: '',
+        taskName: "",
+        scheduleStartTime: "",
+        scheduleEndTime: "",
         expireHours: 0,
         completionCondition: 0,
         executeUserIdList: [],
-        postId: '',
-        remarks: '',
-      }
+        postId: "",
+        remarks: "",
+      };
       // 获取岗位列表
       if (this.planBaseInfo.departmentId) {
         getAllPostByDepartFn(this.planBaseInfo.departmentId).then(({ data }) => {
-          this.postList = data.result || []
-        })
+          this.postList = data.result || [];
+        });
       }
       this.$nextTick(() => {
-        this.$refs.inputForm.resetFields()
-      })
+        this.$refs.inputForm.resetFields();
+      });
     },
     // 查询指定岗位id的用户
     getUsersByPost(postId) {
-      this.inputForm.executeUserIdList = []
+      this.inputForm.executeUserIdList = [];
       if (!postId) {
-        this.users = []
-        return
+        this.users = [];
+        return;
       }
       getUsersByPostFn(postId).then(({ data }) => {
-        this.users = data.result || []
-      })
+        this.users = data.result || [];
+      });
     },
     // 表单提交
     doSubmit() {
       this.$refs.inputForm.validate(async (valid) => {
         if (valid) {
-          this.loading = true
+          this.loading = true;
           try {
-            const { data } = await saveTemporaryScheduleRecord(this.inputForm)
-            this.loading = false
+            const { data } = await saveTemporaryScheduleRecord(this.inputForm);
+            this.loading = false;
             if (data && data.success) {
-              this.$message.success(data.message || '添加成功')
-              this.visible = false
-              this.$emit('refreshDataList')
+              this.$message.success(data.message || "添加成功");
+              this.visible = false;
+              this.$emit("refreshDataList");
             } else {
-              this.$message.error(data.message || '提交失败')
+              this.$message.error(data.message || "提交失败");
             }
           } catch (error) {
-            this.loading = false
-            this.$message.error('提交失败')
+            this.loading = false;
+            this.$message.error("提交失败");
           }
         }
-      })
+      });
     },
   },
-}
+};
 </script>
 
 <template>
@@ -102,7 +109,7 @@ export default {
     <el-dialog
       title="添加临时班次"
       :close-on-click-modal="false"
-      width="550px"
+      width="750px"
       :visible.sync="visible"
       append-to-body
       class="normal-dialog"
@@ -145,12 +152,9 @@ export default {
         </el-form-item>
         <el-form-item label="班次完成条件" prop="completionCondition">
           <el-radio-group v-model="inputForm.completionCondition">
-            <el-radio :label="0">
-              任意执行人巡检完成
-            </el-radio>
-            <el-radio :label="1">
-              所有执行人巡检完成
-            </el-radio>
+            <el-radio :label="0"> 任意执行人巡检完成 </el-radio>
+            <el-radio :label="1"> 所有执行人巡检完成 </el-radio>
+            <el-radio :label="2">任意巡检人组合完成</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="排班岗位" prop="postId">
@@ -195,7 +199,9 @@ export default {
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button size="small" @click="visible = false">关闭</el-button>
-        <el-button size="small" type="primary" :loading="loading" @click="doSubmit()">确定</el-button>
+        <el-button size="small" type="primary" :loading="loading" @click="doSubmit()"
+          >确定</el-button
+        >
       </span>
     </el-dialog>
   </div>

@@ -1,18 +1,19 @@
 <script>
-import { useQuery, useMutation } from "@tanstack/vue-query";
+import { useQuery } from "@tanstack/vue-query";
 import { getCurrentInstance, onMounted, reactive, ref } from "vue";
 import { ExceptionRecordTableConfig } from "./config";
 import ExceptionHandleDialog from "./components/ExceptionHandleDialog.vue";
+import ExceptionRecordPrint from "./components/ExceptionRecordPrint.vue";
 import {
   queryInspectionAbnormalPage,
   countAbnormalByState,
-  auditInspectionAbnormal,
 } from "@/http/inspection/yx-inspection-api";
 
 export default {
   name: "ExceptionRecord",
   components: {
     ExceptionHandleDialog,
+    ExceptionRecordPrint,
   },
   setup() {
     const { proxy } = getCurrentInstance();
@@ -54,6 +55,10 @@ export default {
     const dialogType = ref("view");
     const currentRow = ref({});
 
+    // 打印弹窗
+    const printDialogVisible = ref(false);
+    const currentPrintRow = ref({});
+
     const tableConfig = ref(ExceptionRecordTableConfig);
 
     // 审核结果选项
@@ -66,7 +71,7 @@ export default {
     // 异常级别选项
     const exceptionLevelOptions = [
       { label: "一般", value: "1" },
-      { label: "紧急", value: "2" },
+      { label: "紧急", value: "3" },
     ];
 
     // 查询列表（statusFilter 作为筛选参数）
@@ -89,6 +94,7 @@ export default {
             inspectionPost: item.postName,
             inspector: item.executeUsername,
             exceptionTime: item.executeDate,
+            abnormalLevel: item.abnormalLevel || "",
             status:
               item.auditState === "0"
                 ? "待审核"
@@ -117,9 +123,11 @@ export default {
         if (res.data?.success) {
           const result = res.data.result || [];
           // 初始化计数
-          let pending = 0, processing = 0, processed = 0;
+          let pending = 0,
+            processing = 0,
+            processed = 0;
           // 解析数组格式响应
-          result.forEach(item => {
+          result.forEach((item) => {
             if (item.auditState === "0") pending = item.count || 0;
             else if (item.auditState === "1") processing = item.count || 0;
             else if (item.auditState === "2") processed = item.count || 0;
@@ -184,7 +192,8 @@ export default {
     };
 
     const handlePrint = (row) => {
-      proxy.$message.info("打印功能开发中");
+      currentPrintRow.value = { ...row };
+      printDialogVisible.value = true;
     };
 
     const handleDialogClose = () => {
@@ -223,6 +232,8 @@ export default {
       dialogVisible,
       dialogType,
       currentRow,
+      printDialogVisible,
+      currentPrintRow,
       reviewResultOptions,
       exceptionLevelOptions,
       searchFn,
@@ -326,12 +337,36 @@ export default {
             handleStatusChange();
           "
         >
-          {{ tab.label }} ({{ tab.value === '' ? statusCounts.all : tab.value === '0' ? statusCounts.pending : tab.value === '1' ? statusCounts.processing : statusCounts.processed }})
+          {{ tab.label }} ({{
+            tab.value === ""
+              ? statusCounts.all
+              : tab.value === "0"
+              ? statusCounts.pending
+              : tab.value === "1"
+              ? statusCounts.processing
+              : statusCounts.processed
+          }})
         </button>
       </div>
       <CTable :tableData="tableData" :loading="loading" :list="tableConfig" height="92%">
         <template #exceptionTime="{ info }">
           {{ formatExceptionTime(info.exceptionTime) }}
+        </template>
+
+        <template #abnormalLevel="{ info }">
+          <el-tag
+            v-if="info.abnormalLevel"
+            size="small"
+            :type="info.abnormalLevel === '3' ? 'danger' : 'info'"
+          >
+            {{
+              exceptionLevelOptions.find((item) => item.value === info.abnormalLevel)
+                ?.label || ""
+            }}
+          </el-tag>
+          <template v-else>
+            <span class="text-gray-500">--</span>
+          </template>
         </template>
 
         <!-- auditState	审核状态.待审核:0;处理中:1;已处理:2 -->
@@ -394,6 +429,12 @@ export default {
       :dialogType="dialogType"
       @close="handleDialogClose"
       @submit="handleDialogSubmit"
+    />
+    <ExceptionRecordPrint
+      slot="dialog"
+      :visible.sync="printDialogVisible"
+      :info="currentPrintRow"
+      @close="printDialogVisible = false"
     />
   </KyTreeTable>
 </template>

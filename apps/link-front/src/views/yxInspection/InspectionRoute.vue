@@ -166,10 +166,10 @@ export default {
       selectPointVisible.value = true;
     };
 
-    // 获取已选巡检点ID列表
-    const getSelectedPointIds = () => {
+    // 获取已选巡检点完整列表（用于回显，含跨页项）
+    const getSelectedPoints = () => {
       if (routeDialogRef.value && routeDialogRef.value.form) {
-        return routeDialogRef.value.form.points.map((p) => p.placeId);
+        return routeDialogRef.value.form.points;
       }
       return [];
     };
@@ -214,7 +214,7 @@ export default {
       handleDialogClose,
       handleDialogSubmit,
       handleAddPoint,
-      getSelectedPointIds,
+      getSelectedPoints,
       handleSelectPointConfirm,
       pageSizeFn,
       pageCurFn,
@@ -296,7 +296,7 @@ export default {
     <SelectInspectionPointDialog
       slot="dialog"
       :visible.sync="selectPointVisible"
-      :selectedIds="getSelectedPointIds()"
+      :selected-items="getSelectedPoints()"
       @confirm="handleSelectPointConfirm"
     />
   </KyTreeTable>

@@ -268,6 +268,7 @@ export default {
         <el-radio-group v-model="inputForm.completionCondition">
           <el-radio :label="0">任意执行人巡检完成</el-radio>
           <el-radio :label="1">所有执行人巡检完成</el-radio>
+          <el-radio :label="2">任意巡检人组合完成</el-radio>
         </el-radio-group>
       </el-form-item>
       <el-row>

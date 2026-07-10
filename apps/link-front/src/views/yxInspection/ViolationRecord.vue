@@ -122,9 +122,11 @@ export default {
         if (res.data?.success) {
           const result = res.data.result || [];
           // 初始化计数
-          let pending = 0, confirmed = 0, falseAlarm = 0;
+          let pending = 0,
+            confirmed = 0,
+            falseAlarm = 0;
           // 解析数组格式响应
-          result.forEach(item => {
+          result.forEach((item) => {
             if (item.auditResult === "1") pending = item.count || 0;
             else if (item.auditResult === "2") falseAlarm = item.count || 0;
             else if (item.auditResult === "3") confirmed = item.count || 0;
@@ -312,9 +314,9 @@ export default {
     <!-- 表格区域 -->
     <ECard slot="table">
       <div class="mb-4 flex justify-between items-center">
-        <EButton type="success" icon="el-icon-download" @click="handleExport">
+        <!-- <EButton type="success" icon="el-icon-download" @click="handleExport">
           Excel导出
-        </EButton>
+        </EButton> -->
         <div class="violation-record-status-tabs">
           <span
             v-for="(count, key) in tabCounts"

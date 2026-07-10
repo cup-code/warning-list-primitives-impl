@@ -15,11 +15,11 @@ export default {
     },
     defaultPeriod: {
       type: Object,
-      default: {},
+      default: () => ({}),
     },
     departmentIds: {
       type: Array,
-      default: [],
+      default: () => [],
     },
   },
   data() {
@@ -120,7 +120,6 @@ export default {
     async getDepartmentRankingData(form) {
       const data = await getScreenDatas(form, "departmentAlarmRank", this.departmentIds);
       const { digital } = data;
-      console.log(data, "组织预警排名TOP10data");
       const date =
         Object.keys(digital).map((key) => ({
           name: key,
@@ -134,7 +133,6 @@ export default {
     async getCameraRankingData(form) {
       const data = await getScreenDatas(form, "cameraAlarmRank", this.departmentIds);
       const { digital } = data;
-      console.log(data, "设备预警排名TOP10data");
       const date =
         Object.keys(digital).map((key) => ({
           name: key,
@@ -478,17 +476,6 @@ export default {
 
 <template>
   <div class="panelBox">
-    <!-- <Panel title="预警记录" @refresh="refreshRecords">
-      <div class="record-list">
-        <div v-for="(record, index) in videoAlarmList" :key="index" class="record-item">
-          <div class="type">{{ record.alarmType }}</div>
-          <div class="time">{{ record.alarmDate }}</div>
-          <div class="status" :style="{ color: getStatusColor(record.customerStatus) }">
-            {{ customerStatus[record.customerStatus] || "未知状态" }}
-          </div>
-        </div>
-      </div>
-    </Panel> -->
     <getAlarmRecode :departmentIds="departmentIds" />
     <Panel title="组织预警排名TOP10" @refresh="refreshOrgRanking">
       <div class="overflow-hidden relative custom-charts flex_column">

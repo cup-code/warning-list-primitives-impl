@@ -18,11 +18,11 @@ export default {
     },
     departmentIds: {
       type: Array,
-      default: [],
+      default: () => [],
     },
     defaultPeriod: {
       type: Object,
-      default: {},
+      default: () => ({}),
     },
   },
   data() {
@@ -111,6 +111,10 @@ export default {
           type: 3,
           timeType: this.selectedRankingPeriod,
         });
+        this.getAlarmLiveData({
+          type: 1,
+          timeType: 0,
+        });
       },
       immediate: true,
     },
@@ -124,13 +128,19 @@ export default {
           type: 3,
           timeType: this.selectedRankingPeriod,
         });
+        this.getAlarmLiveData({
+          type: 1,
+          timeType: 0,
+        });
       },
       immediate: true,
     },
     "screenData.alarmLive": {
       handler(val) {
         this.alarmLive = val;
-        this.initAlarmLive(val);
+        if (val) {
+          this.initAlarmLive(val);
+        }
       },
       deep: true,
     },
@@ -164,7 +174,14 @@ export default {
         this.initAlarmTypeRank(digital);
       });
     },
-
+    async getAlarmLiveData(form) {
+      const data = await getScreenDatas(form, "alarmLive", this.departmentIds);
+      const { digital } = data;
+      this.alarmLive = digital;
+      this.$nextTick(() => {
+        this.initAlarmLive(digital);
+      });
+    },
     initAlarmLive(val) {
       this.statusList.forEach((item, index) => {
         item.count = val[item.type];
@@ -482,9 +499,13 @@ export default {
       });
     },
     RefreshLive() {
-      this.$emit("getScreenData", {
+      this.getAlarmLiveData({
         type: 1,
+        timeType: 0,
       });
+      // this.$emit("getScreenData", {
+      //   type: 1,
+      // });
     },
     RefreshtRend() {
       // 使用当前选中的趋势按钮值刷新数据

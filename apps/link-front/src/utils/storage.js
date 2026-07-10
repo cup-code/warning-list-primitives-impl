@@ -10,7 +10,6 @@ export function setCookie(k, v) {
     val = JSON.stringify(v)
   }
   Cookies.set(k, val)
-  Cookies.get(k, val)
 }
 
 export function getCookie(k) {
@@ -52,3 +51,33 @@ export function getStorageItem(k) {
 export function delStorageItem(k) {
   localStorage.removeItem(k)
 }
+
+// 安全版本的 localStorage 操作，捕获异常并静默降级
+export function safeSetStorageItem(k, v) {
+  try {
+    if (typeof v == 'undefined' || v == null) {
+      return false
+    }
+    let val = v
+    if (typeof v == 'object') {
+      val = JSON.stringify(v)
+    }
+    localStorage.setItem(k, val)
+    return true
+  } catch (e) {
+    // localStorage 禁用或空间不足，静默失败
+    return false
+  }
+}
+
+export function safeGetStorageItem(k) {
+  try {
+    const val = localStorage.getItem(k)
+    if (val === null) return null
+    return JSON.parse(val)
+  } catch (e) {
+    return null
+  }
+}
+
+export { clearNamespacedStorage as clearProjectStorage } from './storage-namespace'

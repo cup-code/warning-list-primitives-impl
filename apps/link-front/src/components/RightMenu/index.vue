@@ -3,6 +3,7 @@ import QRCode from '@chenfengyuan/vue-qrcode'
 import { mapState } from 'vuex'
 import logo from '@/assets/logo.png'
 import HelpCenter from '@/components/HelpCenter'
+import { clearSession } from '@/utils/tab-session'
 import MessageTip from '@/components/MessageTip'
 import { getSpecifiedModule } from '@/http/companyConfig/companyConfig-api.js'
 import { getServiceConfiguration } from '@/http/manage-api.js'
@@ -33,8 +34,8 @@ export default {
       return logo
     },
     appUrl() {
-      const globalData = JSON.parse(localStorage.getItem('globalData'))
-      return globalData.minioFilePrefix + globalData.appDownloadPath
+      const globalData = JSON.parse(localStorage.getItem('globalData')) || {}
+      return (globalData.minioFilePrefix || '') + (globalData.appDownloadPath || '')
     },
   },
 
@@ -44,7 +45,7 @@ export default {
       logout().then(({ data }) => {
         if (data.success) {
           // 清空storage（仅清除当前标签页，不影响其他标签页）
-          sessionStorage.clear()
+          clearSession()
           // 清空全局状态
           this.$store.dispatch('user/logout')
           // 跳转到 登录页面

@@ -134,7 +134,10 @@ export default {
         .catch(() => {})
     },
     mouseleave(data, $event) {
-      $event.currentTarget.firstElementChild.nextElementSibling.setAttribute('class', 'none')
+      $event.currentTarget.firstElementChild.nextElementSibling.setAttribute(
+        'class',
+        'none',
+      )
     },
     mouseover(data, $event) {
       $event.currentTarget.nextElementSibling.setAttribute('class', 'block')
@@ -148,8 +151,7 @@ export default {
     class="normal-dialog edit-dialog"
     title="菜单配置"
     :close-on-click-modal="false"
-
-    width="600px"
+    width="700px"
     :visible.sync="visible"
   >
     <div class="tree-drag">
@@ -178,19 +180,11 @@ export default {
         >
           {{ item.dictName }}
         </EButton> -->
-        <EButton
-          type="success"
-          style="margin: 10px"
-          @click="standard('all')"
-        >
+        <EButton type="success" style="margin: 10px" @click="standard('all')">
           标准
         </EButton>
 
-        <EButton
-          type="warning"
-          style="margin: 10px"
-          @click="clear"
-        >
+        <EButton type="warning" style="margin: 10px" @click="clear">
           清空
         </EButton>
       </div>
@@ -207,33 +201,17 @@ export default {
         default-expand-all
         :allow-drop="returnTrue"
       >
-        <span
-          slot-scope="{ node, data }"
-          @mouseleave="mouseleave(data, $event)"
-        >
+        <span slot-scope="{ node, data }" @mouseleave="mouseleave(data, $event)">
           <span @mouseover="mouseover(data, $event)">{{ node.label }}</span>
-          <span
-            style="margin-left: 30px"
-            class="none"
-          >
-            <el-button
-              type="text"
-              size="mini"
-              @click="() => remove(node, data)"
-            >
-              <i
-                class="el-icon-delete"
-                style="color: #ff4949"
-              />
+          <span style="margin-left: 30px" class="none">
+            <el-button type="text" size="mini" @click="() => remove(node, data)">
+              <i class="el-icon-delete" style="color: #ff4949" />
             </el-button>
           </span>
         </span>
       </el-tree>
     </div>
-    <span
-      slot="footer"
-      class="dialog-footer"
-    >
+    <span slot="footer" class="dialog-footer">
       <EButton @click="visible = false">关闭</EButton>
       <EButton
         v-noMoreClick

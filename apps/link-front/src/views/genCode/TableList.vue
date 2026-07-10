@@ -99,7 +99,7 @@ export default {
           this.total = data.page.count
         }
         this.loading = false
-        this.msg = data.msg
+        this.msg = data.message
         this.code = data.code
         this.serial = data.serial
       })
@@ -178,7 +178,7 @@ export default {
           if (data && data.success) {
             this.$message.success({
               dangerouslyUseHTMLString: true,
-              message: data.msg,
+              message: data.message,
             })
             this.refreshList()
           }
@@ -194,16 +194,20 @@ export default {
               return item.id
             })
             .join(',')
-      this.$confirm('\u786E\u8BA4\u8981\u79FB\u9664\u9009\u4E2D\u8BB0\u5F55\u5417?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning',
-      }).then(() => {
+      this.$confirm(
+        '\u786E\u8BA4\u8981\u79FB\u9664\u9009\u4E2D\u8BB0\u5F55\u5417?',
+        '提示',
+        {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning',
+        },
+      ).then(() => {
         removeTableListFn(ids).then(({ data }) => {
           if (data && data.success) {
             this.$message.success({
               dangerouslyUseHTMLString: true,
-              message: data.msg,
+              message: data.message,
             })
             this.refreshList()
           }
@@ -274,10 +278,10 @@ export default {
           }
           createCustomObjFn(params).then(({ data }) => {
             if (data.success) {
-              this.$message.success(data.msg)
+              this.$message.success(data.message)
             }
             else {
-              this.$message.error(data.msg)
+              this.$message.error(data.message)
             }
           })
         })
@@ -302,7 +306,7 @@ export default {
           })
         }
         else {
-          this.$message.error(data.msg)
+          this.$message.error(data.message)
         }
       })
     },
@@ -324,10 +328,7 @@ export default {
 </script>
 
 <template>
-  <TreeTable
-    ref="treeTable"
-    :useMoreBtn="false"
-  >
+  <TreeTable ref="treeTable" :useMoreBtn="false">
     <ECard slot="tree">
       <el-input
         v-model="filterText"
@@ -350,10 +351,7 @@ export default {
         />
       </div>
     </ECard>
-    <ECard
-      slot="search"
-      customStyle="margin-bottom:0"
-    >
+    <ECard slot="search" customStyle="margin-bottom:0">
       <el-form
         ref="searchForm"
         v-model="searchForm"
@@ -370,18 +368,10 @@ export default {
           />
         </el-form-item>
         <el-form-item>
-          <EButton
-            icon="search"
-            type="primary"
-            @click="refreshList"
-          >
+          <EButton icon="search" type="primary" @click="refreshList">
             查询
           </EButton>
-          <EButton
-            plain
-            icon="sync"
-            @click="resetSearch"
-          >
+          <EButton plain icon="sync" @click="resetSearch">
             重置
           </EButton>
         </el-form-item>
@@ -391,26 +381,17 @@ export default {
     <ECard slot="table">
       <div class="card-cell">
         <!-- <el-button-group> -->
-        <EButton
-          type="primary"
-          btnIcon="el-icon-plus"
-          @click="add()"
-        >
+        <EButton type="primary" btnIcon="el-icon-plus" @click="add()">
           新建
         </EButton>
-        <EButton
-          plain
-          icon="download"
-          type="info"
-          @click="importFromDB()"
-        >
+        <EButton plain icon="download" type="info" @click="importFromDB()">
           数据库导入表单
         </EButton>
         <EButton
           plain
           icon="edit"
           type="success"
-          :disabled="dataListSelections.length != 1"
+          :disabled="dataListSelections.length !== 1"
           @click="edit()"
         >
           修改
@@ -428,7 +409,7 @@ export default {
         <EButton
           plain
           icon="code"
-          :disabled="dataListSelections.length != 1"
+          :disabled="dataListSelections.length !== 1"
           @click="genCode()"
         >
           生成代码
@@ -436,7 +417,7 @@ export default {
         <EButton
           plain
           icon="menu"
-          :disabled="dataListSelections.length != 1"
+          :disabled="dataListSelections.length !== 1"
           @click="createMenu()"
         >
           创建菜单
@@ -444,7 +425,7 @@ export default {
         <EButton
           plain
           icon="type"
-          :disabled="dataListSelections.length != 1"
+          :disabled="dataListSelections.length !== 1"
           @click="createCustomObj()"
         >
           添加到java类型
@@ -452,7 +433,7 @@ export default {
         <EButton
           plain
           icon="flow"
-          :disabled="dataListSelections.length != 1"
+          :disabled="dataListSelections.length !== 1"
           @click="getActivitiFormUrl()"
         >
           获取流程表单
@@ -485,7 +466,7 @@ export default {
           label="表类型"
         >
           <template slot-scope="scope">
-            {{ $dictUtils.getDictLabel('table_type', scope.row.tableType) }}
+            {{ $dictUtils.getDictLabel("table_type", scope.row.tableType) }}
           </template>
         </el-table-column>
         <el-table-column
@@ -496,11 +477,7 @@ export default {
           label="表名"
         >
           <template slot-scope="scope">
-            <el-link
-              type="primary"
-              :underline="false"
-              @click="view(scope.row.id)"
-            >
+            <el-link type="primary" :underline="false" @click="view(scope.row.id)">
               {{ scope.row.name }}
             </el-link>
           </template>
@@ -531,42 +508,19 @@ export default {
           align="center"
           label="主表"
         />
-        <el-table-column
-          label="同步数据库"
-          prop="isSync"
-          min-width="120"
-          align="center"
-        >
+        <el-table-column label="同步数据库" prop="isSync" min-width="120" align="center">
           <template slot-scope="props">
-            <el-tag
-              v-if="props.row.isSync !== '1'"
-              size="mini"
-              type="danger"
-            >
+            <el-tag v-if="props.row.isSync !== '1'" size="mini" type="danger">
               未同步
             </el-tag>
-            <el-tag
-              v-if="props.row.isSync === '1'"
-              size="mini"
-              type="success"
-            >
+            <el-tag v-if="props.row.isSync === '1'" size="mini" type="success">
               已同步
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column
-          label="操作"
-          width="200"
-          align="right"
-          fixed="right"
-        >
+        <el-table-column label="操作" width="200" align="right" fixed="right">
           <template slot-scope="scope">
-            <EButton
-              size="mini"
-              icon="edit"
-              type="text"
-              @click="edit(scope.row.id)"
-            >
+            <EButton size="mini" icon="edit" type="text" @click="edit(scope.row.id)">
               修改
             </EButton>
             <EButton
@@ -606,21 +560,13 @@ export default {
     <!-- <div class="content">
       <div class="right"></div>
     </div> -->
-
-    <gen-table-form
-      ref="genTableForm"
-      @refreshDataList="refreshList"
-    />
-    <gen-sync-form
-      ref="genSyncForm"
-      @refreshDataList="refreshList"
-    />
-    <import-table
-      ref="importTable"
-      @refreshDataList="refreshList"
-    />
-    <gen-code-form ref="genCodeForm" />
-    <gen-menu-form ref="genMenuForm" />
+    <template #dialog>
+      <gen-table-form ref="genTableForm" @refreshDataList="refreshList" />
+      <gen-sync-form ref="genSyncForm" @refreshDataList="refreshList" />
+      <import-table ref="importTable" @refreshDataList="refreshList" />
+      <gen-code-form ref="genCodeForm" />
+      <gen-menu-form ref="genMenuForm" />
+    </template>
   </TreeTable>
 </template>
 

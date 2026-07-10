@@ -1,83 +1,82 @@
 <script>
-import { getAlarmRecord, getAlarmRecordTop10 } from '@/http/videoStat/screenData'
+import { getAlarmRecord, getAlarmRecordTop10 } from "@/http/videoStat/screenData";
 
 export default {
-  name: 'getAlarmRecode',
+  name: "getAlarmRecode",
   components: {},
   props: {
     customStyle: {
       type: String,
-      default: '',
+      default: "",
     },
     departmentIds: {
       type: Array,
-      default: [],
+      default: () => [],
     },
   },
   data() {
     return {
       videoAlarmList: [],
-      activeTab: 'todayAlarm',
-      customerStatus: ['待加急处理', '待处理', '有效', '误报'],
-    }
+      activeTab: "todayAlarm",
+      customerStatus: ["待加急处理", "待处理", "有效", "误报"],
+    };
   },
 
   computed: {
     getStatusColor() {
       return (status) => {
         switch (status) {
-          case '3':
-            return 're  d'
-          case '2':
-            return 'green'
-          case '1':
-            return 'white'
-          case '0':
-            return 'orange'
+          case "3":
+            return "re  d";
+          case "2":
+            return "green";
+          case "1":
+            return "white";
+          case "0":
+            return "orange";
           default:
-            return 'blue' // 默认颜色
+            return "blue"; // 默认颜色
         }
-      }
+      };
     },
     getText() {
-      return '暂无预警信息'
+      return "暂无预警信息";
     },
   },
   watch: {
     departmentIds: {
       handler(newVal) {
-        this.getTodayAlarm()
+        this.getTodayAlarm();
       },
       immediate: true,
     },
   },
   mounted() {
-    this.getTodayAlarm()
+    this.getTodayAlarm();
   },
   methods: {
     handleRecordClick() {
       this.$router.push({
-        path: '/videoOperation/ForeWarningManagement/clientWarningInfoList',
-      })
+        path: "/videoOperation/ForeWarningManagement/clientWarningInfoList",
+      });
     },
     handleTabClick(tab, event) {
-      this.activeTab = tab.name
-      if (tab.name === 'todayAlarm') {
-        this.getTodayAlarm()
-      }
-      else {
-        this.getTopAlarm()
+      this.activeTab = tab.name;
+      if (tab.name === "todayAlarm") {
+        this.getTodayAlarm();
+      } else {
+        this.getTopAlarm();
       }
     },
     getTodayAlarm() {
       getAlarmRecord({ departmentId: this.departmentIds, onlyTodo: false }).then(
         (res) => {
-          const { result, code } = res.data
+          const { result, code } = res.data;
           if (code === 200) {
-            this.videoAlarmList = result
+            this.videoAlarmList = result;
           }
-        },
-      )
+        }
+      );
     },
     getTopAlarm() {
       getAlarmRecordTop10({
@@ -85,38 +84,29 @@ export default {
         onlyTodo: false,
         n: 10,
       }).then((res) => {
-        const { result, code } = res.data
+        const { result, code } = res.data;
         if (code === 200) {
-          this.videoAlarmList = result
+          this.videoAlarmList = result;
         }
-      })
+      });
     },
     refreshRecords() {
-      if (this.activeTab === 'todayAlarm') {
-        this.getTodayAlarm()
-      }
-      else {
-        this.getTopAlarm()
+      if (this.activeTab === "todayAlarm") {
+        this.getTodayAlarm();
+      } else {
+        this.getTopAlarm();
       }
     },
   },
-}
+};
 </script>
 
 <template>
   <div class="panel" :style="customStyle">
     <div class="flex justify-between">
       <el-tabs v-model="activeTab" @tab-click="handleTabClick">
-        <el-tab-pane
-          lazy
-          label="今日预警信息"
-          name="todayAlarm"
-        />
-        <el-tab-pane
-          lazy
-          label="最近10条预警信息"
-          name="topAlarm"
-        />
+        <el-tab-pane lazy label="今日预警信息" name="todayAlarm" />
+        <el-tab-pane lazy label="最近10条预警信息" name="topAlarm" />
       </el-tabs>
       <div class="title-actions">
         <button class="refresh-btn" @click="refreshRecords">

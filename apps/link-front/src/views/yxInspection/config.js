@@ -460,6 +460,13 @@ export const ExceptionRecordTableConfig = [
     slot: 'exceptionTime',
   },
   {
+    label: '异常级别',
+    prop: 'abnormalLevel',
+    width: 90,
+    align: 'center',
+    slot: 'abnormalLevel',
+  },
+  {
     label: '状态',
     prop: 'status',
     width: 90,
@@ -483,6 +490,87 @@ export const ExceptionRecordTableConfig = [
   },
 ]
 
+// 紧急记录表格配置（基于异常记录配置，增加异常级别列）
+export const UrgentRecordTableConfig = [
+  {
+    label: '序号',
+    prop: 'index',
+    width: 80,
+    align: 'center',
+  },
+  {
+    label: '巡检内容',
+    prop: 'contentName',
+    minWidth: 180,
+    align: 'left',
+  },
+  {
+    label: '巡检标准',
+    prop: 'inspectionStandard',
+    minWidth: 200,
+    align: 'left',
+  },
+  {
+    label: '计划名称',
+    prop: 'planName',
+    width: 120,
+    align: 'center',
+  },
+  {
+    label: '巡检班次',
+    prop: 'inspectionShift',
+    width: 200,
+    align: 'center',
+  },
+  {
+    label: '所属部门',
+    prop: 'department',
+    width: 100,
+    align: 'center',
+  },
+  {
+    label: '巡检岗位',
+    prop: 'inspectionPost',
+    width: 100,
+    align: 'center',
+  },
+  {
+    label: '巡检人',
+    prop: 'inspector',
+    width: 100,
+    align: 'center',
+  },
+  {
+    label: '异常时间',
+    prop: 'exceptionTime',
+    width: 160,
+    align: 'center',
+    slot: 'exceptionTime',
+  },
+  {
+    label: '异常级别',
+    prop: 'abnormalLevel',
+    width: 90,
+    align: 'center',
+    slot: 'abnormalLevel',
+  },
+  {
+    label: '状态',
+    prop: 'status',
+    width: 90,
+    align: 'center',
+    slot: 'status',
+  },
+  {
+    label: '操作',
+    prop: 'operation',
+    slot: 'operation',
+    fixed: 'right',
+    width: 100,
+    align: 'center',
+  },
+]
+
 // 知识库表格配置
 export const KnowledgeBaseTableConfig = [
   {
@@ -495,12 +583,16 @@ export const KnowledgeBaseTableConfig = [
     label: '资源名称',
     prop: 'resourceName',
     minWidth: 200,
-    align: 'left',
+    align: 'center',
   },
   {
-    label: '资源类型',
+    label: '类别',
+    prop: 'category',
+    align: 'center',
+  },
+  {
+    label: '格式',
     prop: 'resourceType',
-    width: 120,
     align: 'center',
   },
   {
@@ -595,8 +687,8 @@ export const InspectionReportDefaultForm = {
   reportSummary: '',
   timeType: 'week',
   dateRange: [],
-  includeDetail: true,
-  includeChart: false,
+  includeDetail: false,
+  includeChart: true,
 }
 
 // 巡检报告统计卡配置（原型：首行 4 项、次行 5 项；key 对齐 queryDateRangeReport）
@@ -619,3 +711,28 @@ export const InspectionReportResultColorMap = {
   normal: 'text-green-600',
   abnormal: 'text-red-500',
 }
+
+// 终端列表表格配置
+export const TerminalTableConfig = [
+  { label: '序号', prop: 'index', width: 80, align: 'center' },
+  { label: '序列号', prop: 'serialNumber', minWidth: 150, align: 'center' },
+  { label: '产品型号', prop: 'productModel', minWidth: 120, align: 'center', slot: 'productModel' },
+  { label: 'IMEI', prop: 'imei', minWidth: 150, align: 'center' },
+  { label: 'SIM卡号', prop: 'simNumber', minWidth: 150, align: 'center' },
+  { label: '生产日期', prop: 'productionDate', width: 120, align: 'center' },
+  { label: '录入日期', prop: 'createdTime', width: 120, align: 'center' },
+  { label: '操作', prop: 'operation', slot: 'operation', fixed: 'right', width: 180, align: 'center' },
+]
+
+// 报告归档表格配置
+export const ReportArchiveTableConfig = [
+  { label: '序号', prop: 'index', width: 80, align: 'center' },
+  { label: '报告标题', prop: 'title', minWidth: 200, align: 'center' },
+  { label: '报告总结', prop: 'summary', minWidth: 100, align: 'center', slot: 'summary' },
+  { label: '时间范围类型', prop: 'type', width: 120, align: 'center', slot: 'type' },
+  { label: '归档时间范围', prop: 'dateRange', minWidth: 300, align: 'center', slot: 'dateRange' },
+  { label: '包含图表', prop: 'containChart', width: 100, align: 'center', slot: 'containChart' },
+  { label: '包含明细', prop: 'containDetail', width: 100, align: 'center', slot: 'containDetail' },
+  { label: '创建时间', prop: 'createdTime', width: 160, align: 'center' },
+  { label: '操作', prop: 'operation', slot: 'operation', fixed: 'right', width: 140, align: 'center' },
+]

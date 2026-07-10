@@ -1,19 +1,19 @@
 <script>
 import ImageSelect from "@/components/ImageSelect";
 import { upLoadImg } from "@/http/manage-api";
-import { getWeekRange } from "../../test/dateUtils";
-import { setStorage, getStorage } from "@/utils/index";
 import commonMixin from "@/mixins/common";
+import { getStorage, setStorage } from "@/utils/index";
+import { getWeekRange } from "../../test/dateUtils";
 
 const CACHE_KEY = "reportFormCache";
 const CACHE_EXPIRE_TIME = 7 * 24 * 60 * 60; // 7天过期时间（秒）
 
 export default {
   name: "ReportForm",
-  mixins: [commonMixin],
   components: {
     ImageSelect,
   },
+  mixins: [commonMixin],
   props: {
     formData: {
       type: Object,
