@@ -62,7 +62,7 @@ link-shared/
 
 ---
 
-### 任务 1：建立只读来源校验工具
+### Task 1: 建立只读来源校验工具
 
 **文件：**
 - 创建：`scripts/migration/tree-manifest.mjs`
@@ -239,7 +239,7 @@ git commit -m "test: add source tree migration guards"
 
 ---
 
-### 任务 2：记录来源基线并迁入 Git 历史
+### Task 2: 记录来源基线并迁入 Git 历史
 
 **文件：**
 - 创建：`docs/migration/source-before.json`
@@ -319,7 +319,7 @@ git commit -m "chore: record monorepo source revisions"
 
 ---
 
-### 任务 3：覆盖当前工作目录快照并证明来源未变化
+### Task 3: 覆盖当前工作目录快照并证明来源未变化
 
 **文件：**
 - 修改：`apps/link-front/**`
@@ -382,7 +382,7 @@ git commit -m "chore: import current application snapshots"
 
 ---
 
-### 任务 4：建立 pnpm 工作区
+### Task 4: 建立 pnpm 工作区
 
 **文件：**
 - 创建：`.gitignore`
@@ -546,7 +546,7 @@ git commit -m "build: configure pnpm monorepo workspace"
 
 ---
 
-### 任务 5：调整应用构建边界
+### Task 5: 调整应用构建边界
 
 **文件：**
 - 修改：`apps/link-front/rsbuild.config.js`
@@ -615,7 +615,7 @@ git commit -m "build: isolate application output directories"
 
 ---
 
-### 任务 6：安装依赖并验证双应用构建
+### Task 6: 安装依赖并验证双应用构建
 
 **文件：**
 - 创建：`pnpm-lock.yaml`
@@ -700,7 +700,7 @@ git commit -m "build: lock monorepo dependencies"
 
 ---
 
-### 任务 7：生成共享源码审计结果
+### Task 7: 生成共享源码审计结果
 
 **文件：**
 - 创建：`scripts/audit/shared-source-audit.mjs`
@@ -859,7 +859,7 @@ git commit -m "chore: audit shared application sources"
 
 ---
 
-### 任务 8：基线验收和第二阶段交接
+### Task 8: 基线验收和第二阶段交接
 
 **文件：**
 - 修改：`README.md`
