@@ -1,4 +1,3 @@
-import linkSdk from 'link-sdk'
 import qs from 'qs'
 import {
   axiosParams,
@@ -6,8 +5,6 @@ import {
   createAxiosFromStore,
   createFormDataAxios,
 } from '../common/utils'
-
-const { downloadFile } = linkSdk.axiosUtil
 
 function getFilenameFromContentDisposition(contentDisposition) {
   if (!contentDisposition)
@@ -95,13 +92,16 @@ export function cameraList(params) {
 export function exportCameraList(params) {
   const paramsStr = qs.stringify(params)
   const connectUrl = `videoCamera/exportCamera?${paramsStr}`
-  return downloadFile({ url: connectUrl, method: 'get' })
+  return downloadFileAsPromise({ url: connectUrl, method: 'get', name: '摄像头列表.xlsx' })
 }
 
 // 摄像头-模板下载
 export function downloadCameraTemplate() {
-  const connectUrl = `videoCamera/getCameraTemplate`
-  return downloadFile({ url: connectUrl, method: 'post' })
+  return downloadFileAsPromise({
+    url: 'videoCamera/getCameraTemplate',
+    method: 'post',
+    name: '摄像头导入模板.xlsx',
+  })
 }
 
 // 摄像头-excel导入
@@ -283,7 +283,7 @@ export function exportWarningData(params) {
   const paramsStr = qs.stringify(params)
   console.log(paramsStr)
   const connectUrl = `videoAlarm/exportAlarm?${paramsStr}`
-  return downloadFile({ url: connectUrl, method: 'get' })
+  return downloadFileAsPromise({ url: connectUrl, method: 'get', name: '预警数据.xlsx' })
 }
 
 // 统计分析导出接口

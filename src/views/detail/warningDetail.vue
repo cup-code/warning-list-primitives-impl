@@ -43,7 +43,7 @@ export default {
 
     // 文件前缀
     const filePrefix = ref(
-      JSON.parse(localStorage.getItem("globalData")).minioFilePrefix
+      JSON.parse(localStorage.getItem("globalData"))?.minioFilePrefix || ""
     );
 
     // 预警等级列表

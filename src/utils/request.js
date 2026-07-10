@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { Message, MessageBox } from 'element-ui'
-import { clearProjectStorage, clearSession } from '@/utils/storage-namespace'
+import { clearUserSession } from '@/utils/storage-namespace'
 // 创建axios实例
 const service = axios.create({
   baseURL: process.env.NODE_ENV !== 'production' ? window.g.BASE_URL_DEV : window.g.BASE_URL_PRO,
@@ -42,8 +42,7 @@ service.interceptors.response.use(
         cancelButtonText: '取消',
         type: 'warning',
       }).then(() => {
-        clearSession()
-        clearProjectStorage()
+        clearUserSession()
         window.location.href = '/'
       })
     }

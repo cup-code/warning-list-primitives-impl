@@ -86,3 +86,35 @@ export function clearNamespacedStorage() {
 // Convenient aliases
 export const clearSession = clearNamespacedSession
 export const clearProjectStorage = clearNamespacedStorage
+
+/**
+ * localStorage keys to PRESERVE on logout (tenant-level config, not user-specific).
+ */
+const PRESERVE_KEYS = ['globalData', 'setting']
+
+/**
+ * Clear all user-session data while preserving tenant-level config.
+ * - Saves globalData & setting
+ * - Clears all namespaced sessionStorage + localStorage
+ * - Restores globalData & setting
+ */
+export function clearUserSession() {
+  const saved = {}
+  try {
+    PRESERVE_KEYS.forEach((key) => {
+      const val = localStorage.getItem(key)
+      if (val !== null) saved[key] = val
+    })
+  }
+  catch (e) { /* ignore */ }
+
+  clearNamespacedSession()
+  clearNamespacedStorage()
+
+  try {
+    Object.keys(saved).forEach((key) => {
+      localStorage.setItem(key, saved[key])
+    })
+  }
+  catch (e) { /* ignore */ }
+}

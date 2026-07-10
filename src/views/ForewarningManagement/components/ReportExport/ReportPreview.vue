@@ -1,13 +1,11 @@
 <script>
-import headIcon from '../../static/headIcon.png'
-import topLabel from '../../static/topLabel.png'
-import ReportChart from '../../test/reportChart.js'
-import ReportTable from './ReportTable.vue'
-import SkillTable from './SkillTable.vue'
-import StatGrid from './StatGrid.vue'
+import ReportChart from "../../test/reportChart.js";
+import ReportTable from "./ReportTable.vue";
+import SkillTable from "./SkillTable.vue";
+import StatGrid from "./StatGrid.vue";
 
 export default {
-  name: 'ReportPreview',
+  name: "ReportPreview",
   components: {
     SkillTable,
     StatGrid,
@@ -17,11 +15,11 @@ export default {
   props: {
     reportTitle: {
       type: String,
-      default: '',
+      default: "",
     },
     reportSummary: {
       type: String,
-      default: '',
+      default: "",
     },
     showTable: {
       type: Boolean,
@@ -69,7 +67,19 @@ export default {
     },
     getText: {
       type: String,
-      required: true,
+      default: "",
+    },
+    showAdvert: {
+      type: Boolean,
+      default: true,
+    },
+    headerLogo: {
+      type: String,
+      default: "",
+    },
+    headerText: {
+      type: String,
+      default: "",
     },
     chartData: {
       type: Object,
@@ -85,60 +95,57 @@ export default {
     },
   },
   data() {
-    return {
-      headIcon,
-      topLabel,
-    }
+    return {};
   },
   computed: {
     trendColumns() {
       return [
-        { key: 'date', title: '日期', width: '33%' },
-        { key: 'week', title: '星期', width: '33%' },
-        { key: 'count', title: '预警数量（个）', width: '33%' },
-      ]
+        { key: "date", title: "日期", width: "33%" },
+        { key: "week", title: "星期", width: "33%" },
+        { key: "count", title: "预警数量（个）", width: "33%" },
+      ];
     },
     typeRankColumns() {
       return [
-        { key: 'rank', title: '名次', width: '33%' },
-        { key: 'type', title: '预警类型', width: '33%' },
-        { key: 'count', title: '预警数量（个）', width: '33%' },
-      ]
+        { key: "rank", title: "名次", width: "33%" },
+        { key: "type", title: "预警类型", width: "33%" },
+        { key: "count", title: "预警数量（个）", width: "33%" },
+      ];
     },
     deviceRankColumns() {
       return [
-        { key: 'rank', title: '名次', width: '33%' },
-        { key: 'deviceName', title: '设备名称', width: '33%' },
-        { key: 'count', title: '预警数量（个）', width: '33%' },
-      ]
+        { key: "rank", title: "名次", width: "33%" },
+        { key: "deviceName", title: "设备名称", width: "33%" },
+        { key: "count", title: "预警数量（个）", width: "33%" },
+      ];
     },
     levelRankColumns() {
       return [
-        { key: 'rank', title: '名次', width: '20%' },
-        { key: 'level', title: '预警等级', width: '20%' },
-        { key: 'count', title: '预警数量（个）', width: '30%' },
-        { key: 'percent', title: '预警等级占比', width: '30%' },
-      ]
+        { key: "rank", title: "名次", width: "20%" },
+        { key: "level", title: "预警等级", width: "20%" },
+        { key: "count", title: "预警数量（个）", width: "30%" },
+        { key: "percent", title: "预警等级占比", width: "30%" },
+      ];
     },
   },
   watch: {
     chartData: {
       handler(newVal) {
         this.$nextTick(() => {
-          this.initAlarmTrend(newVal.alarmTrend)
-          this.initAlarmTypeRank(newVal.alarmTypeRank)
-          this.initCameraAlarmRank(newVal.cameraAlarmRank)
-          this.initAlarmLevelRank(newVal.alarmLevelLive, newVal.total)
-        })
+          this.initAlarmTrend(newVal.alarmTrend);
+          this.initAlarmTypeRank(newVal.alarmTypeRank);
+          this.initCameraAlarmRank(newVal.cameraAlarmRank);
+          this.initAlarmLevelRank(newVal.alarmLevelLive, newVal.total);
+        });
       },
       deep: true,
       immediate: true,
     },
   },
   created() {
-    this.getPrefix()
+    this.getPrefix();
   },
-}
+};
 </script>
 
 <template>
@@ -154,12 +161,10 @@ export default {
         padding: 0 20px;
       "
     >
-      <div class="report-header">
+      <div ref="reportHeader" class="report-header" v-if="headerLogo || headerText">
+        <div class="header-text">{{ headerLogo || " " }}</div>
         <div>
-          <img :src="headIcon" alt="Logo" class="logo">
-        </div>
-        <div>
-          <img :src="topLabel" alt="Right" class="right-logo">
+          <div class="header-text">{{ headerText || " " }}</div>
         </div>
       </div>
       <div id="printBox" ref="printBox" class="pdf-export-content">
@@ -185,9 +190,7 @@ export default {
 
         <!-- 报告主体内容 -->
         <div class="p-2 px-4 mb-4 mx-4 bg-white rounded-lg border border-gray-200">
-          <div class="text-lg font-semibold">
-            本周小结：
-          </div>
+          <div class="text-lg font-semibold">本周小结：</div>
           <div class="text-base leading-relaxed pb-1" style="text-indent: 2em">
             {{ reportSummary || " " }}
           </div>
@@ -195,9 +198,7 @@ export default {
 
         <!-- 表格部分 -->
         <div class="mb-8 mx-4">
-          <h3 class="mb-4 text-xl font-semibold">
-            一、预警报警统计情况
-          </h3>
+          <h3 class="mb-4 text-xl font-semibold">一、预警报警统计情况</h3>
           <div class="table-container box-border">
             <ul class="flex justify-between items-center">
               <li v-for="item in list" :key="item.name" class="text-base">
@@ -210,16 +211,12 @@ export default {
         </div>
 
         <div class="mb-8 mx-4">
-          <h3 class="mb-4 text-xl font-semibold">
-            二、本周预警智能运营报告
-          </h3>
+          <h3 class="mb-4 text-xl font-semibold">二、本周预警智能运营报告</h3>
           <StatGrid :actual-list="actualList" />
 
           <!-- 预警趋势 -->
           <div class="table-container">
-            <div class="mb-4 py-2 box-border text-lg font-semibold">
-              本周预警趋势
-            </div>
+            <div class="mb-4 py-2 box-border text-lg font-semibold">本周预警趋势</div>
             <div
               class="py-2 flex flex-col items-center justify-center w-full bg-white rounded-md"
             >
@@ -297,9 +294,7 @@ export default {
 
           <!-- 预警等级占比 -->
           <div class="table-container">
-            <div class="mb-4 py-2 box-border text-lg font-semibold">
-              本周预警等级占比
-            </div>
+            <div class="mb-4 py-2 box-border text-lg font-semibold">本周预警等级占比</div>
             <div
               class="py-2 flex flex-col items-center justify-center w-full bg-white rounded-md"
             >
@@ -321,7 +316,7 @@ export default {
             </div>
           </div>
 
-          <div class="table-container">
+          <div v-if="showAdvert" class="table-container">
             <div
               class="py-2 text-lg font-semibold"
               style="text-indent: 2em; color: #1d376a"
@@ -333,7 +328,7 @@ export default {
           <div class="flex flex-col justify-end items-end mt-4 w-full">
             <div v-if="wechat" class="flex items-end">
               <span class="ml-2">企业微信：</span>
-              <img :src="filePrefix + wechat" alt="Logo" class="w-10 h-10">
+              <img :src="filePrefix + wechat" alt="Logo" class="w-10 h-10" />
             </div>
             <div v-if="phone" class="flex items-end">
               <span class="ml-2">联系电话：</span>
@@ -378,9 +373,14 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid #ccc;
   margin: 0 0 20px 0;
   padding: 10px 0;
+}
+
+.header-text {
+  font-size: 16px;
+  font-weight: bold;
+  color: #1d376a;
 }
 
 .logo {

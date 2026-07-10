@@ -107,7 +107,11 @@ export default {
           :key="index"
           style="text-align: center; border-top: 1px solid #e5e6eb"
         >
-          <td v-for="column in columns" :key="column.key" style="padding: 8px 0">
+          <td
+            v-for="column in columns"
+            :key="column.key"
+            style="padding: 8px 0"
+          >
             {{ row[column.key] }}
           </td>
         </tr>

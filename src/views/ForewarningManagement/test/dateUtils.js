@@ -64,7 +64,7 @@ export function getCurrentWeekDates() {
 
 function formatDate(date) {
   if (date === 'week') {
-    return moment().startOf('week').add(1, 'day').format('YYYY-MM-DD HH:mm:ss')
+    return moment().startOf('week').format('YYYY-MM-DD HH:mm:ss')
   }
   else {
     return moment().startOf(date).format('YYYY-MM-DD HH:mm:ss')

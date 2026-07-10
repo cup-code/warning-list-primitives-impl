@@ -95,8 +95,8 @@ export default {
       if (!this.downloadable) {
         return
       }
-      const globalData = JSON.parse(localStorage.getItem('globalData'))
-      window.open(globalData.minioFilePrefix + file.file)
+      const globalData = JSON.parse(localStorage.getItem('globalData')) || {}
+      window.open((globalData.minioFilePrefix || '') + file.file)
     },
   },
 }

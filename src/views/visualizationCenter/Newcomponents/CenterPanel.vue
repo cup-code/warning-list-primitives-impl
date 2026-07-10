@@ -1,5 +1,6 @@
 <script>
 import { getScreenDatas } from "./common";
+// import Item from "@/layout/components/Item.vue";
 import Panel from "./Panel.vue";
 
 export default {
@@ -31,8 +32,6 @@ export default {
     return {
       alarmLevel: ["", "一级", "二级", "三级", "四级"],
       videoAlarmList: [],
-      alarmStatusLive: null,
-      alarmLevelLive: null,
       activeIndex: 0,
       periods: [
         {
@@ -52,6 +51,8 @@ export default {
       selectedTrendPeriod: "1", // 默认选中的趋势按钮
       selectedRankingPeriod: "1", // 默认选中的排名按钮
       scrollTime: null,
+      alarmLevelLive: {},
+      alarmStatusLive: {},
       defaultCircle: {
         type: "pie",
         center: ["26%", "50%"],
@@ -69,6 +70,7 @@ export default {
         ],
         tooltip: { show: false },
         animation: false,
+        eventInterval: null,
       },
     };
   },
@@ -78,11 +80,28 @@ export default {
     },
   },
   watch: {
+    // activeIndex 一变（点选/上一张/下一张/自动轮播都会改）→ 把选中项滚进可见区
+    activeIndex() {
+      this.scrollActiveIntoView();
+    },
     defaultPeriod: {
       handler(val) {
         const { handlePeriod, levelPeriod } = { ...val };
         this.selectedTrendPeriod = handlePeriod || "1";
         this.selectedRankingPeriod = levelPeriod || "1";
+        this.getHandlingData({
+          type: 4,
+          timeType: this.selectedTrendPeriod,
+        });
+        this.getLevelData({
+          type: 5,
+          timeType: this.selectedRankingPeriod,
+        });
+      },
+      immediate: true,
+    },
+    departmentIds: {
+      handler(val) {
         this.getHandlingData({
           type: 4,
           timeType: this.selectedTrendPeriod,
@@ -122,8 +141,12 @@ export default {
         this.handleResize();
       }, 1000);
     });
+
+    this.startAutoCycle();
   },
+
   beforeDestroy() {
+    this.stopAutoCycle();
     // 移除resize监听器
     window.removeEventListener("resize", this.handleResize);
   },
@@ -148,6 +171,7 @@ export default {
     initPoint() {
       this.drawImageWithBoxes(this.currentEvent);
     },
+
     drawImageWithBoxes(info) {
       const canvasEl = this.$refs.canvasImage;
       if (!canvasEl) return;
@@ -237,22 +261,66 @@ export default {
     updateVisibleEvents() {
       this.visibleEvents = this.videoAlarmList;
     },
+    // 自动循环显示事件缩略图
 
+    startAutoCycle() {
+      // 清除已有定时器，避免重复
+      if (this.eventInterval) {
+        clearInterval(this.eventInterval);
+      }
+      // 每3秒自动切换到下一个事件
+      this.eventInterval = setInterval(() => {
+        this.nextEvent(true); // 标记为自动切换
+      }, 3000);
+    },
+    stopAutoCycle() {
+      if (this.eventInterval) {
+        clearInterval(this.eventInterval);
+        this.eventInterval = null;
+      }
+    },
     prevEvent() {
       this.activeIndex =
         (this.activeIndex - 1 + this.videoAlarmList.length) % this.videoAlarmList.length;
       this.updateVisibleEvents();
       this.initPoint();
+      this.restartAutoCycle();
     },
-    nextEvent() {
+    nextEvent(isAuto = false) {
       this.activeIndex = (this.activeIndex + 1) % this.videoAlarmList.length;
       this.updateVisibleEvents();
       this.initPoint();
+      // 只有手动点击时重启自动循环，自动切换时不重启
+      if (!isAuto) {
+        this.restartAutoCycle();
+      }
     },
     selectEvent(index) {
       this.activeIndex = index;
       this.initPoint();
+      this.restartAutoCycle();
     },
+    // 选中项被滚动条遮住时，只滚到刚好露出（已可见则不动），不强行居中
+    scrollActiveIntoView() {
+      this.$nextTick(() => {
+        const container = this.$refs.thumbnails;
+        if (!container) return;
+        const active = container.children[this.activeIndex];
+        if (!active) return;
+        const cRect = container.getBoundingClientRect();
+        const aRect = active.getBoundingClientRect();
+        let delta = 0;
+        if (aRect.left < cRect.left) delta = aRect.left - cRect.left;
+        // 左边被遮 → 向左滚
+        else if (aRect.right > cRect.right) delta = aRect.right - cRect.right; // 右边被遮 → 向右滚
+        if (delta !== 0) container.scrollBy({ left: delta, behavior: "smooth" });
+      });
+    },
+    restartAutoCycle() {
+      this.stopAutoCycle();
+      this.startAutoCycle();
+    },
+
     initHandlingChart(digital, total) {
       // 误报不参与计算
       const currentTotal = digital["误报"] ? total - digital["误报"] : total;
@@ -767,7 +835,7 @@ export default {
                 />
               </svg>
             </button>
-            <div class="event-thumbnails">
+            <div ref="thumbnails" class="event-thumbnails">
               <img
                 v-for="(event, index) in visibleEvents"
                 :key="index"

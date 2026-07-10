@@ -7,7 +7,7 @@ import MessageTip from "@/components/MessageTip";
 import { getSpecifiedModule } from "@/http/companyConfig/companyConfig-api.js";
 import { getServiceConfiguration } from "@/http/manage-api.js";
 import { logout } from "@/http/user-api";
-import { clearProjectStorage, clearSession } from "@/utils/storage-namespace";
+import { clearUserSession } from "@/utils/storage-namespace";
 
 export default {
   components: {
@@ -34,8 +34,8 @@ export default {
       return logo;
     },
     appUrl() {
-      const globalData = JSON.parse(localStorage.getItem("globalData"));
-      return globalData.minioFilePrefix + globalData.appDownloadPath;
+      const globalData = JSON.parse(localStorage.getItem("globalData")) || {};
+      return (globalData.minioFilePrefix || '') + (globalData.appDownloadPath || '');
     },
   },
 
@@ -44,13 +44,10 @@ export default {
       // 调用登出接口
       logout().then(({ data }) => {
         if (data.success) {
-          const saveSet = localStorage.getItem("setting");
-          // 清空storage
-          clearSession();
-          clearProjectStorage();
+          // 清空storage (保留globalData/setting)
+          clearUserSession();
           // 清空全局状态
           this.$store.dispatch("user/logout");
-          localStorage.setItem("setting", saveSet);
           // 跳转到 登录页面
           this.$router.push(`/login?redirect=${this.$route.fullPath}`);
         } else {
