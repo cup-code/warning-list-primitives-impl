@@ -108,7 +108,7 @@ export default defineConfig(env => ({
   output: {
     assetPrefix: './', // 统一为空字符串，避免CSS中图片路径被错误添加前缀
     distPath: {
-      root: 'dist',
+      root: resolve('../../dist/link-front'),
       html: './',
       js: 'js',
       css: 'css',

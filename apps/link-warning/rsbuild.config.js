@@ -88,7 +88,7 @@ export default defineConfig(env => ({
   output: {
     assetPrefix: './', // 使用相对路径，支持子目录部署
     distPath: {
-      root: 'dist',
+      root: resolve('../../dist/link-warning'),
       html: './',
       js: 'js',
       css: 'css',
