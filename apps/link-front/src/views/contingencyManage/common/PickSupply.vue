@@ -1,0 +1,332 @@
+<script>
+import { queryGoods } from '@/http/contingency/contingencyGoods.js'
+// 应急物资接口路径
+export default {
+  props: {
+    /* mark标记，emit结果时会一并传回 */
+    mark: {
+      type: [Number, String],
+      default: '',
+    },
+    /* 是否单选 */
+    isSingle: {
+      type: Boolean,
+      default: false,
+    },
+    /* 打开前已选的数据 - 多选 */
+    oldPickList: {
+      type: Array,
+      default() {
+        return []
+      },
+    },
+    /* 打开前已选的数据 - 单选 */
+    oldPickData: {
+      type: Object,
+      default() {
+        return {}
+      },
+    },
+  },
+  data() {
+    return {
+      loading: false,
+      total: 0,
+      sForm: {
+        pageNum: 1,
+        pageSize: 10,
+        category: '', // 物品类别
+        keyWords: '', // 关键字
+      },
+      tableData: [],
+      pickList: [], // 选中的数据，多选
+      pickData: {}, // 选中的数据，单选
+    }
+  },
+  computed: {
+    setPickClass() {
+      return function (id) {
+        let isExsit = false
+        for (const item of this.pickList) {
+          if (item.id === id) {
+            isExsit = true
+            break
+          }
+        }
+        return isExsit
+      }
+    },
+  },
+  created() {
+    this.searchClick()
+    if (this.isSingle) {
+      this.pickData = JSON.parse(JSON.stringify(this.oldPickData))
+    }
+    else {
+      this.pickList = JSON.parse(JSON.stringify(this.oldPickList))
+    }
+  },
+  methods: {
+    /* 点击搜索 */
+    queryClick() {
+      this.sForm.pageNum = 1
+      this.searchClick()
+    },
+    /* 点击搜索 */
+    searchClick() {
+      this.loading = true
+      queryGoods(this.sForm)
+        .then((data) => {
+          if (data.success) {
+            this.tableData = data.result.list || []
+            this.total = data.result.total
+            // this.$message.success(data.message || '查询成功')
+          }
+          else {
+            this.$message.warning(data.message || '查询失败')
+          }
+        })
+        .finally(() => {
+          this.loading = false
+        })
+    },
+    /* 点击选中回调-多选 */
+    pickClick(pickItem) {
+      console.log(pickItem)
+      let isExsit = false
+      let dataIndex = -1
+      for (let i = 0; i < this.pickList.length; i++) {
+        if (pickItem.id === this.pickList[i].id) {
+          isExsit = true
+          dataIndex = i
+          break
+        }
+      }
+      if (isExsit) {
+        this.pickList.splice(dataIndex, 1)
+      }
+      else {
+        this.pickList.push({ id: pickItem.id, name: pickItem.unit })
+      }
+      console.log(this.pickList)
+    },
+    /* 移除回调 */
+    delTagClick(index) {
+      this.pickList.splice(index, 1)
+    },
+    /* 点击取消 */
+    cancelClick() {
+      this.$emit('close', null)
+    },
+    /* 确认保存 */
+    submitClick() {
+      let result = { mark: this.mark, data: this.pickList }
+      if (this.isSingle) {
+        result = { mark: this.mark, data: this.pickData }
+      }
+      this.$emit('close', result)
+    },
+  },
+}
+</script>
+
+<template>
+  <div
+    v-loading="loading"
+    class="pick-bg"
+  >
+    <!-- 搜索栏 -->
+    <el-form
+      inline
+      label-width="100"
+    >
+      <el-form-item label="物品类别">
+        <el-select
+          v-model="sForm.category"
+          clearable
+        >
+          <el-option
+            v-for="item in $dictUtils.getDictList('em_supply_type')"
+            :key="item.id"
+            :label="item.dictName"
+            :value="item.dictCode"
+          />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="关键字">
+        <el-input
+          v-model="sForm.keyWords"
+          class="header-item-data"
+          placeholder="品名/地点/负责人/电话"
+        />
+      </el-form-item>
+      <el-form-item>
+        <el-button
+          type="primary"
+          size="mini"
+          @click="queryClick"
+        >
+          查询
+        </el-button>
+      </el-form-item>
+    </el-form>
+    <!-- 表格 -->
+    <el-table
+      class="pick-table"
+      :data="tableData"
+      :header-cell-style="{ borderLeft: 'none', borderRight: 'none' }"
+      align="center"
+    >
+      <el-table-column
+        v-if="!isSingle"
+        width="55"
+      >
+        <template slot-scope="scope">
+          <i
+            :class="setPickClass(scope.row.id) ? 'el-icon-circle-check activeRadio' : ''"
+            class="radio-normal"
+            @click="pickClick(scope.row)"
+          />
+        </template>
+      </el-table-column>
+      <el-table-column
+        v-if="isSingle"
+        width="55"
+      >
+        <template slot-scope="scope">
+          <i
+            :class="pickData.id == scope.row.id ? 'el-icon-circle-check activeRadio' : ''"
+            class="radio-normal"
+            @click="pickData = scope.row"
+          />
+        </template>
+      </el-table-column>
+      <el-table-column
+        type="index"
+        width="50"
+        align="center"
+        label="序号"
+      />
+      <el-table-column
+        label="应急物品类别"
+        align="center"
+        min-width="100"
+        prop="category"
+      >
+        <template slot-scope="scope">
+          {{ $dictUtils.getDictLabel('em_supply_type', scope.row.category) }}
+        </template>
+      </el-table-column>
+      <el-table-column
+        label="详细分类"
+        align="center"
+        prop="detailedClassification"
+      />
+      <el-table-column
+        label="品名及单位"
+        align="center"
+        prop="unit"
+      />
+      <el-table-column
+        label="数量"
+        align="center"
+        prop="number"
+      />
+      <el-table-column
+        label="存放地点"
+        align="center"
+        prop="place"
+      />
+      <el-table-column
+        label="负责人"
+        align="center"
+        prop="person"
+      />
+    </el-table>
+    <!-- 分页器 -->
+    <div class="pick-page">
+      <el-pagination
+        slot="page"
+        :disabled="loading"
+        :current-page.sync="sForm.pageNum"
+        :page-size.sync="sForm.pageSize"
+        :page-sizes="[10, 20, 30, 50]"
+        layout="total, prev, pager, next, jumper, sizes"
+        :total="total"
+        @current-change="searchClick"
+        @size-change="searchClick"
+      />
+    </div>
+    <!-- 已选择 -->
+    <div
+      v-if="!isSingle"
+      class="pick-list"
+    >
+      <div class="pick-list-title">
+        已选择
+      </div>
+      <div>
+        <el-tag
+          v-for="(item, index) in pickList"
+          :key="item.id"
+          closable
+          @close="delTagClick(index)"
+        >
+          {{ item.name }}
+        </el-tag>
+      </div>
+    </div>
+    <!-- 底部按钮 -->
+    <div class="dialog-footer">
+      <el-button
+        size="small"
+        style="margin: 0 20px 0 0"
+        @click="cancelClick"
+      >
+        取消
+      </el-button>
+      <el-button
+        type="primary"
+        size="small"
+        @click="submitClick"
+      >
+        确认保存
+      </el-button>
+    </div>
+  </div>
+</template>
+
+<style lang="scss" scoped>
+.pick-bg {
+  .pick-page {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+  }
+  .pick-list {
+    // border: 1px solid lightgray;
+    box-shadow: 0 1px 4px rgba(0, 21, 41, 0.08);
+    min-height: 60px;
+    padding: 5px;
+    .pick-title {
+      margin: 0 0 10px 0;
+      font-weight: bold;
+    }
+  }
+  .radio-normal {
+    display: block;
+    width: 20px;
+    height: 20px;
+    border: 1px solid lightgray;
+    border-radius: 50%;
+    font-size: 20px;
+    line-height: 20px;
+    user-select: none;
+    cursor: pointer;
+  }
+  .activeRadio {
+    color: #409eff;
+    border: none;
+  }
+}
+</style>

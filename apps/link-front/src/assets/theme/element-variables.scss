@@ -1,0 +1,509 @@
+/* Element Chalk Variables */
+@use 'sass:color';
+
+/* Transition
+-------------------------- */
+$--all-transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1) !default;
+$--fade-transition: opacity 300ms cubic-bezier(0.23, 1, 0.32, 1) !default;
+$--fade-linear-transition: opacity 200ms linear !default;
+$--md-fade-transition:
+  transform 300ms cubic-bezier(0.23, 1, 0.32, 1),
+  opacity 300ms cubic-bezier(0.23, 1, 0.32, 1) !default;
+$--border-transition-base: border-color 0.2s cubic-bezier(0.645, 0.045, 0.355, 1) !default;
+$--color-transition-base: color 0.2s cubic-bezier(0.645, 0.045, 0.355, 1) !default;
+
+/* Colors
+-------------------------- */
+$--color-white: #fff !default;
+$--color-black: #000 !default;
+
+/* 改变主题色变量 */
+$--color-primary: $--ky-primary;
+$--color-success: $--ky-success;
+$--color-warning: $--ky-warning;
+$--color-danger: $--ky-danger;
+$--color-info: $--ky-info;
+
+$--color-primary-light-1: color.mix($--color-white, $--color-primary, 10%) !default;
+/* 53a8ff */
+$--color-primary-light-2: color.mix($--color-white, $--color-primary, 20%) !default;
+/* 66b1ff */
+$--color-primary-light-3: color.mix($--color-white, $--color-primary, 30%) !default;
+/* 79bbff */
+$--color-primary-light-4: color.mix($--color-white, $--color-primary, 40%) !default;
+/* 8cc5ff */
+$--color-primary-light-5: color.mix($--color-white, $--color-primary, 50%) !default;
+/* a0cfff */
+$--color-primary-light-6: color.mix($--color-white, $--color-primary, 60%) !default;
+/* b3d8ff */
+$--color-primary-light-7: color.mix($--color-white, $--color-primary, 70%) !default;
+/* c6e2ff */
+$--color-primary-light-8: color.mix($--color-white, $--color-primary, 80%) !default;
+/* d9ecff */
+$--color-primary-light-9: color.mix($--color-white, $--color-primary, 90%) !default;
+/* ecf5ff */
+
+$--color-success-light: color.mix($--color-white, $--color-success, 80%) !default;
+$--color-warning-light: color.mix($--color-white, $--color-warning, 80%) !default;
+$--color-danger-light: color.mix($--color-white, $--color-danger, 80%) !default;
+$--color-info-light: color.mix($--color-white, $--color-info, 80%) !default;
+
+$--color-success-lighter: color.mix($--color-white, $--color-success, 90%) !default;
+$--color-warning-lighter: color.mix($--color-white, $--color-warning, 90%) !default;
+$--color-danger-lighter: color.mix($--color-white, $--color-danger, 90%) !default;
+$--color-info-lighter: color.mix($--color-white, $--color-info, 90%) !default;
+
+$--color-text-primary: #303133 !default;
+$--color-text-regular: #606266 !default;
+$--color-text-secondary: #909399 !default;
+$--color-text-placeholder: #c0c4cc !default;
+
+/* Link
+-------------------------- */
+$--link-color: $--color-primary-light-2 !default;
+$--link-hover-color: $--color-primary !default;
+
+/* Background
+-------------------------- */
+$--background-color-base: #f5f7fa !default;
+
+/* Border
+-------------------------- */
+$--border-color-base: #dcdfe6 !default;
+$--border-color-light: #e4e7ed !default;
+$--border-color-lighter: #ebeef5 !default;
+$--border-color-extra-light: #f2f6fc !default;
+$--border-color-hover: $--color-text-placeholder !default;
+
+/* Box-shadow
+-------------------------- */
+$--box-shadow-base:
+  0 2px 4px rgba(0, 0, 0, 0.12),
+  0 0 6px rgba(0, 0, 0, 0.04) !default;
+$--box-shadow-dark:
+  0 2px 4px rgba(0, 0, 0, 0.12),
+  0 0 6px rgba(0, 0, 0, 0.12) !default;
+$--box-shadow-light: 0 2px 12px 0 rgba(0, 0, 0, 0.1) !default;
+
+/* Fill
+-------------------------- */
+$--fill-base: $--color-white !default;
+
+/* Font
+-------------------------- */
+/* 移除了这里的$--font-path定义，统一使用文件末尾的定义 */
+$--font-color-disabled-base: #bbb !default;
+
+/* Disable base
+-------------------------- */
+$--disabled-fill-base: $--background-color-base !default;
+$--disabled-color-base: $--color-text-regular !default; // 表单禁用状态下，placeholder字体颜色修改为黑色
+$--disabled-border-base: $--border-color-light !default;
+
+/* Icon
+-------------------------- */
+$--icon-color: #666 !default;
+$--icon-color-base: $--color-info !default;
+
+/* Checkbox
+-------------------------- */
+.el-checkbox__input.is-focus .el-checkbox__inner {
+  border-color: $--color-primary;
+}
+
+.el-checkbox__inner:hover {
+  border-color: $--color-primary;
+}
+
+.el-checkbox__input.is-checked + .el-checkbox__label {
+  color: $--color-primary;
+  font-weight: bold;
+}
+
+.el-checkbox__input.is-checked .el-checkbox__inner,
+.el-checkbox__input.is-indeterminate .el-checkbox__inner {
+  border-color: $--color-primary;
+  background-color: $--color-primary;
+}
+
+// Disabled
+.el-checkbox__input.is-disabled:not(.is-checked) + span.el-checkbox__label {
+  color: $--disabled-color-base;
+}
+
+.el-checkbox__input.is-disabled.is-checked .el-checkbox__inner::after {
+  border-color: $--color-primary;
+}
+
+/* Select
+-------------------------- */
+$--select-border-color-hover: $--border-color-hover !default;
+$--select-close-hover-color: $--color-text-secondary !default;
+
+$--select-input-color: $--color-text-placeholder !default;
+$--select-multiple-input-color: #666 !default;
+$--select-input-focus-background: $--color-primary !default;
+
+$--select-option-color: $--color-text-regular !default;
+$--select-option-disabled-color: $--color-text-placeholder !default;
+$--select-option-disabled-background: $--color-white !default;
+$--select-option-hover-background: $--background-color-base !default;
+$--select-option-selected: $--color-primary !default;
+$--select-option-selected-hover: $--background-color-base !default;
+
+$--select-group-color: $--color-info !default;
+
+$--select-dropdown-background: $--color-white !default;
+$--select-dropdown-shadow: $--box-shadow-light !default;
+$--select-dropdown-empty-color: #999 !default;
+
+.el-select-dropdown__item.selected {
+  color: $--color-primary;
+}
+
+.el-dropdown-menu__item:focus,
+.el-dropdown-menu__item:not(.is-disabled):hover {
+  color: $--color-primary;
+  background-color: $--color-primary-light-9;
+}
+
+/* Alert
+-------------------------- */
+$--alert-success-color: $--color-success-lighter !default;
+$--alert-info-color: $--color-info-lighter !default;
+$--alert-warning-color: $--color-warning-lighter !default;
+$--alert-danger-color: $--color-danger-lighter !default;
+
+/* Message Box
+-------------------------- */
+$--msgbox-content-color: $--color-text-regular !default;
+
+$--msgbox-success-color: $--color-success !default;
+$--msgbox-info-color: $--color-info !default;
+$--msgbox-warning-color: $--color-warning !default;
+$--msgbox-danger-color: $--color-danger !default;
+
+/* Message
+-------------------------- */
+$--message-shadow: $--box-shadow-base !default;
+$--message-background-color: #edf2fc !default;
+$--message-content-color: $--color-text-regular !default;
+$--message-close-color: $--color-text-placeholder !default;
+$--message-close-hover-color: $--color-text-secondary !default;
+
+$--message-success-color: $--color-success !default;
+$--message-info-color: $--color-info !default;
+$--message-warning-color: $--color-warning !default;
+$--message-danger-color: $--color-danger !default;
+
+/* Notification
+-------------------------- */
+$--notification-shadow: $--box-shadow-light !default;
+$--notification-border-color: $--border-color-lighter !default;
+$--notification-color: $--color-text-regular !default;
+$--notification-title-color: $--color-text-primary !default;
+
+$--notification-close-color: $--color-text-secondary !default;
+$--notification-close-hover-color: $--color-text-regular !default;
+
+$--notification-success-color: $--color-success !default;
+$--notification-info-color: $--color-info !default;
+$--notification-warning-color: $--color-warning !default;
+$--notification-danger-color: $--color-danger !default;
+
+/* Input
+-------------------------- */
+.el-input__inner:focus {
+  border-color: $--color-primary;
+}
+
+.el-textarea__inner:focus {
+  border-color: $--color-primary;
+}
+
+/* Cascader
+-------------------------- */
+$--cascader-menu-fill: $--fill-base !default;
+$--cascader-menu-border-color: $--border-color-base !default;
+$--cascader-menu-color: $--color-text-regular !default;
+$--cascader-menu-option-color-active: $--color-text-secondary !default;
+$--cascader-menu-option-fill-active: rgba($--color-text-secondary, 0.12) !default;
+$--cascader-menu-option-color-hover: $--color-text-regular !default;
+$--cascader-menu-option-fill-hover: rgba($--color-text-primary, 0.06) !default;
+$--cascader-menu-option-color-disabled: #999 !default;
+$--cascader-menu-option-fill-disabled: rgba($--color-black, 0.06) !default;
+$--cascader-menu-option-empty-color: #666 !default;
+$--cascader-menu-group-color: #999 !default;
+$--cascader-menu-shadow:
+  0 1px 2px rgba($--color-black, 0.14),
+  0 0 3px rgba($--color-black, 0.14) !default;
+$--cascader-menu-option-pinyin-color: #999 !default;
+$--cascader-menu-submenu-shadow:
+  1px 1px 2px rgba($--color-black, 0.14),
+  1px 0 2px rgba($--color-black, 0.14) !default;
+
+/* TimeLine
+-------------------------- */
+.el-timeline-item__node--primary {
+  background-color: $--color-primary;
+}
+
+.el-timeline-item__node--success {
+  background-color: $--color-success;
+}
+
+.el-timeline-item__node--warning {
+  background-color: $--color-warning;
+}
+
+.el-timeline-item__node--danger {
+  background-color: $--color-danger;
+}
+
+.el-timeline-item__node--info {
+  background-color: $--color-info;
+}
+
+/* Group
+-------------------------- */
+$--group-option-fill-hover: rgba($--color-black, 0.06) !default;
+$--group-title-color: $--color-black !default;
+
+/* Tab
+-------------------------- */
+.el-tabs__item.is-active {
+  color: $--color-primary;
+  color: $--color-primary;
+}
+
+.el-tabs__active-bar {
+  background-color: $--color-primary;
+}
+
+.el-tabs__item:hover {
+  color: $--color-primary;
+}
+
+/* Button
+-------------------------- */
+#app {
+  .el-button + .el-button {
+    margin-left: 10px;
+  }
+}
+
+$--button-default-color: $--color-text-regular !default;
+$--button-default-fill: $--color-white !default;
+$--button-default-border: $--border-color-base !default;
+
+$--button-disabled-color: $--color-text-placeholder !default;
+$--button-disabled-fill: $--color-white !default;
+$--button-disabled-border: $--border-color-lighter !default;
+
+$--button-primary-border: $--color-primary !default;
+$--button-primary-color: $--color-white !default;
+$--button-primary-fill: $--color-primary !default;
+
+$--button-success-border: $--color-success !default;
+$--button-success-color: $--color-white !default;
+$--button-success-fill: $--color-success !default;
+
+$--button-warning-border: $--color-warning !default;
+$--button-warning-color: $--color-white !default;
+$--button-warning-fill: $--color-warning !default;
+
+$--button-danger-border: $--color-danger !default;
+$--button-danger-color: $--color-white !default;
+$--button-danger-fill: $--color-danger !default;
+
+$--button-info-border: $--color-info !default;
+$--button-info-color: $--color-white !default;
+$--button-info-fill: $--color-info !default;
+
+/* Switch
+-------------------------- */
+$--switch-on-color: $--color-primary !default;
+$--switch-off-color: $--border-color-base !default;
+$--switch-disabled-color: $--border-color-lighter !default;
+$--switch-disabled-text-color: $--color-text-placeholder !default;
+
+/* Pagination
+-------------------------- */
+// $--pagination-fill: $--color-white !default;
+// $--pagination-color: $--color-text-primary !default;
+// $--pagination-button-color: $--color-text-primary !default;
+// $--pagination-button-disabled-color: $--color-text-placeholder !default;
+// $--pagination-button-disabled-fill: $--color-white !default;
+// $--pagination-hover-fill: $--color-primary !default;
+// $--pagination-hover-color: $--color-white !default;
+
+/* Popover
+-------------------------- */
+$--popover-fill: $--color-white !default;
+$--popover-border-color: $--border-color-lighter !default;
+$--popover-title-color: $--color-text-primary !default;
+
+/* Tooltip
+-------------------------- */
+$--tooltip-fill: $--color-text-primary !default;
+$--tooltip-color: $--color-white !default;
+$--tooltip-border-color: $--color-text-primary !default;
+
+/* Tag
+-------------------------- */
+$--tag-fill: rgba($--color-primary, 0.1) !default;
+$--tag-color: $--color-primary !default;
+$--tag-border: rgba($--color-primary, 0.2) !default;
+
+$--tag-info-fill: rgba($--color-info, 0.1) !default;
+$--tag-info-border: rgba($--color-info, 0.2) !default;
+$--tag-info-color: $--color-info !default;
+
+$--tag-primary-fill: rgba($--color-primary, 0.1) !default;
+$--tag-primary-border: rgba($--color-primary, 0.2) !default;
+$--tag-primary-color: $--color-primary !default;
+
+$--tag-success-fill: rgba($--color-success, 0.1) !default;
+$--tag-success-border: rgba($--color-success, 0.2) !default;
+$--tag-success-color: $--color-success !default;
+
+$--tag-warning-fill: rgba($--color-warning, 0.1) !default;
+$--tag-warning-border: rgba($--color-warning, 0.2) !default;
+$--tag-warning-color: $--color-warning !default;
+
+$--tag-danger-fill: rgba($--color-danger, 0.1) !default;
+$--tag-danger-border: rgba($--color-danger, 0.2) !default;
+$--tag-danger-color: $--color-danger !default;
+
+/* Tree
+-------------------------- */
+$--tree-node-hover-color: $--background-color-base !default;
+$--tree-text-color: $--color-text-regular !default;
+$--tree-expand-icon-color: $--color-text-placeholder !default;
+
+/* Dropdown
+-------------------------- */
+$--dropdown-menu-box-shadow: $--box-shadow-light !default;
+$--dropdown-menuItem-hover-fill: $--color-primary-light-9 !default;
+$--dropdown-menuItem-hover-color: $--link-color !default;
+
+/* Badge
+-------------------------- */
+$--badge-fill: $--color-danger !default;
+
+/* Slider
+--------------------------*/
+$--slider-main-background-color: $--color-primary !default;
+$--slider-runway-background-color: $--border-color-light !default;
+$--slider-button-hover-color: color.mix($--color-primary, black, 97%) !default;
+$--slider-stop-background-color: $--color-white !default;
+$--slider-disable-color: $--color-text-placeholder !default;
+
+/* Radio
+-------------------------- */
+$--radio-button-disabled-checked-fill: $--color-primary;
+$--radio-button-checked-background-color: $--color-primary;
+$--radio-button-checked-font-color: $--color-white;
+$--radio-button-checked-border-color: $--color-primary;
+
+.el-radio-button__orig-radio:checked + .el-radio-button__inner {
+  background-color: $--color-primary;
+  border-color: $--color-primary;
+  box-shadow: -1px 0 0 0 $--color-primary;
+}
+
+.el-radio-button__inner:hover {
+  color: $--color-primary;
+}
+
+.el-radio__input.is-checked .el-radio__inner {
+  background: $--color-primary;
+  border-color: $--color-primary;
+}
+
+.el-radio__input.is-checked + .el-radio__label {
+  color: $--color-primary;
+  font-weight: bold;
+}
+
+.el-radio-button__orig-radio:disabled:checked + .el-radio-button__inner {
+  background: $--color-primary;
+}
+
+// Disabled
+.el-radio__input.is-disabled:not(.is-checked) + span.el-radio__label {
+  color: $--disabled-color-base;
+}
+
+.el-radio__input.is-disabled.is-checked .el-radio__inner::after {
+  background-color: $--color-primary;
+}
+
+/* Steps
+--------------------------*/
+$--steps-border-color: $--disabled-border-base !default;
+
+/* Menu
+--------------------------*/
+$--menu-item-color: $--color-text-primary !default;
+$--menu-item-fill: $--color-white !default;
+$--menu-item-hover-fill: $--color-primary-light-9 !default;
+
+.el-menu.el-menu--popup.el-menu--popup-right-start {
+  background-color: white;
+}
+
+/* Rate
+--------------------------*/
+$--rate-icon-color: $--color-text-placeholder !default;
+
+/* DatePicker
+--------------------------*/
+$--datepicker-color: $--color-text-regular !default;
+$--datepicker-off-color: $--color-text-placeholder !default;
+$--datepicker-header-color: $--color-text-regular !default;
+$--datepicker-icon-color: $--color-text-primary !default;
+$--datepicker-border-color: $--disabled-border-base !default;
+$--datepicker-inner-border-color: #e4e4e4 !default;
+$--datepicker-inrange-color: $--border-color-extra-light !default;
+$--datepicker-inrange-hover-color: $--border-color-extra-light !default;
+$--datepicker-active-color: $--color-primary !default;
+$--datepicker-text-hover-color: $--color-primary !default;
+$--datepicker-cell-hover-color: #fff !default;
+
+/* Scrollbar
+--------------------------*/
+$--scrollbar-background-color: rgba($--color-text-secondary, 0.3) !default;
+$--scrollbar-hover-background-color: rgba($--color-text-secondary, 0.5) !default;
+
+/* Carousel
+--------------------------*/
+$--carousel-arrow-background: rgba(31, 45, 61, 0.11) !default;
+$--carousel-arrow-hover-background: rgba(31, 45, 61, 0.23) !default;
+$--carousel-indicator-out-color: $--border-color-hover !default;
+
+/* Collapse
+--------------------------*/
+$--collapse-border-color: $--border-color-lighter !default;
+$--collapse-header-fill: $--color-white !default;
+$--collapse-header-color: $--color-text-primary !default;
+$--collapse-content-fill: $--color-white !default;
+$--collapse-content-color: $--color-text-primary !default;
+
+/* Transfer
+--------------------------*/
+$--transfer-border-color: $--border-color-lighter !default;
+$--transfer-panel-header-background: $--background-color-base !default;
+$--transfer-item-hover-background: $--color-text-secondary !default;
+
+/* Dialog
+--------------------------*/
+.el-dialog__headerbtn:focus .el-dialog__close,
+.el-dialog__headerbtn:hover .el-dialog__close {
+  color: $--color-primary;
+}
+
+/* 改变 icon 字体路径变量，必需 */
+$--font-path: 'element-ui/lib/theme-chalk/fonts';
+
+@import 'element-ui/packages/theme-chalk/src/index.scss'; // 主题样式

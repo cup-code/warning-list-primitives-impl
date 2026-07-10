@@ -1,0 +1,174 @@
+@import './variables.scss';
+@import './mixin.scss';
+@import './transition.scss';
+@import './element-ui.scss';
+@import './sidebar.scss';
+@import './navbar.scss';
+@import './app-main.scss';
+@import './font-face.scss';
+
+body {
+  height: 100%;
+  background: #f3f7f9;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  color: $defaultColor;
+  font-size: 14px;
+  font-family:
+    Helvetica Neue,
+    Helvetica,
+    PingFang SC,
+    Hiragino Sans GB,
+    Microsoft YaHei,
+    Arial,
+    sans-serif;
+}
+
+label {
+  font-weight: 700;
+}
+
+html {
+  height: 100%;
+  box-sizing: border-box;
+}
+
+// 新样式改版全局选择器
+// 页面内容内边距
+.page-container {
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+
+  &-fixed {
+    height: calc(100vh - 45px);
+    box-sizing: border-box;
+    padding: 14px;
+  }
+
+  &-sidebar {
+    // 包含侧边栏的页面样式
+    padding: 14px;
+    box-sizing: border-box;
+    display: flex;
+  }
+}
+
+.page-main {
+  width: calc(100% - 200px);
+  display: flex;
+  flex-direction: column;
+}
+// 模块之间的间距
+.card-cell {
+  margin-bottom: 10px;
+}
+
+#app {
+  height: 100%;
+}
+
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
+}
+
+a:focus,
+a:active {
+  outline: none;
+}
+
+a,
+a:focus,
+a:hover {
+  cursor: pointer;
+  color: inherit;
+  text-decoration: none;
+}
+
+div:focus {
+  outline: none;
+}
+
+.clearfix {
+  &:after {
+    visibility: hidden;
+    display: block;
+    font-size: 0;
+    content: ' ';
+    clear: both;
+    height: 0;
+  }
+}
+
+// 敏捷开发 动态生成的页面用到的类
+.jp-page {
+  padding: 10px;
+  height: calc(100vh - 50px);
+  overflow: auto;
+  .top {
+    height: calc(100% - 50px);
+  }
+  &.jp-common-layout {
+    display: flex;
+    .jp-common-layout-left {
+      width: 240px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      .jp-common-el-tree-scrollbar {
+        flex: 1;
+        overflow: auto;
+        margin-top: 10px;
+        .el-tree-node__content {
+          &:hover .tree-item-button {
+            display: unset;
+          }
+          .tree-item-button {
+            display: none;
+          }
+
+          .custom-tree-node {
+            width: calc(100% - 30px);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 14px;
+          }
+        }
+      }
+    }
+    .jp-common-layout-center {
+      flex: 1;
+      margin-left: 10px;
+    }
+  }
+  .el-dialog {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-height: calc(100% - 30px);
+    max-width: calc(100% - 30px);
+    margin: 0 !important;
+    display: flex;
+    flex-direction: column;
+    .el-dialog__header {
+      border-bottom: 1px solid #e8e8e8;
+    }
+    .el-dialog__body {
+      overflow: auto;
+      // padding: 10px 0 0 10px;
+    }
+    .el-dialog__footer {
+      border-top: 1px solid #e8e8e8;
+      border-radius: 0 0 4px 4px;
+    }
+  }
+}
+.pull-right {
+  text-align: right;
+  float: right;
+}

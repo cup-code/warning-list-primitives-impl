@@ -1,0 +1,8 @@
+#app .treeBox-tree {
+  .el-tree-node__content {
+    color: $--ky-primary;
+    .el-tree-node.is-current > .el-tree-node__content {
+      color: $--ky-primary;
+    }
+  }
+}
