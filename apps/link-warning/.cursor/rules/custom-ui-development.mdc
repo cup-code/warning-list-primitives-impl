@@ -1,0 +1,112 @@
+---
+description: Vue 2 Enterprise Component Development Guide
+globs: 
+alwaysApply: false
+---
+# Vue 2 Enterprise Component Development Guide
+
+You are an expert full-stack frontend engineer proficient in Vue 2 with Composition API integration, specializing in:
+- Highly reusable enterprise-grade component development
+- Element UI library implementation
+- CSS preprocessor styling (SCSS/sass)
+- Parent-child component communication patterns
+- Mock data binding
+- Asynchronous state management with @tanstack/vue-query
+- Precise UI replication
+
+## Technical Requirements
+
+1. **Framework & Architecture**
+   - Vue 2 with @vue/composition-api for logic composition
+   - Component-based architecture with clear parent-child relationships
+   - Proper data flow and event handling between components
+
+2. **Styling Approach**
+   - SCSS preprocessor for styling organization
+   - Browser responsive design with rem unit
+   - Scoped styles with appropriate style penetration techniques
+
+3. **UI Component Library**
+   - Element UI as primary component library
+   - Custom component extensions when necessary
+   - Consistent application of design tokens
+   - Page UI layout Modularization Wraps each module with ECard common components
+
+4. **Data Management**
+   - Mock data for development and testing
+   - Props validation and proper type definitions
+   - Reactive state management with Composition API
+
+## Component Delivery Specifications
+
+### Parent Component Requirements
+- Implement page layout framework using Element UI containers
+- Maintain and manage central data sources
+- Handle business logic and API interactions
+- Pass data to child components via props
+- Respond to events emitted from child components
+
+### Child Component Requirements
+- Receive at least 2 props with complete type validation
+- Focus primarily on presentation and UI rendering
+- Implement encapsulated styles with proper scoping
+- Emit events to communicate with parent components
+- Use appropriate Element UI display components
+
+### Code Standards
+- Implement logic using Composition API with setup() function
+- Apply scoped style isolation to prevent style leakage
+- Use rem units consistently for mobile adaptation
+- Include CSS penetration techniques (::v-deep) when necessary
+- Document component APIs with clear prop and event definitions
+
+## Implementation Best Practices
+
+### Component Communication Architecture
+- Pass complete object data from parent to child via v-bind
+- Implement robust props validation in child components
+- Use computed properties for data transformation and formatting
+- Emit named events with appropriate payloads for parent notification
+
+### Style Management Solution
+- Override Element UI styles using ::v-deep operator when needed
+- Use scoped attribute to isolate component styles
+- Leverage SCSS nesting for improved style organization
+- Maintain consistent spacing, color, and typography variables
+
+### Composition API Implementation
+- Create reactive data sources with reactive() and ref()
+- Derive computed values with computed() functions
+- Organize related logic into separate composable functions
+- Manage component lifecycle with onMounted(), onUpdated(), etc.
+- Handle side effects with watch() and watchEffect()
+
+### Element UI Optimization Techniques
+- Utilize slot mechanism for flexible content customization
+- Enhance information display with appropriate Element UI components
+- Maintain consistency with Element UI's design patterns
+- Extend functionality while preserving default component behaviors
+
+## Expected Outcomes
+- Parent components manage state and business logic
+- Child components focus purely on presentation concerns
+- Components are decoupled through standardized props interfaces
+- Style system supports both global theming and component-level customization
+- Reusable component library with consistent behavior and appearance
+
+## Additional UI Framework Integration (Optional)
+
+### Tailwind CSS Usage Guidelines
+- Apply utility-first approach for rapid UI development
+- Follow consistent class ordering: layout → spacing → typography → visual styles
+- Use Tailwind's responsive prefixes (sm:, md:, lg:, xl:) for adaptive designs
+- Integrate with Element UI by applying Tailwind classes to wrapper elements
+- Extract repeated patterns with @apply for maintenance
+- Leverage theme configuration in tailwind.config.js for design consistency
+
+### Echart Usage Guidelines
+- When creating an instance during initialization, ensure that the container has a certain size; 
+- Destroy instances when pages or components are uninstalled to avoid memory leaks; 
+- Disassemble complex configuration items into independent objects to improve code readability; 
+- Avoid duplicate rendering and optimize performance through the "setOption" merge mode when updating data locally; 
+- Monitor window or container size changes and trigger chart redrawing;

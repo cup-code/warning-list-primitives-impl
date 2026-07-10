@@ -1,0 +1,145 @@
+.theme-official {
+  --ky-keypoint: #1b3194; // 强调色
+  --ky-primary: #11c8e5; // 主色
+  --ky-success: #67c23a; // 成功色
+  --ky-warning: #ffb930; // 警告色
+  --ky-danger: #f03d3d; // 危险色
+  --ky-info: #909399; // 普通色
+
+  $--ky-keypoint: #1b3194; // 强调色
+  $--ky-primary: #11c8e5; // 主色
+  $--ky-success: #67c23a; // 成功色
+  $--ky-warning: #ffb930; // 警告色
+  $--ky-danger: #f03d3d; // 危险色
+  $--ky-info: #909399; // 普通色
+
+  // 导航栏相关颜色配置
+  // 仅主页面左侧导航栏使用，请勿在其他地方使用该配色
+  $--ky-themebg: #ffffff;
+  $--ky-themebg-hover: #506bdb;
+  $--ky-themebg-active: #506bdb;
+  $--ky-themebd-dark: #11c8e5;
+  $--ky-themetext: #222222;
+  $--ky-themetext-hover: white;
+  $--ky-themetext-active: white;
+
+  @import './element-variables.scss';
+  @import './menu.scss';
+}
+.theme-default {
+  --ky-keypoint: #1b3194; // 强调色
+  --ky-primary: #0069b9; // 主色
+  --ky-success: #2d9c0e; // 成功色
+  // --ky-warning: #e3d700; // 警告色
+  --ky-warning: #cfde00; // 警告色
+  --ky-danger: #f54a41; // 危险色
+  --ky-info: #909399; // 普通色
+
+  // 主题线条颜色
+  --ky-border-color: #e8f0f7;
+  --ky-head-color: #f7fbff;
+
+  $--ky-keypoint: #1b3194; // 强调色
+  $--ky-primary: #0069b9; // 主色
+  $--ky-success: #2d9c0e; // 成功色
+  // $--ky-success: #67c23a; // 成功色
+  $--ky-warning: #cfde00; // 警告色
+  $--ky-danger: #f54a41; // 危险色
+  $--ky-info: #909399; // 普通色
+
+  // 导航栏相关颜色配置
+  // 仅主页面左侧导航栏使用，请勿在其他地方使用该配色
+  $--ky-themebg: #ffffff;
+  $--ky-themebg-hover: #e8f0f7;
+  $--ky-themebg-active: #e8f0f7;
+  $--ky-themebd-dark: #c1cbe2;
+  $--ky-themetext: #444444;
+  $--ky-navBarText: #0069b9;
+  $--ky-themetext-hover: #0069b9;
+  $--ky-themetext-active: #0069b9;
+
+  @import './element-variables.scss';
+  @import './menu.scss';
+}
+
+.theme-dark {
+  --ky-keypoint: #1b3194; // 强调色
+  --ky-primary: black; // 主色
+  --ky-success: #67c23a; // 成功色
+  --ky-warning: #ffb930; // 警告色
+  --ky-danger: #f03d3d; // 危险色
+  --ky-info: #909399; // 普通色
+
+  $--ky-keypoint: #1b3194; // 强调色
+  $--ky-primary: black; // 主色
+  $--ky-success: #67c23a; // 成功色
+  $--ky-warning: #ffb930; // 警告色
+  $--ky-danger: #f03d3d; // 危险色
+  $--ky-info: #909399; // 普通色
+
+  $--ky-themebg: #ffffff;
+  $--ky-themebg-hover: #f5f5f5;
+  $--ky-themebg-active: #f5f5f5;
+  $--ky-themebd-dark: #222222;
+  $--ky-themetext: #222222;
+  $--ky-themetext-hover: #292f33;
+  $--ky-themetext-active: #292f33;
+
+  @import './element-variables.scss';
+  @import './menu.scss';
+}
+
+.theme-green {
+  --ky-keypoint: #1b3194; // 强调色
+  --ky-primary: #4ca154; // 主色
+  --ky-success: #67c23a; // 成功色
+  --ky-warning: #ffb930; // 警告色
+  --ky-danger: #f03d3d; // 危险色
+  --ky-info: #909399; // 普通色
+
+  $--ky-keypoint: #1b3194; // 强调色
+  $--ky-primary: #00a53c; // 主色
+  $--ky-success: #67c23a; // 成功色
+  $--ky-warning: #ffb930; // 警告色
+  $--ky-danger: #f03d3d; // 危险色
+  $--ky-info: #909399; // 普通色
+
+  $--ky-themebg: #ffffff;
+  $--ky-themebg-hover: #eef5ee;
+  $--ky-themebg-active: #eef5ee;
+  $--ky-themebd-dark: #008000;
+  $--ky-themetext: #222222;
+  $--ky-themetext-hover: #4ca154;
+  $--ky-themetext-active: #4ca154;
+
+  @import './element-variables.scss';
+  @import './menu.scss';
+}
+
+.theme-orange {
+  --ky-keypoint: #1b3194; // 强调色
+  --ky-primary: #ff8d1a; // 主色
+  --ky-success: #67c23a; // 成功色
+  --ky-warning: #ffb930; // 警告色
+  --ky-danger: #f03d3d; // 危险色
+  --ky-info: #909399; // 普通色
+
+  $--ky-keypoint: #1b3194; // 强调色
+  $--ky-primary: #ff8d1a; // 主色
+  $--ky-success: #67c23a; // 成功色
+  $--ky-warning: #ffb930; // 警告色
+  $--ky-danger: #f03d3d; // 危险色
+  $--ky-info: #909399; // 普通色
+
+  $--ky-themebg: #ffffff;
+  $--ky-themebg-hover: #fdf6e8;
+  $--ky-themebg-active: #fdf6e8;
+  $--ky-themebd-dark: #ff8c00;
+  $--ky-themetext: #222222;
+  $--ky-themetext-hover: #ff8d1a;
+  $--ky-themetext-active: #ff8d1a;
+
+  @import './element-variables.scss';
+  @import './menu.scss';
+}
+@import './dialog.scss';
