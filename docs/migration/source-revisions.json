@@ -1,0 +1,33 @@
+{
+  "front": {
+    "root": "/Users/jxz/project/new/front/project",
+    "branch": "001-shared-code",
+    "commit": "42c6cda355bafe98656f7b866dd9454d3765d394"
+  },
+  "warning": {
+    "root": "/Users/jxz/project/new/front/project/link-warning",
+    "branch": "main",
+    "commit": "4fe62c5ff46c5fe1c1068ebe043d1eed4d874a25"
+  },
+  "historyRewrite": {
+    "removed": [
+      ".npmrc",
+      "node_modules",
+      "dist",
+      ".cache",
+      ".rsbuild-cache",
+      ".DS_Store"
+    ],
+    "front": {
+      "sourceCommit": "42c6cda355bafe98656f7b866dd9454d3765d394",
+      "splitCommit": "50c0ec9c3e6d84a022bdd4200858d762fe7e737b",
+      "sanitizedCommit": "695e394e024955cc7bc432abe3bc5e7ac139145f",
+      "map": "docs/migration/front-commit-map.txt"
+    },
+    "warning": {
+      "sourceCommit": "4fe62c5ff46c5fe1c1068ebe043d1eed4d874a25",
+      "sanitizedCommit": "14c2025d5b5576e8c6e1afc5379bb3e1aee7e07a",
+      "map": "docs/migration/warning-commit-map.txt"
+    }
+  }
+}
