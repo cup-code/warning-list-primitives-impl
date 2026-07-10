@@ -1,31 +1,29 @@
-# Link Monorepo Design
+# Link Monorepo 设计方案
 
-## 1. Objective
+## 1. 建设目标
 
-Create a new, independent Monorepo in `link-shared` while leaving the existing
-`link-front_new` and `link-warning` projects unchanged.
+在 `link-shared` 中创建一个新的独立 Monorepo，现有的 `link-front_new` 和
+`link-warning` 项目保持不变。
 
-The new repository must:
+新项目需要满足以下要求：
 
-- Produce two independently deployable applications.
-- Keep one authoritative copy of shared warning-domain code.
-- Preserve the relevant Git history of both source projects.
-- Include the current working-tree content of both source projects, including
-  uncommitted changes.
-- Allow shared source changes to be consumed immediately during local
-  development without publishing an npm package.
+- 分别构建、部署完整版应用和预警应用。
+- 两个应用共用一份预警业务源码。
+- 保留两个来源项目中与本次迁移有关的 Git 历史。
+- 新项目以两个来源项目当前工作目录为准，包含尚未提交的修改。
+- 本地修改共享源码后立即生效，不需要先发布 npm 包。
 
-## 2. Source Projects
+## 2. 来源项目
 
-| Source | Git layout | New location |
+| 来源 | Git 结构 | 新项目中的位置 |
 | --- | --- | --- |
-| `link-front_new` | Subdirectory of `/Users/jxz/project/new/front/project` | `apps/link-front` |
-| `link-warning` | Independent Git repository | `apps/link-warning` |
+| `link-front_new` | `/Users/jxz/project/new/front/project` 仓库中的子目录 | `apps/link-front` |
+| `link-warning` | 独立 Git 仓库 | `apps/link-warning` |
 
-Both source directories are read-only inputs during migration. The migration
-must not edit, move, delete, clean, reset, or commit files in either source.
+迁移期间，两个来源目录只用于读取。迁移脚本不得在其中修改、移动、删除、清理、
+重置或提交文件。
 
-## 3. Target Structure
+## 3. 目录结构
 
 ```text
 link-shared/
@@ -42,19 +40,16 @@ link-shared/
 `-- pnpm-lock.yaml
 ```
 
-Responsibilities:
+各目录职责如下：
 
-- `apps/link-front`: full product entry point, routes, runtime configuration,
-  public assets, and product-only features.
-- `apps/link-warning`: warning product entry point, routes, runtime
-  configuration, public assets, and product-only features.
-- `packages/warning-feature`: authoritative warning-domain pages, components,
-  APIs, and domain logic used by both applications.
-- `packages/shared-core`: framework-independent or broadly reusable request,
-  storage, permission, and utility code.
-- `packages/shared-ui`: reusable Vue 2 components and shared presentation code.
+- `apps/link-front`：完整版应用入口、路由、运行时配置、公共资源和专属功能。
+- `apps/link-warning`：预警应用入口、路由、运行时配置、公共资源和专属功能。
+- `packages/warning-feature`：两个应用共用的预警页面、组件、接口和业务逻辑，
+  是预警业务源码的唯一维护位置。
+- `packages/shared-core`：请求、存储、权限和工具函数等通用基础代码。
+- `packages/shared-ui`：可复用的 Vue 2 组件、样式和展示逻辑。
 
-The dependency direction is one-way:
+依赖方向固定为：
 
 ```text
 apps/link-front   --\
@@ -62,14 +57,13 @@ apps/link-front   --\
 apps/link-warning --/
 ```
 
-Packages must never import from `apps`. ESLint boundaries will enforce this.
+`packages` 不能反向引用 `apps`，该约束通过 ESLint 检查。
 
-## 4. Workspace And Package Management
+## 4. 工作区和包管理
 
-Use pnpm workspaces. Do not add Nx, Turborepo, or another task orchestrator in
-the initial migration.
+新项目使用 pnpm workspace。首次迁移不引入 Nx、Turborepo 或其他任务编排工具。
 
-The root workspace provides these commands:
+根目录提供以下命令：
 
 ```text
 pnpm dev:front
@@ -81,62 +75,55 @@ pnpm lint
 pnpm test
 ```
 
-Each application retains its own Rsbuild configuration and produces a distinct
-deployment artifact:
+两个应用各自保留 Rsbuild 配置，分别输出部署产物：
 
 ```text
 dist/link-front/
 dist/link-warning/
 ```
 
-Workspace packages expose source code directly to Rsbuild so edits support hot
-reload without a separate package publication or prebuild step.
+工作区包直接向 Rsbuild 提供源码，不增加单独的预构建或发布步骤。因此，开发时
+修改 `warning-feature` 后，两个应用都可以正常热更新。
 
-## 5. Git History Migration
+## 5. Git 历史迁移
 
-History migration is performed without modifying the source repositories.
+历史迁移不能改变来源仓库，具体步骤如下：
 
-1. Clone the parent repository containing `link-front_new` into a temporary
-   directory.
-2. Run `git subtree split --prefix=link-front_new` in the temporary clone to
-   isolate the relevant history.
-3. Import the split history beneath `apps/link-front` in the new repository.
-4. Import the complete `link-warning` history beneath `apps/link-warning`.
-5. Overlay the current source working trees onto those application directories.
-6. Exclude `.git`, `node_modules`, `dist`, build caches, and `.DS_Store` files.
-7. Commit the working-tree overlays and Monorepo structure in the new repository.
+1. 把包含 `link-front_new` 的上级仓库克隆到临时目录。
+2. 在临时仓库中执行 `git subtree split --prefix=link-front_new`，提取该目录的历史。
+3. 把提取后的历史导入新仓库的 `apps/link-front`。
+4. 把 `link-warning` 的完整历史导入新仓库的 `apps/link-warning`。
+5. 将两个来源项目当前工作目录的内容覆盖到对应应用目录。
+6. 复制时排除 `.git`、`node_modules`、`dist`、构建缓存和 `.DS_Store`。
+7. 在新仓库提交工作目录快照和 Monorepo 配置。
 
-This yields reachable source history plus a snapshot containing current
-uncommitted changes. The migration process must compare copied file manifests
-against the inputs before beginning shared-code extraction.
+这样既能保留来源历史，也能把尚未提交的最新代码带入新项目。开始提取共享代码
+之前，需要对比来源目录和复制结果的文件清单，确认没有遗漏或多复制文件。
 
-## 6. Shared-Code Migration
+## 6. 共享代码迁移
 
-The current projects cannot be deduplicated by blindly copying files. Of the
-477 source files in `link-warning`, 470 have matching relative paths in
-`link-front_new`, but 148 of those files currently differ.
+现有代码不能按文件路径直接批量去重。`link-warning` 有 477 个源码文件，其中 470
+个文件在 `link-front_new` 中存在相同路径，但这 470 个文件中已有 148 个内容不同。
 
-Migration proceeds incrementally:
+迁移分为以下阶段：
 
-1. Establish both applications in the workspace without changing behavior.
-2. Verify that both applications install and build from their copied sources.
-3. Classify the 148 differing files as accidental drift, product-specific
-   behavior, or parameterizable shared behavior.
-4. Move clearly bounded warning-domain code, including
-   `ForewarningManagement` and `videoWarning`, into `warning-feature`.
-5. Move genuinely reusable infrastructure and UI code into `shared-core` and
-   `shared-ui` only when both consumers have the same contract.
-6. Remove duplicated application copies only after both applications consume
-   and verify the workspace version.
+1. 先把两个应用放入工作区，不改变原有行为。
+2. 确认两个应用都能在新目录中安装依赖并完成构建。
+3. 对 148 个差异文件分类，判断是无意产生的代码漂移、产品差异，还是可以通过
+   参数解决的公共逻辑。
+4. 将边界明确的预警业务迁入 `warning-feature`，优先处理
+   `ForewarningManagement`、`videoWarning` 及其直接依赖。
+5. 只有当两个应用使用相同契约时，才把基础代码和 UI 组件迁入 `shared-core` 或
+   `shared-ui`。
+6. 两个应用都接入并验证工作区版本后，再删除应用内的重复副本。
 
-Code with substantial product-specific branches remains in the corresponding
-application. Deduplication is not a goal when it weakens module boundaries.
+如果一段代码包含大量产品分支，应继续保留在对应应用中，不为了减少文件数量而
+强行共享。
 
-## 7. Host Integration
+## 7. 宿主应用接入方式
 
-Shared warning code must not assume one application's router, Vuex store,
-request client, permissions, or runtime configuration. Applications provide
-these dependencies through an explicit integration contract, conceptually:
+共享预警代码不能默认使用某个应用的 router、Vuex store、请求客户端、权限实现或
+运行时配置。两个应用通过明确的接口传入这些依赖，例如：
 
 ```js
 createWarningFeature({
@@ -148,52 +135,46 @@ createWarningFeature({
 })
 ```
 
-The concrete Vue 2 integration may use plugin installation, providers, or
-factory functions, but the contract must remain explicit and testable.
+Vue 2 中可以使用插件安装函数、provider 或工厂函数实现，但对外契约必须明确且
+能够独立测试。
 
-Application aliases such as `@/` may only refer to the consuming application.
-Workspace packages use package-relative imports or declared workspace package
-names and must not depend on an application's directory layout.
+`@/` 等应用别名只允许指向使用方应用自身。工作区包使用包内相对路径或声明过的
+工作区包名，不能依赖某个应用的目录结构。
 
-## 8. Verification
+## 8. 验证方式
 
-Verification is performed at three levels:
+验证分为三个层次：
 
-- Package tests cover shared utilities, integration contracts, and warning
-  domain logic.
-- Application tests cover entry points, routes, permissions, and runtime
-  configuration.
-- CI runs lint, tests, `build:front`, and `build:warning` for every shared-code
-  change.
+- `packages` 测试覆盖共享工具、接入契约和预警业务逻辑。
+- `apps` 测试覆盖应用入口、路由、权限和运行时配置。
+- CI 对每次共享代码修改执行 lint、测试、`build:front` 和 `build:warning`。
 
-Before freezing the old projects, compare the old and new applications for:
+旧项目停更之前，需要对比新旧应用的以下功能：
 
-- Route availability and access control.
-- Warning list, detail, export, and video-warning workflows.
-- Runtime environment and public configuration loading.
-- Static asset resolution and deployment base paths.
-- Production build completion and artifact structure.
+- 路由可用性和访问控制。
+- 预警列表、详情、导出和视频预警流程。
+- 运行时环境及公共配置加载。
+- 静态资源路径和部署基础路径。
+- 生产构建结果及产物目录结构。
 
-## 9. Failure Handling And Rollback
+## 9. 失败处理和回退
 
-The old projects remain operational throughout migration. A failed import,
-build, or module extraction is rolled back only inside the new repository.
+迁移期间，旧项目始终保持可用。历史导入、构建或模块提取失败时，只回退新仓库
+中的修改。
 
-Shared-code migration uses small commits by module boundary. If a shared
-extraction causes a regression, revert that extraction commit and keep the
-application-local copies until the contract is corrected.
+共享代码按模块边界拆成小提交。如果某次提取引起回归，回退对应提交，继续使用
+应用内副本，等接入契约修正后再迁移。
 
-The old repositories are frozen only after both new artifacts pass the agreed
-verification suite. Deleting or archiving old projects is outside this design.
+只有两个新产物都通过约定的验证后，才考虑停止旧项目的日常开发。删除或归档旧
+项目不在本方案范围内。
 
-## 10. Completion Criteria
+## 10. 完成标准
 
-The migration is complete when:
+满足以下条件后，迁移才算完成：
 
-- Both source histories are reachable from the new repository.
-- Current working-tree content is represented in the new applications.
-- The old source directories remain byte-for-byte unchanged by the migration.
-- `pnpm build:front` and `pnpm build:warning` succeed.
-- Both applications use the same `warning-feature` source for the agreed warning
-  modules.
-- CI verifies both applications whenever a shared package changes.
+- 新仓库能够访问两个来源项目的相关提交历史。
+- 两个新应用包含来源工作目录中的当前内容。
+- 迁移过程没有改变两个来源目录的文件内容。
+- `pnpm build:front` 和 `pnpm build:warning` 均构建成功。
+- 约定的预警模块在两个应用中引用同一份 `warning-feature` 源码。
+- 共享包发生修改时，CI 会验证两个应用。
