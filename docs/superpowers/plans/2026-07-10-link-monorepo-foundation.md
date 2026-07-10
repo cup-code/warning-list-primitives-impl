@@ -15,7 +15,7 @@
 - 新项目必须包含来源项目当前未提交的工作目录内容。
 - 复制时排除 `.git`、`node_modules`、`dist`、构建缓存、`.DS_Store` 和含凭据的 `.npmrc`。
 - 不把来源 `.npmrc` 中的认证信息提交到新仓库；新仓库通过 `NPM_AUTH` 环境变量读取私有仓库认证。
-- 保留 `link-warning` 的完整历史，并从上级仓库中提取 `link-front_new` 的目录历史。
+- 保留两份来源的有效源码历史，但必须从全部历史提交中删除 `.npmrc`、`node_modules`、`dist`、构建缓存和 `.DS_Store`；保留作者、时间、提交说明和提交拓扑，并记录完整的新旧 SHA 映射。
 - 首次迁移不引入 Nx 或 Turborepo。
 - 任务 2 生成来源基线摘要后，所有会写入新项目的任务结束时都必须验证两个来源目录的清单摘要没有变化。
 - 本计划不删除或归档旧项目，也不删除两应用中的重复业务代码。
@@ -43,10 +43,13 @@ link-shared/
 |   |-- migration/tree-manifest.mjs    # 生成稳定且可比较的目录摘要
 |   |-- migration/tree-manifest.test.mjs
 |   |-- migration/compare-manifests.mjs
+|   |-- migration/sanitize-history.sh  # 净化临时历史并输出 SHA 映射
 |   |-- audit/shared-source-audit.mjs  # 统计同路径文件及内容差异
 |   `-- audit/shared-source-audit.test.mjs
 `-- docs/migration/
     |-- source-revisions.json          # 迁移时的来源提交
+    |-- front-commit-map.txt           # 完整版历史的新旧 SHA 映射
+    |-- warning-commit-map.txt         # 预警版历史的新旧 SHA 映射
     |-- source-before.json             # 来源迁移前摘要
     |-- source-after.json              # 来源迁移后摘要
     `-- shared-source-audit.json       # 第二阶段计划的输入
@@ -244,6 +247,9 @@ git commit -m "test: add source tree migration guards"
 **文件：**
 - 创建：`docs/migration/source-before.json`
 - 创建：`docs/migration/source-revisions.json`
+- 创建：`docs/migration/front-commit-map.txt`
+- 创建：`docs/migration/warning-commit-map.txt`
+- 创建：`scripts/migration/sanitize-history.sh`
 - 创建目录：`apps/link-front`
 - 创建目录：`apps/link-warning`
 
@@ -272,7 +278,36 @@ node -e "const { execFileSync } = require('node:child_process'); const run = (cw
 
 预期：`front.root` 是 `/Users/jxz/project/new/front/project`，`warning.root` 是 `/Users/jxz/project/new/front/project/link-warning`。
 
-- [ ] **步骤 3：在临时克隆中提取 link-front_new 历史**
+- [ ] **步骤 3：创建历史净化脚本**
+
+创建 `scripts/migration/sanitize-history.sh`：
+
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo=${1:?缺少仓库目录}
+branch=${2:?缺少待净化分支}
+map_file=${3:?缺少 SHA 映射输出文件}
+map_file=$(cd "$(dirname "$map_file")" && pwd)/$(basename "$map_file")
+: > "$map_file"
+
+export FILTER_BRANCH_SQUELCH_WARNING=1
+export MAP_FILE="$map_file"
+git -C "$repo" filter-branch --force \
+  --index-filter 'git ls-files -z | perl -0ne '\''print if m{(?:^|/)(?:\.npmrc|\.DS_Store)$|(?:^|/)(?:node_modules|dist|\.cache|\.rsbuild-cache)(?:/|$)}'\'' | git update-index --force-remove -z --stdin' \
+  --commit-filter 'new_commit=$(git commit-tree "$@"); printf "%s %s\n" "$GIT_COMMIT" "$new_commit" >> "$MAP_FILE"; echo "$new_commit"' \
+  -- "$branch"
+
+if git -C "$repo" ls-tree -r --name-only "$branch" | perl -ne '$found=1 if m{(?:^|/)(?:\.npmrc|\.DS_Store)$|(?:^|/)(?:node_modules|dist|\.cache|\.rsbuild-cache)(?:/|$)}; END { exit($found ? 0 : 1) }'; then
+  echo '净化后历史仍包含排除路径' >&2
+  exit 1
+fi
+
+test -s "$map_file"
+```
+
+- [ ] **步骤 4：在临时克隆中提取并净化两份历史**
 
 执行：
 
@@ -280,42 +315,64 @@ node -e "const { execFileSync } = require('node:child_process'); const run = (cw
 MIGRATION_TMP="$(mktemp -d /tmp/link-monorepo-history.XXXXXX)"
 git clone --no-local /Users/jxz/project/new/front/project "$MIGRATION_TMP/front-parent"
 git -C "$MIGRATION_TMP/front-parent" subtree split --prefix=link-front_new -b link-front-history
+FRONT_SPLIT_COMMIT="$(git -C "$MIGRATION_TMP/front-parent" rev-parse link-front-history)"
+scripts/migration/sanitize-history.sh "$MIGRATION_TMP/front-parent" link-front-history docs/migration/front-commit-map.txt
+FRONT_SANITIZED_COMMIT="$(git -C "$MIGRATION_TMP/front-parent" rev-parse link-front-history)"
+
+git clone --no-local /Users/jxz/project/new/front/project/link-warning "$MIGRATION_TMP/warning"
+git -C "$MIGRATION_TMP/warning" branch warning-history main
+scripts/migration/sanitize-history.sh "$MIGRATION_TMP/warning" warning-history docs/migration/warning-commit-map.txt
+WARNING_SANITIZED_COMMIT="$(git -C "$MIGRATION_TMP/warning" rev-parse warning-history)"
+```
+
+预期：两个映射文件非空；两个净化分支的树中均不存在排除路径。
+
+- [ ] **步骤 5：记录净化提交并导入两份历史**
+
+执行：
+
+```bash
+FRONT_SPLIT_COMMIT="$FRONT_SPLIT_COMMIT" FRONT_SANITIZED_COMMIT="$FRONT_SANITIZED_COMMIT" WARNING_SANITIZED_COMMIT="$WARNING_SANITIZED_COMMIT" node -e "const fs=require('node:fs'); const path='docs/migration/source-revisions.json'; const data=JSON.parse(fs.readFileSync(path)); data.historyRewrite={ removed:['.npmrc','node_modules','dist','.cache','.rsbuild-cache','.DS_Store'], front:{ sourceCommit:data.front.commit, splitCommit:process.env.FRONT_SPLIT_COMMIT, sanitizedCommit:process.env.FRONT_SANITIZED_COMMIT, map:'docs/migration/front-commit-map.txt' }, warning:{ sourceCommit:data.warning.commit, sanitizedCommit:process.env.WARNING_SANITIZED_COMMIT, map:'docs/migration/warning-commit-map.txt' } }; fs.writeFileSync(path, JSON.stringify(data,null,2)+'\n')"
+
 git remote add front-history "$MIGRATION_TMP/front-parent"
 git fetch front-history link-front-history
 git subtree add --prefix=apps/link-front front-history link-front-history
+git remote remove front-history
+
+git remote add warning-history "$MIGRATION_TMP/warning"
+git fetch warning-history warning-history
+git subtree add --prefix=apps/link-warning warning-history warning-history
+git remote remove warning-history
 ```
 
-预期：`apps/link-front/package.json` 存在，并且 `git log --all --oneline -- link-front_new` 不会把父仓库其他目录加入新工作树。
+预期：两个应用的 `package.json` 存在，并且两个临时 remote 已删除。
 
-- [ ] **步骤 4：迁入 link-warning 完整历史**
+- [ ] **步骤 6：验证净化历史、SHA 映射和导入范围**
 
 执行：
 
 ```bash
-git remote add warning-history /Users/jxz/project/new/front/project/link-warning
-git fetch warning-history main
-git subtree add --prefix=apps/link-warning warning-history main
-```
-
-预期：`apps/link-warning/package.json` 存在。
-
-- [ ] **步骤 5：验证两个来源提交在新仓库历史中可达**
-
-执行：
-
-```bash
-node -e "const fs = require('node:fs'); const cp = require('node:child_process'); const revisions = JSON.parse(fs.readFileSync('docs/migration/source-revisions.json')); cp.execFileSync('git', ['merge-base', '--is-ancestor', revisions.warning.commit, 'HEAD']); console.log('warning history reachable')"
+node -e "const fs=require('node:fs'); const cp=require('node:child_process'); const data=JSON.parse(fs.readFileSync('docs/migration/source-revisions.json')); for (const item of [data.historyRewrite.front, data.historyRewrite.warning]) cp.execFileSync('git',['merge-base','--is-ancestor',item.sanitizedCommit,'HEAD']); console.log('sanitized histories reachable')"
+test -z "$(git ls-tree -r --name-only HEAD apps | perl -ne 'print if m{(?:^|/)(?:\.npmrc|\.DS_Store)$|(?:^|/)(?:node_modules|dist|\.cache|\.rsbuild-cache)(?:/|$)}')"
+test -s docs/migration/front-commit-map.txt
+test -s docs/migration/warning-commit-map.txt
+test -f apps/link-front/package.json
+test -f apps/link-warning/package.json
 git log --all --oneline -- apps/link-front/package.json | head -5
 ```
 
-预期：输出 `warning history reachable`，并且完整版应用的 `package.json` 至少显示一条历史记录。
+预期：输出 `sanitized histories reachable`；排除路径检查无输出；两个映射文件和两个应用入口均存在。
 
-- [ ] **步骤 6：提交迁移元数据**
+- [ ] **步骤 7：验证来源未变化并提交迁移元数据**
 
 ```bash
-git add docs/migration/source-before.json docs/migration/source-revisions.json
+node -e "Promise.all([import('./scripts/migration/tree-manifest.mjs')]).then(async ([m]) => { const front = await m.collectManifest('/Users/jxz/project/new/front/project/link-front_new'); const warning = await m.collectManifest('/Users/jxz/project/new/front/project/link-warning'); process.stdout.write(JSON.stringify({ front, warning }, null, 2) + '\n') })" > /tmp/link-source-current.json
+node scripts/migration/compare-manifests.mjs docs/migration/source-before.json /tmp/link-source-current.json
+git add scripts/migration/sanitize-history.sh docs/migration/source-before.json docs/migration/source-revisions.json docs/migration/front-commit-map.txt docs/migration/warning-commit-map.txt
 git commit -m "chore: record monorepo source revisions"
 ```
+
+预期：提交前输出 `来源目录未发生变化`。
 
 ---
 
