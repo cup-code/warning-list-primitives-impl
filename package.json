@@ -1,0 +1,25 @@
+{
+  "name": "@link/monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "packageManager": "pnpm@10.14.0",
+  "engines": {
+    "node": ">=18.17.0"
+  },
+  "scripts": {
+    "dev:front": "pnpm --filter @link/link-front dev",
+    "dev:warning": "pnpm --filter @link/link-warning dev",
+    "build:front": "pnpm --filter @link/link-front build",
+    "build:warning": "pnpm --filter @link/link-warning build",
+    "build": "pnpm run build:front && pnpm run build:warning",
+    "lint": "pnpm --filter './apps/*' lint",
+    "test:migration": "node --test scripts/migration/*.test.mjs scripts/audit/*.test.mjs",
+    "audit:shared": "node scripts/audit/shared-source-audit.mjs apps/link-warning/src apps/link-front/src docs/migration/shared-source-audit.json",
+    "verify:sources": "node scripts/migration/compare-manifests.mjs docs/migration/source-before.json docs/migration/source-after.json"
+  },
+  "pnpm": {
+    "overrides": {
+      "axios": "^1.11.0"
+    }
+  }
+}

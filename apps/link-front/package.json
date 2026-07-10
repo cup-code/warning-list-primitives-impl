@@ -1,5 +1,5 @@
 {
-  "name": "elink",
+  "name": "@link/link-front",
   "type": "module",
   "version": "1.0.0",
   "private": true,
@@ -99,7 +99,10 @@
     "vuex": "^3.6.2",
     "vxe-table": "3.4.15",
     "xe-utils": "3.5.7",
-    "xlsx": "^0.16.9"
+    "xlsx": "^0.16.9",
+    "@link/shared-core": "workspace:*",
+    "@link/shared-ui": "workspace:*",
+    "@link/warning-feature": "workspace:*"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^6.2.0",

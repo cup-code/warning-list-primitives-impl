@@ -1,2 +1,11 @@
 .worktrees/
 .superpowers/
+.DS_Store
+.cache/
+.rsbuild-cache/
+node_modules/
+dist/
+apps/*/dist/
+packages/*/dist/
+*.log
+.env.local

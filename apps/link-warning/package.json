@@ -1,5 +1,5 @@
 {
-  "name": "elink",
+  "name": "@link/link-warning",
   "type": "module",
   "version": "1.0.0",
   "private": true,
@@ -62,7 +62,10 @@
     "vue-runtime-helpers": "^1.1.2",
     "vuex": "^3.6.2",
     "vxe-table": "3.4.15",
-    "xe-utils": "3.5.7"
+    "xe-utils": "3.5.7",
+    "@link/shared-core": "workspace:*",
+    "@link/shared-ui": "workspace:*",
+    "@link/warning-feature": "workspace:*"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^6.2.0",
