@@ -18,6 +18,14 @@
     "verify:sources": "node scripts/migration/compare-manifests.mjs docs/migration/source-before.json docs/migration/source-after.json"
   },
   "pnpm": {
+    "onlyBuiltDependencies": [
+      "cwebp-bin",
+      "vue-demi"
+    ],
+    "ignoredBuiltDependencies": [
+      "core-js",
+      "core-js-pure"
+    ],
     "overrides": {
       "axios": "^1.11.0"
     }

@@ -1,5 +1,9 @@
 import path from 'path'
 import fs from 'fs'
+import { fileURLToPath } from 'url'
+import { resolveWorkspaceDependency } from '../build-paths.mjs'
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 export function getPkgAlias() {
   const lifecycle = process.env.npm_lifecycle_event
@@ -12,8 +16,8 @@ export function getPkgAlias() {
   }
   let alias = {}
   Object.keys(PKGALIAS).forEach((item) => {
-    const linkPath = path.join(process.cwd(), './node_modules/', PKGALIAS[item], '/src')
-    const localPath = linkPath || path.join(process.cwd(), './src/views/', item.split('@')[1])
+    const linkPath = resolveWorkspaceDependency(`${PKGALIAS[item]}/src`)
+    const localPath = path.join(__dirname, './src/views/', item.split('@')[1])
     if (lifecycle == 'linkserve' || lifecycle == 'linkserve:lite') {
       alias[item] = fs.existsSync(linkPath) ? linkPath : localPath
     } else if (lifecycle == 'serve') {

@@ -9,6 +9,7 @@ import { pluginSass } from '@rsbuild/plugin-sass'
 import { pluginVue2 } from '@rsbuild/plugin-vue2'
 import { pluginVue2Jsx } from '@rsbuild/plugin-vue2-jsx'
 import { rspack } from '@rspack/core'
+import { resolveWorkspaceDependency } from '../build-paths.mjs'
 import pkg from './aliasconfig.js'
 
 const { getPkgAlias } = pkg
@@ -98,9 +99,10 @@ export default defineConfig(env => ({
       // 确保使用完整版的 Vue
       'vue$': 'vue/dist/vue.esm.js',
       // 使用dayjs替代moment
-      'dayjs': resolve('node_modules/dayjs'),
+      'dayjs': resolveWorkspaceDependency('dayjs'),
       // 为了兼容，添加moment别名指向dayjs
-      'moment': resolve('node_modules/dayjs'),
+      'moment': resolveWorkspaceDependency('dayjs'),
+      '@vueuse/core$': resolveWorkspaceDependency('@vueuse/core/index.cjs'),
       '@/dayjs': resolve('src/utils/dayjs.js'),
       ...getPkgAlias(),
     },
@@ -133,16 +135,17 @@ export default defineConfig(env => ({
     copy: [
       // 视频播放器相关资源
       {
-        from: 'node_modules/@liveqing/liveplayer/dist/component/crossdomain.xml',
+        from: resolveWorkspaceDependency('@liveqing/liveplayer/dist/component/crossdomain.xml'),
         to: '',
       },
       {
-        from: 'node_modules/@liveqing/liveplayer/dist/component/liveplayer.swf',
+        from: resolveWorkspaceDependency('@liveqing/liveplayer/dist/component/liveplayer.swf'),
         to: '',
       },
       {
-        from:
-          'node_modules/@liveqing/liveplayer/dist/component/liveplayer-lib.min.js',
+        from: resolveWorkspaceDependency(
+          '@liveqing/liveplayer/dist/component/liveplayer-lib.min.js',
+        ),
         to: 'js/',
       },
       {
