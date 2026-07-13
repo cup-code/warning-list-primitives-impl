@@ -52,10 +52,22 @@ test('带页眉导出保持配置、分页图片和保存契约', async () => {
   const options = fixture.calls.find(call => call[0] === 'set')[1]
   assert.deepEqual(options.margin, [44, 20, 20, 20])
   assert.equal(options.filename, 'report.pdf')
-  assert.deepEqual(fixture.calls.filter(call => call[0] === 'setPage'), [
-    ['setPage', 1], ['setPage', 2],
+  assert.deepEqual(fixture.calls.filter(call => (
+    ['set', 'from', 'toPdf', 'get'].includes(call[0])
+  )), [
+    ['set', options],
+    ['from', element],
+    ['toPdf'],
+    ['get', 'pdf'],
   ])
-  assert.equal(fixture.calls.filter(call => call[0] === 'addImage').length, 2)
+  assert.deepEqual(fixture.calls.filter(call => (
+    ['setPage', 'addImage'].includes(call[0])
+  )), [
+    ['setPage', 1],
+    ['addImage', 'header-data', 'JPEG', 20, 5, 170, 34],
+    ['setPage', 2],
+    ['addImage', 'header-data', 'JPEG', 20, 5, 170, 34],
+  ])
   assert.deepEqual(fixture.calls.at(-1), ['save', 'report.pdf'])
 })
 
