@@ -1,0 +1,48 @@
+import elementEnLocale from 'element-ui/lib/locale/lang/en' // element-ui lang
+import elementZhLocale from 'element-ui/lib/locale/lang/zh-CN' // element-ui lang
+import Cookies from 'js-cookie'
+import FormMaking from 'kaka-form/dist/JpFormMaking.common.js'
+import Vue from 'vue'
+import VueI18n from 'vue-i18n'
+import enLocale from './en'
+import zhLocale from './zh'
+
+Vue.use(VueI18n)
+
+const messages = {
+  en: {
+    ...enLocale,
+    ...elementEnLocale,
+  },
+  zh: {
+    ...zhLocale,
+    ...elementZhLocale,
+  },
+}
+export function getLanguage() {
+  const chooseLanguage = Cookies.get('language')
+  if (chooseLanguage)
+    return chooseLanguage
+
+  // if has not choose language
+  const language = (navigator.language || navigator.browserLanguage).toLowerCase()
+  const locales = Object.keys(messages)
+  for (const locale of locales) {
+    if (language.includes(locale)) {
+      return locale
+    }
+  }
+  return 'en'
+}
+
+const i18n = new VueI18n({
+  // set locale
+  // options: en | zh
+  locale: getLanguage(),
+  // set locale messages
+  messages,
+})
+
+Vue.use(FormMaking, { lang: 'zh-CN', i18n })
+
+export default i18n

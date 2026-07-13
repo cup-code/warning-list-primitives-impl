@@ -1,0 +1,184 @@
+// 左侧列表
+.el-menu.el-menu--popup.el-menu--popup-right-start {
+  background-color: $--ky-themebg !important;
+}
+// 外层底色
+#app .sidebar-container {
+  font-weight: bold;
+  background-color: $--ky-themebg;
+  padding: 0 8px;
+  box-sizing: border-box;
+  // logo背景
+  .sidebar-logo-container {
+    background-color: $--ky-themebg !important;
+  }
+  // logo文字颜色
+  .sidebar-logo-container .sidebar-logo-link .sidebar-title {
+    color: $--ky-themetext !important;
+  }
+  // 列表item颜色
+  .el-menu .el-submenu .el-submenu__title {
+    background-color: $--ky-themebg !important;
+    color: $--ky-themetext !important;
+    border-radius: 6px;
+    height: 50px !important;
+    line-height: 50px !important;
+    overflow: hidden;
+    margin: 2px 0;
+  }
+  .el-menu {
+    .el-submenu .el-submenu__title i {
+      color: $--ky-themetext !important;
+      font-size: 15px;
+    }
+    .el-menu-item i {
+      color: $--ky-themetext !important;
+      font-size: 15px;
+      padding: 0 13px;
+      // margin-right: 10px;
+    }
+  }
+  // 列表item颜色hover
+  .el-menu .el-submenu .el-submenu__title:hover {
+    background-color: $--ky-themebg-hover !important;
+    color: $--ky-themetext-hover !important;
+    box-sizing: border-box;
+    border-radius: 6px;
+    margin: 2px 0;
+
+    i {
+      color: $--ky-themetext-hover !important;
+    }
+    // border-right: 5px solid $--ky-themebd-dark !important;
+  }
+  // 内层列表item颜色
+  .el-submenu .el-menu-item,
+  .el-menu .el-menu-item {
+    background-color: $--ky-themebg !important;
+    color: $--ky-themetext !important;
+    border-radius: 6px;
+    height: 50px !important;
+    line-height: 50px !important;
+    margin: 2px 0;
+    overflow: hidden;
+  }
+  // 内层列表item颜色hover
+  .el-submenu .el-menu-item:hover,
+  .el-menu .el-menu-item:hover {
+    margin: 2px 0;
+    border-radius: 6px;
+    box-sizing: border-box;
+    background-color: $--ky-themebg-hover !important;
+    color: $--ky-themetext-hover !important;
+
+    i {
+      color: $--ky-themetext-hover !important;
+    }
+    // border-right: 5px solid $--ky-themebd-dark !important;
+  }
+  // 内层列表item选中
+  .el-submenu .el-menu-item.is-active,
+  .el-menu .el-menu-item.is-active {
+    margin: 2px 0;
+    border-radius: 6px;
+    overflow: hidden;
+    box-sizing: border-box;
+    background-color: $--ky-themebg-active !important;
+    color: $--ky-themetext-active !important;
+    // border-right: 5px solid $--ky-themebd-dark !important;
+  }
+}
+
+// 顶部列表 start
+#app .navbar {
+  background-color: $--ky-themebg;
+  font-weight: bold;
+  .el-menu-item,
+  .el-submenu__title,
+  .el-submenu__title i {
+    color: $--ky-themetext;
+  }
+
+  .el-menu-item:hover,
+  .el-submenu__title:hover {
+    background-color: $--ky-themebg-hover;
+    color: $--ky-themetext-hover;
+    i {
+      color: $--ky-themetext-hover;
+    }
+  }
+  .el-menu-item.is-active,
+  .el-submenu.is-active {
+    .el-submenu__title,
+    i {
+      color: $--ky-themetext-active !important;
+    }
+    background-color: $--ky-themebg-active !important;
+  }
+
+  .user-right-menu-item,
+  .hamburger-container {
+    color: $--ky-themetext;
+  }
+  .sidebar-title {
+    color: $--ky-themetext;
+  }
+  .el-breadcrumb__inner,
+  .no-redirect,
+  .el-breadcrumb__separator {
+    color: $--ky-themetext;
+  }
+}
+
+// 弹出层
+.homepage-submenu-hover {
+  .el-menu-item:hover {
+    background-color: $--ky-themebg-hover !important;
+    color: $--ky-themetext-hover !important;
+  }
+  .el-menu-item {
+    background-color: $--ky-themebg !important;
+    color: $--ky-themetext !important;
+    i {
+      color: $--ky-themetext !important;
+    }
+  }
+  .el-menu-item.is-active {
+    background-color: $--ky-themebg-active !important;
+    color: $--ky-themetext-active !important;
+  }
+  .el-menu-item:hover {
+    background-color: $--ky-themebg-hover !important;
+    color: $--ky-themetext-hover !important;
+  }
+  .el-submenu__title {
+    background-color: $--ky-themebg !important;
+    color: $--ky-themetext !important;
+  }
+  .el-submenu__title:hover {
+    background-color: $--ky-themebg-hover !important;
+    color: $--ky-themetext-hover !important;
+  }
+}
+
+.nest-menu {
+  .el-menu-item {
+    background-color: $--ky-themebg !important;
+    color: $--ky-themetext !important;
+    i {
+      color: $--ky-themetext !important;
+    }
+  }
+  .el-menu-item:hover {
+    background-color: $--ky-themebg-hover !important;
+    color: $--ky-themetext-hover !important;
+  }
+  .el-submenu__title i {
+    color: $--ky-themetext !important;
+  }
+}
+.el-menu--horizontal > .el-submenu .el-submenu__title {
+  height: 45px !important;
+  line-height: 45px !important;
+  border-bottom-color: transparent !important;
+}

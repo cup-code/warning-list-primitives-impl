@@ -1,0 +1,61 @@
+// {"x":111.39339336254672,"y":30.653846370940975,"z":"4.56"}
+// 未使用
+const personData = {
+  type: 'person',
+  data: [
+    {
+      buildId: '29',
+      cardCode: 'BA3F6219',
+      timestamp: 1667892226519,
+      longitude: 111.3948727368382,
+      latitude: 30.653589273044176,
+      floorNum: '1',
+      busName: '张宏',
+      busType: 1,
+      userType: 'company',
+      userPost: '电仪工',
+      dept: '电仪班',
+    },
+    {
+      buildId: '29',
+      cardCode: 'BA3F6220',
+      timestamp: 1667892226519,
+      longitude: 111.39481761297954,
+      latitude: 30.65347392916248,
+      floorNum: '1',
+      busName: '张飞',
+      busType: 1,
+      userType: 'company',
+      userPost: '电仪工',
+      dept: '电仪班',
+    },
+    {
+      buildId: '29',
+      cardCode: '1AE6EB7F',
+      timestamp: 1667892226519,
+      longitude: 111.39330706361575,
+      latitude: 30.65419242434206,
+      floorNum: '1',
+      busName: '王蒙',
+      busType: 1,
+      userType: 'company',
+      userPost: '过滤',
+      dept: '运行3班',
+    },
+    {
+      buildId: '29',
+      cardCode: '1AE6EB7D',
+      timestamp: 1667892226519,
+      longitude: 111.39339336254672,
+      latitude: 30.653846370940975,
+      floorNum: '1',
+      busName: '王明',
+      busType: 1,
+      userType: 'company',
+      userPost: '过滤',
+      dept: '运行3班',
+    },
+  ],
+}
+
+export default personData

@@ -1,1 +1,12 @@
 .worktrees/
+.superpowers/
+.DS_Store
+.cache/
+.rsbuild-cache/
+node_modules/
+apps/*/package-lock.json
+dist/
+apps/*/dist/
+packages/*/dist/
+*.log
+.env.local

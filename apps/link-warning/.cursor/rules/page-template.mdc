@@ -1,0 +1,263 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+---
+description: General page layout and common components used
+globs: *.vue
+alwaysApply: false
+---
+
+# Vue 2 Enterprise Page Template Guide
+
+This template provides a standard template for enterprise page development based on the Vue 2 + Composition API, integrating common components and best practices.
+
+## Core component description
+
+### 1. KyTreeTable layout component
+- Supports tree sidebars, search areas, table content, and pagination
+- Control sidebar display via the 'isShowLeft' property
+- Provides the search, table, and page slots
+
+### 2. ECard card assembly
+- Used to wrap various functional blocks
+- Support type="search" and type="footer"
+- Provides uniform card styles and spacing
+
+### 3. CTable table component
+- Enterprise form components
+- Supports custom column configuration
+- Integrated paging, sorting, filtering and other functions
+- Table header configuration properties list, table actual data tableData, load, default setting height "92%"
+- Table "list" Information about configuration files is as follows:
+
+```js
+const tableConfig =[
+{
+  label:'名称',
+  prop:'name',
+  slot:'name',// Sockets are used when special styles are included or when more data manipulation is required
+  width: 150, // The width is controlled according to the actual display length
+  align: 'center', // By default, the content is too long, the first column of content is aligned against it, and the last column is aligned to the right
+},
+{
+  label: "操作",
+  fixed: "right", // If the table list exceeds the width limit, fix the last column to the right
+  align: "right",
+  prop: "operation",
+  width: 210,
+  slot: 'operation', // 超过三个以上的操作使⽤“'更多'组件EMoreButton”
+}
+]
+```
+### 4. EButton button assembly
+- Uniform button style
+- Supports multiple states and types
+- Integrated permission control
+
+## Standard page template
+```vue
+<template>
+  <KyTreeTable
+    :isShowLeft="true"
+  >
+    <!-- 搜索区域 -->
+    <ECard
+      type="search"
+      noneBottom
+      slot="search"
+    >
+      <div class="p-4">
+        <!-- 搜索表单内容 -->
+        <el-form :model="searchForm" size="mini" inline>
+        <el-form-item label="" props="" v-if="showMore"> // 根据实际情况，搜索条件超过一行则隐藏控制后面条件
+        <el-input
+            v-model="searchForm.['prop']"
+            placeholder=""
+            style="width: 100%"
+            clearable
+            @change="onChange(['prop'], $event)"
+          />
+        </el-form-item>
+        <!-- 按钮 -->
+        <el-form-item>
+          <el-button type="primary" icon="el-icon-search" @click="searchFn">
+            查询
+          </el-button>
+          <el-button icon="el-icon-refresh-right" @click="resetFn">重置</el-button>
+          <el-button type="text" style="margin-left: 8px" @click="toggleMore">
+            {{ showMore == true ? "收起" : "高级筛选" }}
+            <i :class="showMore ? 'el-icon-arrow-up' : 'el-icon-arrow-down'" />
+          </el-button>
+        </el-form-item>
+      </el-form>
+      </div>
+    </ECard>
+
+    <!-- 表格区域 -->
+    <ECard slot="table">
+      <div class="mb-4">  // 根据实际条件显示按钮内容，没有则不显示
+        <EButton type="primary" @click="handleAdd" class="mr-2">新增</EButton>
+        <EButton type="danger" @click="handleBatchDelete">批量删除</EButton>
+      </div>
+      <CTable
+        type="index" // 根据实际需求设置表格是多选表格还是自定义索引的表格（selection/index/expand）
+        :tableData="tableData"
+        :loading="loading"
+        :list="columns"
+        @selection-change="handleSelectionChange"
+      />
+    </ECard>
+
+    <!-- 分页区域 -->
+    <ECard
+      slot="page"
+      type="footer"
+    >
+    </ECard>
+
+  </KyTreeTable>
+</template>
+
+<script>
+import {
+  ref,
+  reactive,
+  getCurrentInstance,
+  onMounted
+} from "vue";
+import {
+  useQuery,
+  useMutation
+} from "@tanstack/vue-query";
+
+export default {
+  name: 'StandardPage',
+  setup() {
+    const { proxy } = getCurrentInstance();
+
+    // 表格数据
+    const tableData = ref([]);
+    const loading = ref(false);
+    const columns = ref([
+      { type: 'selection', width: 55 },
+      { prop: 'name', label: '名称' },
+      { prop: 'createTime', label: '创建时间' },
+      { prop: 'status', label: '状态' }
+    ]);
+
+ // 搜索表单数据
+    const searchForm = reactive({
+      pageNum: 1,
+      pageSize: 12,
+    });
+
+    const total = ref(0)
+
+
+    // 查询列表数据
+    const { data: listData, refetch } = useQuery({
+      queryKey: ['list', searchForm],
+      queryFn: () => fetchList(searchForm),
+      onSuccess:({data})=>{
+        const { result } = data || {};
+        if (data?.success) {
+          tableData.value = result.list
+          total.value = result.total;
+       }
+      }
+    });
+
+   const onChange = (key, value) => {
+      console.log(key, value);
+      if (value) {
+       form.value[key] = value;
+      } else {
+        delete form.value[key];
+      }
+
+      searchFn();
+    };
+
+    // 搜索
+    const searchFn = () => {
+      form.value = {
+        pageNum: 1,
+        pageSize: 12,
+      };
+      refetch();
+    };
+
+    // 重置
+    const resetFn = () => {
+      proxy.$refs.searchForm.resetFields();
+      searchFn();
+    };
+
+    // 分页变化
+    const handlePageChange = (current) => {
+      page.current = current;
+      refetch();
+    };
+
+    // 表格选择
+    const handleSelectionChange = (selection) => {
+      console.log('selected:', selection);
+    };
+
+    // 生命周期
+    onMounted(() => {
+      fetchList();
+    });
+
+    return {
+      searchForm,
+      tableData,
+      loading,
+      columns,
+      page,
+      searchFn,
+      resetFn,
+      handlePageChange,
+      handleSelectionChange
+    };
+  }
+};
+</script>
+
+<!-- 使用Tailwind CSS，无需额外的样式 -->
+```
+## Instructions for use
+
+1. ** components are introduced **
+- Ensure that vue is installed and configured
+- Ensure that @tanstack/vue-query is installed and configured
+- Introduce the required Element UI components
+- Ensure that Tailwind CSS is installed and configured
+
+2. ** Data management **
+- Managing form data using reactive
+- Use ref to manage reactive data
+- Manage asynchronous data requests using useQuery
+
+3. ** Style specification **
+- Use the Tailwind CSS utility class
+- Follow Tailwind's responsive design principles
+- Customize using Tailwind's theme configuration
+
+4. ** Best Practice **
+- Organize code uniformly using the Composition API
+- Rational use of computed and watch
+- Unified error handling and loading status
+- Implement the necessary permission control
+- Use Tailwind's @apply instruction to extract duplicate style patterns
+
+## Precautions
+
+1. Notice the error when processing asynchronous requests
+2. Optimize the cache performance
+3. Pay attention to component lifecycle management
+4. Keep your code style consistent
+5. Organize the name of Tailwind reasonably to avoid being too long
+6. Consider using Tailwind's @apply instruction to create reusable style components

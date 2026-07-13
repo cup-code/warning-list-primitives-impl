@@ -1,0 +1,29 @@
+#videoid {
+  position: absolute;
+  /* bottom: 25px;
+     right: 0px; */
+  width: 320px;
+  /*!!!由于是等比缩放，在弹窗显示中要设置固定宽 width:320px 计算高 */
+  height: auto;
+  visibility: hidden;
+  /*display hidden */
+  border-radius: 6px;
+  margin: auto;
+  top: 9px;
+  left: 0;
+  right: 0;
+}
+
+.video-close {
+  position: absolute;
+  right: 20px;
+  padding: 0px 4px 0 0;
+  text-align: center;
+  font:
+    18px/25px Tahoma,
+    Verdana,
+    sans-serif;
+  color: rgb(0, 69, 142);
+  text-decoration: none;
+  background: transparent;
+}

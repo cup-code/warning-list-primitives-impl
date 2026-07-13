@@ -1,0 +1,80 @@
+// 重要危险源——测试数据
+const importantDangerOriginData = [
+  {
+    id: 'important01',
+    unifyName: '氨站',
+    hazardLevel: 1,
+    state: '正常',
+    floor: 1,
+    location: { x: 111.39783073411125, y: 30.65281272505585, z: 4.33 },
+    detail: {
+      unitName: '氨站',
+      region: '罐区',
+      hazardLevel: 1,
+      liableUserName: '张权',
+      insuranceUserName: '张权',
+    },
+  },
+  {
+    id: 'important02',
+    unifyName: '滚筒车间一',
+    hazardLevel: 2,
+    state: '正常',
+    floor: 1,
+    location: { x: 111.39795592891315, y: 30.653443967833567, z: 9.37 },
+    detail: {
+      unitName: '滚筒车间一',
+      region: '危化品罐区01',
+      hazardLevel: 2,
+      liableUserName: '李恒凯',
+      insuranceUserName: '李恒凯',
+    },
+  },
+  {
+    id: 'important03',
+    unifyName: '磷鞍车间',
+    hazardLevel: 3,
+    state: '正常',
+    floor: 1,
+    location: { x: 111.39770620288903, y: 30.652663939105445, z: 11.61 },
+    detail: {
+      unitName: '磷鞍车间',
+      region: '危化品罐区02',
+      hazardLevel: 3,
+      liableUserName: '马小辉',
+      insuranceUserName: '马小辉',
+    },
+  },
+  {
+    id: 'important04',
+    unifyName: '酶制剂动力车间顶部',
+    hazardLevel: 4,
+    floor: 1,
+    state: '正常',
+    location: { x: 111.39694468593534, y: 30.653275601377604, z: 14.26 },
+    detail: {
+      unitName: '酶制剂动力车间顶部',
+      region: '酶制剂动力车间顶部',
+      hazardLevel: 4,
+      liableUserName: '赵乐',
+      insuranceUserName: '赵乐',
+    },
+  },
+  {
+    id: 'important05',
+    unifyName: '酶制剂动发酵车间一层',
+    hazardLevel: 4,
+    floor: 1,
+    state: '正常',
+    location: { x: 111.39699760683501, y: 30.653696807385074, z: 5.03 },
+    detail: {
+      unitName: '酶制剂动发酵车间一层',
+      region: '酶制剂动发酵车间一层',
+      hazardLevel: 4,
+      liableUserName: '刘洋',
+      insuranceUserName: '刘洋',
+    },
+  },
+]
+
+export default importantDangerOriginData
