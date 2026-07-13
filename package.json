@@ -13,7 +13,7 @@
     "build:warning": "pnpm --filter @link/link-warning build",
     "build": "pnpm run build:front && pnpm run build:warning",
     "lint": "pnpm --filter './apps/*' lint",
-    "test:migration": "node --test scripts/migration/*.test.mjs",
+    "test:migration": "node --test scripts/migration/*.test.mjs scripts/audit/*.test.mjs",
     "audit:shared": "node scripts/audit/shared-source-audit.mjs apps/link-warning/src apps/link-front/src docs/migration/shared-source-audit.json",
     "verify:sources": "node scripts/migration/compare-manifests.mjs docs/migration/source-before.json docs/migration/source-after.json"
   },
