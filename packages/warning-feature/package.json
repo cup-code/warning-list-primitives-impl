@@ -6,6 +6,8 @@
   "exports": {
     "./video-warning": "./src/video-warning/createVideoWarningApi.js",
     "./batch-selection": "./src/state/batchSelection.js",
-    "./detail-info": "./src/state/createDetailInfoModule.js"
+    "./detail-info": "./src/state/createDetailInfoModule.js",
+    "./report-date-utils": "./src/report/createReportDateUtils.js",
+    "./report-pdf-export": "./src/report/createReportPdfExporter.js"
   }
 }
