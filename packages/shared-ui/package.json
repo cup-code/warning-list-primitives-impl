@@ -2,5 +2,10 @@
   "name": "@link/shared-ui",
   "version": "0.0.0",
   "private": true,
-  "type": "module"
+  "type": "module",
+  "exports": {
+    "./forewarning-management/chart-card": "./src/forewarning-management/ChartCard.vue",
+    "./forewarning-management/chart-container": "./src/forewarning-management/ChartContainer.vue",
+    "./forewarning-management/skill-table": "./src/forewarning-management/SkillTable.vue"
+  }
 }
