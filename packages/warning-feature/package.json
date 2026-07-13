@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "exports": {
-    "./video-warning": "./src/video-warning/createVideoWarningApi.js"
+    "./video-warning": "./src/video-warning/createVideoWarningApi.js",
+    "./batch-selection": "./src/state/batchSelection.js"
   }
 }
