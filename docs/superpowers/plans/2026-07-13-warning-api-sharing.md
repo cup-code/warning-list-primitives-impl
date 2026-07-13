@@ -214,16 +214,7 @@ pnpm test:warning-feature
 
 预期：失败，错误包含 `ERR_MODULE_NOT_FOUND` 和 `createVideoWarningApi.js`。
 
-- [ ] **步骤 5：提交契约测试**
-
-```bash
-git add package.json packages/warning-feature
-git commit -m "test: define shared video warning API contract"
-```
-
----
-
-### Task 2: 实现共享预警 API 工厂
+#### Task 1 续：实现共享预警 API 工厂
 
 **文件：**
 - 创建：`packages/warning-feature/src/video-warning/createVideoWarningApi.js`
@@ -296,13 +287,13 @@ pnpm test:warning-feature
 - [ ] **步骤 5：提交共享工厂**
 
 ```bash
-git add packages/warning-feature/src/video-warning
+git add package.json packages/warning-feature
 git commit -m "feat: add shared video warning API factory"
 ```
 
 ---
 
-### Task 3: 用相同 shim 接入两个应用
+### Task 2: 用相同 shim 接入两个应用
 
 **文件：**
 - 修改：`apps/link-front/src/http/videoWarning/warning-api.js`
@@ -438,7 +429,7 @@ git commit -m "refactor: share video warning API implementation"
 
 ---
 
-### Task 4: 双应用构建和共享结果验收
+### Task 3: 双应用构建和共享结果验收
 
 **文件：**
 - 修改：`docs/migration/shared-source-audit.json`
