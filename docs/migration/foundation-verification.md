@@ -38,8 +38,8 @@ f2ffd2091a1fdaf93eca9360d96f55aefd6613b5fef814a1cd8d5b7f32d97c6b  dist/link-warn
 
 ## 提交前工作区状态
 
-验收命令执行完成后，工作区无未提交文件。创建本 README 与验收记录后，
-`git status --short` 的预期且实际输出为：
+README 和验收记录已创建。本次验收命令执行完成后，`git status --short`
+实际只显示这两个未跟踪文件：
 
 ```text
 ?? README.md
