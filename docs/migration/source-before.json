@@ -12137,7 +12137,7 @@
   },
   "warning": {
     "root": "/Users/jxz/project/new/front/project/link-warning",
-    "digest": "43461fd48f9c915b24da8de3890536951fc58fc4f54bce12b0dee3121fd12ad0",
+    "digest": "087bea1d7ecb3cf5a3c396e1a29dad3ad7768739e561070f617f0eb385b653b9",
     "files": [
       {
         "path": ".claude/settings.local.json",
@@ -13511,8 +13511,8 @@
       },
       {
         "path": "src/http/videoWarning/warning-api.js",
-        "size": 13627,
-        "sha256": "08e015d5b5fc78bdc6ed46e7a787aae1401a8bc2adb4b51ef7bfff570afbbd5f"
+        "size": 15971,
+        "sha256": "1a38789590132779e4faf0a1f5d5397f478430030b1f1322a8e7e09dd750da38"
       },
       {
         "path": "src/icons/iconSvg/add.svg",
@@ -14500,6 +14500,11 @@
         "sha256": "fff51f57c63f3d35180bfc03b0b4e945b3122f5db555b19d7797cfa327e9a034"
       },
       {
+        "path": "src/views/ForewarningManagement/components/AddModelSkill.vue",
+        "size": 5306,
+        "sha256": "e2eb470a5afa1af5797759ac979c5a2fa1ddd7af3eadb7d01f09aebfde9feb23"
+      },
+      {
         "path": "src/views/ForewarningManagement/components/addSkill.vue",
         "size": 7542,
         "sha256": "4fa444bec9a451a198b38b8326f473dc8946f3fc1efa3c267a34a594169d7412"
@@ -14643,6 +14648,16 @@
         "path": "src/views/ForewarningManagement/reportExport.vue",
         "size": 7369,
         "sha256": "e2f8a36e24833224db66a0e1feb6569e4eb83c6368f94fe6dc340177d38a1b57"
+      },
+      {
+        "path": "src/views/ForewarningManagement/SkillConfiguration.vue",
+        "size": 7123,
+        "sha256": "e2870e28f96961c1d161f18cb5a8758ed5f054b3b44fbbd1b17b9cbc806ec459"
+      },
+      {
+        "path": "src/views/ForewarningManagement/SkillConfigurationGlobal.vue",
+        "size": 7129,
+        "sha256": "c34b9ae197f4e457f691c382b2f07edb0be874a1f1a5689df18bfa3fbb80fbe8"
       },
       {
         "path": "src/views/ForewarningManagement/static/headIcon.png",
