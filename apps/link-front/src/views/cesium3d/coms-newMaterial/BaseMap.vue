@@ -17,6 +17,10 @@ import { loadJsmap, unloadJsmap } from "@/utils/loadJsmap";
 import trackPlay from "./components/zq_trackPlayer.vue";
 import { zq_handleMarker } from "./handleMarker.js";
 import { buildIndoorArea, zq_config } from "./js/index.js";
+import {
+  buildViewerOptions,
+  flyToViewerOption,
+} from "./viewerOption.js";
 
 let handleMarker;
 
@@ -151,7 +155,6 @@ export default {
     //   background: "rgba(0, 0, 0, 0.8)",
     // });
     this.firePointType = this.$dictUtils.getDictList("fire_point");
-    this.getViewerOptions();
   },
 
   async mounted() {
@@ -161,6 +164,12 @@ export default {
     this.isDestroy = false;
     // this.companyId = this.$store.state.user.user.companyId;
     // 人员定位
+    try {
+      await this.getViewerOptions();
+    } catch (error) {
+      console.error("视角配置加载失败:", error);
+    }
+
     try {
       await loadJsmap();
       handleMarker = new zq_handleMarker(window.jsmap);
@@ -236,43 +245,20 @@ export default {
   methods: {
     // 请求所有视图位置
     getViewerOptions() {
-      getViewPointList({
+      return getViewPointList({
         pageNum: 1,
         pageSize: 10000,
         isPage: false,
       }).then(({ data }) => {
-        if (data.code === 200) {
-          const { result } = data || {};
-          this.viewerOptions =
-            result.list
-              .filter((item) => item.buildId == this.buildId)
-              .map((item) => {
-                return {
-                  id: item.id,
-                  name: item.viewName,
-                  isDefault: item.isDefault,
-                  center: {
-                    center: {
-                      x: Number(item.longitude),
-                      y: Number(item.latitude),
-                      z: Number(item.height),
-                    },
-                    distance: Number(item.distance),
-                    rotate: Number(item.rotation),
-                    tilt: Number(item.inclination),
-                  },
-                };
-              })
-              .sort((a, b) => (b.isDefault === true) - (a.isDefault === true)) || [];
-
-          this.view3d = this.viewerOptions.find((option) => option.isDefault === true);
-          this.view2d_top = this.viewerOptions.find(
-            (option) => option.isDefault === false
-          );
-          this.currViewerId = this.viewerOptions.find(
-            (option) => option.isDefault === true
-          )?.id;
-        }
+        this.viewerOptions = buildViewerOptions(data?.code === 200 ? data?.result?.list : [], this.buildId);
+        this.view3d = this.viewerOptions.find(
+          (option) => option.isDefault === true
+        );
+        this.view2d_top = this.viewerOptions.find(
+          (option) => option.isDefault === false
+        );
+        this.currViewerId = this.view3d?.id;
+        return this.viewerOptions;
       });
     },
     // 请求所有定位卡最后位置
@@ -2554,20 +2540,11 @@ export default {
     },
     // 获取视图
     setCurrView(option) {
-      console.log(option, "option");
-      const { center } = option.center;
-      this.mainMap.flyToPosition(
-        { x: center.x, y: center.y, z: center.z },
-        {
-          duration: 1500,
-          offset: {
-            rotate: 360 - option.center.rotate, // 45
-            tilt: option.center.tilt, // 60
-            range: option.center.distance, // 距离
-          },
-        }
-      );
+      if (!flyToViewerOption(this.mainMap, option)) {
+        return false;
+      }
       this.currViewerId = option.id;
+      return true;
     },
     // 图层UI 展开/折叠
     layerSpreadAndFold() {

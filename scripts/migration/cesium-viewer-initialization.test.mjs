@@ -133,3 +133,49 @@ test("flyToViewerOption preserves the existing valid flight arguments", () => {
     ],
   ]);
 });
+
+const baseMapSource = readFileSync(
+  new URL(
+    "../../apps/link-front/src/views/cesium3d/coms-newMaterial/BaseMap.vue",
+    import.meta.url
+  ),
+  "utf8"
+);
+
+test("BaseMap awaits viewpoint configuration before loading JSMap", () => {
+  const createdStart = baseMapSource.indexOf("  created() {");
+  const mountedStart = baseMapSource.indexOf("  async mounted() {");
+  const createdSource = baseMapSource.slice(createdStart, mountedStart);
+  const awaitViewerIndex = baseMapSource.indexOf("await this.getViewerOptions();");
+  const loadJsmapIndex = baseMapSource.indexOf("await loadJsmap();");
+
+  assert.doesNotMatch(createdSource, /this\.getViewerOptions\(\)/);
+  assert.ok(awaitViewerIndex > mountedStart);
+  assert.ok(awaitViewerIndex < loadJsmapIndex);
+});
+
+test("BaseMap isolates viewpoint failures from JSMap failures", () => {
+  assert.match(
+    baseMapSource,
+    /try\s*{\s*await this\.getViewerOptions\(\);\s*}\s*catch \(error\)\s*{\s*console\.error\("视角配置加载失败:", error\);\s*}\s*try\s*{\s*await loadJsmap\(\);/s
+  );
+});
+
+test("BaseMap returns the viewpoint request and safely maps a missing list", () => {
+  assert.match(
+    baseMapSource,
+    /getViewerOptions\(\)\s*{\s*return getViewPointList\(/s
+  );
+  assert.match(
+    baseMapSource,
+    /buildViewerOptions\(data\?\.code === 200 \? data\?\.result\?\.list : \[\], this\.buildId\)/
+  );
+});
+
+test("BaseMap delegates every view change to the guarded flight helper", () => {
+  assert.match(
+    baseMapSource,
+    /setCurrView\(option\)\s*{\s*if \(!flyToViewerOption\(this\.mainMap, option\)\)\s*{\s*return false;\s*}\s*this\.currViewerId = option\.id;\s*return true;\s*}/s
+  );
+  assert.doesNotMatch(baseMapSource, /const \{ center \} = option\.center/);
+});
