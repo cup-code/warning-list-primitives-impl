@@ -6,6 +6,11 @@
   "exports": {
     "./forewarning-management/chart-card": "./src/forewarning-management/ChartCard.vue",
     "./forewarning-management/chart-container": "./src/forewarning-management/ChartContainer.vue",
+    "./forewarning-management/select-machine": "./src/forewarning-management/SelectMachine.vue",
     "./forewarning-management/skill-table": "./src/forewarning-management/SkillTable.vue"
+  },
+  "peerDependencies": {
+    "@tanstack/vue-query": "^4.33.0",
+    "vue": "2.7.16"
   }
 }
