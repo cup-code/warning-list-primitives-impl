@@ -167,17 +167,33 @@ export default {
     try {
       await this.getViewerOptions();
     } catch (error) {
-      console.error("视角配置加载失败:", error);
+      if (!this.isDestroy) {
+        console.error("视角配置加载失败:", error);
+      }
+    }
+
+    if (this.isDestroy) {
+      return;
     }
 
     try {
       await loadJsmap();
+      if (this.isDestroy) {
+        unloadJsmap();
+        return;
+      }
       handleMarker = new zq_handleMarker(window.jsmap);
       // 人员定位
       this.initMap();
     } catch (error) {
-      console.error("❌ jsmap 加载失败:", error);
-      this.$message.error("地图资源加载失败，请刷新页面重试");
+      if (!this.isDestroy) {
+        console.error("❌ jsmap 加载失败:", error);
+        this.$message.error("地图资源加载失败，请刷新页面重试");
+      }
+    }
+
+    if (this.isDestroy) {
+      return;
     }
 
     // 监听点击详情

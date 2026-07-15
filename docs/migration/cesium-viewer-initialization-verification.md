@@ -2,15 +2,16 @@
 
 ## Automated regression
 
-- `node --test scripts/migration/cesium-viewer-initialization.test.mjs`: PASS (8 tests passed)
+- `node --test scripts/migration/cesium-viewer-initialization.test.mjs`: PASS (9 tests passed)
 - Missing API list maps to an empty list: PASS
 - Missing, nested-center-missing, and non-finite viewpoints skip `flyToPosition`: PASS
 - Valid viewpoints preserve the existing SDK flight arguments: PASS
-- `BaseMap` waits for viewpoint configuration and isolates request failures: PASS
+- `BaseMap` source-contract checks cover initialization ordering, failure isolation, safe viewpoint mapping, guarded view changes, and destroy-time cancellation: PASS
+- The `BaseMap` checks inspect source structure only; they do not mount the Vue component or verify runtime lifecycle behavior.
 
 ## Repository verification
 
-- `pnpm test`: PASS (36 migration/audit tests and 20 warning-feature tests passed)
+- `pnpm test`: PASS (37 migration/audit tests and 20 warning-feature tests passed)
 - `pnpm run build`: FAIL (`link-front` stopped with `cross-env: command not found`; pnpm also reported missing worktree `node_modules`, so `link-warning` was not built)
 - `git diff --check HEAD~2`: PASS
 

@@ -157,7 +157,7 @@ test("BaseMap awaits viewpoint configuration before loading JSMap", () => {
 test("BaseMap isolates viewpoint failures from JSMap failures", () => {
   assert.match(
     baseMapSource,
-    /try\s*{\s*await this\.getViewerOptions\(\);\s*}\s*catch \(error\)\s*{\s*console\.error\("视角配置加载失败:", error\);\s*}\s*try\s*{\s*await loadJsmap\(\);/s
+    /try\s*{\s*await this\.getViewerOptions\(\);\s*}\s*catch \(error\)\s*{[\s\S]*?console\.error\("视角配置加载失败:", error\);[\s\S]*?}\s*if \(this\.isDestroy\) \{\s*return;\s*}\s*try\s*{\s*await loadJsmap\(\);/s
   );
 });
 
@@ -178,4 +178,11 @@ test("BaseMap delegates every view change to the guarded flight helper", () => {
     /setCurrView\(option\)\s*{\s*if \(!flyToViewerOption\(this\.mainMap, option\)\)\s*{\s*return false;\s*}\s*this\.currViewerId = option\.id;\s*return true;\s*}/s
   );
   assert.doesNotMatch(baseMapSource, /const \{ center \} = option\.center/);
+});
+
+test("BaseMap stops async initialization when the component is destroyed", () => {
+  assert.match(
+    baseMapSource,
+    /await this\.getViewerOptions\(\);[\s\S]*?if \(this\.isDestroy\) \{\s*return;\s*\}[\s\S]*?await loadJsmap\(\);\s*if \(this\.isDestroy\) \{\s*unloadJsmap\(\);\s*return;\s*\}[\s\S]*?this\.initMap\(\);[\s\S]*?catch \(error\) \{\s*if \(!this\.isDestroy\) \{[\s\S]*?this\.\$message\.error\("地图资源加载失败，请刷新页面重试"\);\s*\}\s*\}\s*if \(this\.isDestroy\) \{\s*return;\s*\}\s*\/\/ 监听点击详情\s*window\.showPath =/s
+  );
 });
