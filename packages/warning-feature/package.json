@@ -8,6 +8,7 @@
     "./batch-selection": "./src/state/batchSelection.js",
     "./detail-info": "./src/state/createDetailInfoModule.js",
     "./report-date-utils": "./src/report/createReportDateUtils.js",
-    "./report-pdf-export": "./src/report/createReportPdfExporter.js"
+    "./report-pdf-export": "./src/report/createReportPdfExporter.js",
+    "./batch-deal": "./src/batch-deal/createBatchDealModel.js"
   }
 }
