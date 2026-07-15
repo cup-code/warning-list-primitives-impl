@@ -4,10 +4,15 @@
   "private": true,
   "type": "module",
   "exports": {
+    "./forewarning-management/batch-deal": "./src/forewarning-management/BatchDeal.vue",
     "./forewarning-management/chart-card": "./src/forewarning-management/ChartCard.vue",
     "./forewarning-management/chart-container": "./src/forewarning-management/ChartContainer.vue",
+    "./forewarning-management/deal-dialog": "./src/forewarning-management/DealDialog.vue",
     "./forewarning-management/select-machine": "./src/forewarning-management/SelectMachine.vue",
     "./forewarning-management/skill-table": "./src/forewarning-management/SkillTable.vue"
+  },
+  "dependencies": {
+    "@link/warning-feature": "workspace:*"
   },
   "peerDependencies": {
     "@tanstack/vue-query": "^4.33.0",

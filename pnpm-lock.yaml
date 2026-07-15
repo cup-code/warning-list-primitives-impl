@@ -621,7 +621,11 @@ importers:
 
   packages/shared-core: {}
 
-  packages/shared-ui: {}
+  packages/shared-ui:
+    dependencies:
+      '@link/warning-feature':
+        specifier: workspace:*
+        version: link:../warning-feature
 
   packages/warning-feature: {}
 
