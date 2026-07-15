@@ -1,12 +1,12 @@
 {
   "counts": {
     "smaller": 477,
-    "larger": 1865,
+    "larger": 1866,
     "common": 470,
-    "identical": 323,
-    "different": 147,
+    "identical": 324,
+    "different": 146,
     "smallerOnly": 7,
-    "largerOnly": 1395
+    "largerOnly": 1396
   },
   "identicalFiles": [
     "assets/404_images/404.png",
@@ -295,6 +295,7 @@
     "views/ForewarningManagement/components/ReportExport/SkillTable.vue",
     "views/ForewarningManagement/components/batchDeal.vue",
     "views/ForewarningManagement/components/charts/index.js",
+    "views/ForewarningManagement/components/dealDialog.vue",
     "views/ForewarningManagement/components/index.js",
     "views/ForewarningManagement/components/selectMachine.vue",
     "views/ForewarningManagement/static/headIcon.png",
@@ -425,7 +426,6 @@
     "views/ForewarningManagement/components/charts/WarningTrendChart.vue",
     "views/ForewarningManagement/components/charts/WarningTypeChart.vue",
     "views/ForewarningManagement/components/checkGroup.vue",
-    "views/ForewarningManagement/components/dealDialog.vue",
     "views/ForewarningManagement/components/list.vue",
     "views/ForewarningManagement/components/warningInfo.vue",
     "views/ForewarningManagement/config.js",
@@ -1014,6 +1014,7 @@
     "views/cesium3d/coms-newMaterial/js/riskTrobleData.js",
     "views/cesium3d/coms-newMaterial/js/ticketData.js",
     "views/cesium3d/coms-newMaterial/js/viewerOptions.js",
+    "views/cesium3d/coms-newMaterial/viewerOption.js",
     "views/cesium3d/css/bg-icon.png",
     "views/cesium3d/css/btn.scss",
     "views/cesium3d/css/icon.png",
