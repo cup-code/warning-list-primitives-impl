@@ -36,10 +36,58 @@ async function source(relativePath) {
   return readFile(path.join(root, relativePath), 'utf8')
 }
 
-function assertProps(value, props) {
-  for (const prop of props) {
-    assert.match(value, new RegExp(`props:\\s*\\{[\\s\\S]*?\\b${prop}\\s*:`))
+function extractObject(value, marker, label) {
+  const match = marker.exec(value)
+  assert.ok(match, `${label} 应存在`)
+  const start = value.indexOf('{', match.index + match[0].length)
+  assert.notEqual(start, -1, `${label} 应是对象`)
+
+  let depth = 0
+  for (let index = start; index < value.length; index += 1) {
+    if (value[index] === '{') depth += 1
+    if (value[index] === '}') depth -= 1
+    if (depth === 0) return value.slice(start, index + 1)
   }
+
+  assert.fail(`${label} 对象未闭合`)
+}
+
+function assertProp(propsBlock, name, contract) {
+  const prop = extractObject(
+    propsBlock,
+    new RegExp(`\\b${name}\\s*:`),
+    `Prop ${name}`,
+  )
+  assert.match(prop, new RegExp(`\\btype\\s*:\\s*${contract.type}\\b`), `${name} type`)
+  if (contract.required) {
+    assert.match(prop, /\brequired\s*:\s*true\b/, `${name} required`)
+  }
+  if (contract.default) {
+    assert.match(prop, contract.default, `${name} default`)
+  }
+}
+
+function assertComponentContract(value, componentName, contracts) {
+  assert.match(
+    value,
+    new RegExp(`\\bname\\s*:\\s*['"]${componentName}['"]`),
+    `${componentName} name`,
+  )
+  const propsBlock = extractObject(value, /\bprops\s*:/, `${componentName} props`)
+  assert.equal(
+    (propsBlock.match(/\btype\s*:/g) || []).length,
+    Object.keys(contracts).length,
+    `${componentName} Props 数量`,
+  )
+  for (const [name, contract] of Object.entries(contracts)) {
+    assertProp(propsBlock, name, contract)
+  }
+}
+
+function componentOpeningTag(value, componentName, label) {
+  const match = value.match(new RegExp(`<${componentName}\\b[\\s\\S]*?>`))
+  assert.ok(match, `${label} 应渲染 ${componentName}`)
+  return match[0]
 }
 
 test('shared-ui 显式导出报表页面、组件和图表 mixin', async () => {
@@ -73,9 +121,10 @@ test('两个应用保留全部原路径并只包含适配逻辑', async () => {
       assert.ok(value.length > 0, `${app}/${file} 应继续存在`)
     }
     const host = await source(`apps/${app}/src/views/ForewarningManagement/reportExportHost.js`)
-    assert.match(host, /getCurrentCompanyId/)
-    assert.match(host, /getFilePrefix/)
-    assert.match(host, /reportData/)
+    assert.match(host, /^\s*export\s+default\s+\{/m, `${app} host 应默认导出对象`)
+    assert.match(host, /\bgetCurrentCompanyId\s*[(,:]/, `${app} host companyId 能力`)
+    assert.match(host, /\bgetFilePrefix\s*[(,:]/, `${app} host filePrefix 能力`)
+    assert.match(host, /\breportData\s*[:,]/, `${app} host reportData 能力`)
   }
 })
 
@@ -86,78 +135,178 @@ test('两端能力明确保留标题和趋势图差异', async () => {
   assert.match(warning, /useFixedWeekTitle:\s*false/)
   assert.match(front, /showAlarmTypeAxisLabels:\s*true/)
   assert.match(front, /useFixedWeekTitle:\s*true/)
+
+  const statGrid = await readFile(path.join(sharedRoot, 'StatGrid.vue'), 'utf8')
+  assert.match(statGrid, /['"]本周报告预警实况['"]/, 'StatGrid 应保留固定周标题')
+  assert.match(
+    statGrid,
+    /(?:this\.)?useFixedWeekTitle\s*\?\s*['"]本周报告预警实况['"]\s*:\s*`\$\{(?:this\.)?timeTitle\}报告预警实况`/,
+    'StatGrid 应由 useFixedWeekTitle 在固定标题和动态 timeTitle 之间选择',
+  )
+
+  const chartMixin = await readFile(path.join(sharedRoot, 'reportChartMixin.js'), 'utf8')
+  const alarmTypeStart = chartMixin.search(/\binitAlarmTypeRank\s*\(/)
+  const nextMethod = chartMixin.search(/\binitCameraAlarmRank\s*\(/)
+  assert.ok(alarmTypeStart >= 0, 'chart mixin 应实现 initAlarmTypeRank')
+  assert.ok(nextMethod > alarmTypeStart, 'alarm type 图表方法边界应明确')
+  const alarmTypeMethod = chartMixin.slice(alarmTypeStart, nextMethod)
+  assert.match(alarmTypeMethod, /\bshowAlarmTypeAxisLabels\b/)
+  assert.match(
+    alarmTypeMethod,
+    /(?:if\s*\(\s*(?:this\.)?showAlarmTypeAxisLabels\s*\)[\s\S]{0,400}\baxisLabel\b|(?:this\.)?showAlarmTypeAxisLabels[\s\S]{0,120}(?:\?|&&)[\s\S]{0,300}\baxisLabel\b|\baxisLabel\s*:\s*(?:this\.)?showAlarmTypeAxisLabels\s*\?)/,
+    'alarm type 轴标签只能由 showAlarmTypeAxisLabels 开启',
+  )
 })
 
 test('公共组件保留原有 Props 和事件契约', async () => {
   const form = await readFile(path.join(sharedRoot, 'ReportForm.vue'), 'utf8')
-  assertProps(form, ['formData'])
+  assertComponentContract(form, 'ReportForm', {
+    formData: {
+      type: 'Object',
+      required: true,
+      default: /\bdefault\s*:\s*\(\)\s*=>\s*\(\s*\{/,
+    },
+  })
   for (const event of ['update-field', 'search', 'reset', 'export-pdf']) {
     assert.match(form, new RegExp(`\\$emit\\(\\s*['"]${event}['"]`))
   }
 
   const preview = await readFile(path.join(sharedRoot, 'ReportPreview.vue'), 'utf8')
-  assertProps(preview, [
-    'reportTitle',
-    'defaultReportTitle',
-    'reportSummary',
-    'showTable',
-    'currentYear',
-    'currentWeekNumber',
-    'weekDateStr',
-    'list',
-    'skillList',
-    'actualList',
-    'trendTableData',
-    'alarmTypeRank',
-    'cameraAlarmRank',
-    'alarmLevelRank',
-    'getText',
-    'showAdvert',
-    'headerLogo',
-    'headerText',
-    'chartData',
-    'wechat',
-    'phone',
-    'timeTitle',
-  ])
+  assertComponentContract(preview, 'ReportPreview', {
+    reportTitle: { type: 'String', default: /\bdefault\s*:\s*['"]['"]/ },
+    defaultReportTitle: {
+      type: 'String',
+      default: /\bdefault\s*:\s*['"]视频智能运营平台管理周报['"]/,
+    },
+    reportSummary: { type: 'String', default: /\bdefault\s*:\s*['"]['"]/ },
+    showTable: { type: 'Boolean', default: /\bdefault\s*:\s*false\b/ },
+    currentYear: { type: 'Number', required: true },
+    currentWeekNumber: { type: 'Number', required: true },
+    weekDateStr: { type: 'String', required: true },
+    list: { type: 'Array', required: true },
+    skillList: { type: 'Array', required: true },
+    actualList: { type: 'Array', required: true },
+    trendTableData: { type: 'Array', required: true },
+    alarmTypeRank: { type: 'Array', required: true },
+    cameraAlarmRank: { type: 'Array', required: true },
+    alarmLevelRank: { type: 'Array', required: true },
+    getText: { type: 'String', default: /\bdefault\s*:\s*['"]['"]/ },
+    showAdvert: { type: 'Boolean', default: /\bdefault\s*:\s*true\b/ },
+    headerLogo: { type: 'String', default: /\bdefault\s*:\s*['"]['"]/ },
+    headerText: { type: 'String', default: /\bdefault\s*:\s*['"]['"]/ },
+    chartData: { type: 'Object', required: true },
+    wechat: { type: 'String', required: true },
+    phone: { type: 'String', required: true },
+    timeTitle: { type: 'String', required: true },
+  })
 
   const table = await readFile(path.join(sharedRoot, 'ReportTable.vue'), 'utf8')
-  assertProps(table, [
-    'title',
-    'subtitle',
-    'columns',
-    'tableData',
-    'showTable',
-    'width',
-    'headerBgColor',
-    'headerTextColor',
-    'subtitleBgColor',
-    'subtitleTextColor',
-    'columnHeaderBgColor',
-    'columnHeaderTextColor',
-  ])
+  assertComponentContract(table, 'ReportTable', {
+    title: { type: 'String', default: /\bdefault\s*:\s*['"]['"]/ },
+    subtitle: { type: 'String', default: /\bdefault\s*:\s*['"]['"]/ },
+    columns: {
+      type: 'Array',
+      required: true,
+      default: /\bdefault\s*:\s*\(\)\s*=>\s*\[\s*\]/,
+    },
+    tableData: {
+      type: 'Array',
+      required: true,
+      default: /\bdefault\s*:\s*\(\)\s*=>\s*\[\s*\]/,
+    },
+    showTable: { type: 'Boolean', default: /\bdefault\s*:\s*true\b/ },
+    width: { type: 'String', default: /\bdefault\s*:\s*['"]100%['"]/ },
+    headerBgColor: { type: 'String', default: /\bdefault\s*:\s*['"]#2986c7['"]/ },
+    headerTextColor: { type: 'String', default: /\bdefault\s*:\s*['"]#fff['"]/ },
+    subtitleBgColor: { type: 'String', default: /\bdefault\s*:\s*['"]#f5f6fa['"]/ },
+    subtitleTextColor: { type: 'String', default: /\bdefault\s*:\s*['"]#333['"]/ },
+    columnHeaderBgColor: { type: 'String', default: /\bdefault\s*:\s*['"]#e5e6eb['"]/ },
+    columnHeaderTextColor: { type: 'String', default: /\bdefault\s*:\s*['"]#333['"]/ },
+  })
 
   const statGrid = await readFile(path.join(sharedRoot, 'StatGrid.vue'), 'utf8')
-  assertProps(statGrid, ['actualList', 'timeTitle', 'useFixedWeekTitle'])
+  assertComponentContract(statGrid, 'StatGrid', {
+    actualList: {
+      type: 'Array',
+      required: true,
+      default: /\bdefault\s*:\s*\(\)\s*=>\s*\[\s*\]/,
+    },
+    timeTitle: { type: 'String', required: true },
+    useFixedWeekTitle: { type: 'Boolean', default: /\bdefault\s*:\s*false\b/ },
+  })
 })
 
-test('页面和组件原路径仅作为透传包装层', async () => {
+test('页面实际注入 host 且各组件原路径只透传到对应公共导出', async () => {
   const wrappers = [
-    'reportExport.vue',
-    'components/ReportExport/ReportForm.vue',
-    'components/ReportExport/ReportPreview.vue',
-    'components/ReportExport/ReportTable.vue',
-    'components/ReportExport/StatGrid.vue',
+    {
+      file: 'components/ReportExport/ReportForm.vue',
+      component: 'SharedReportForm',
+      exportPath: '@link/shared-ui/forewarning-management/report-export/form',
+    },
+    {
+      file: 'components/ReportExport/ReportPreview.vue',
+      component: 'SharedReportPreview',
+      exportPath: '@link/shared-ui/forewarning-management/report-export/preview',
+    },
+    {
+      file: 'components/ReportExport/ReportTable.vue',
+      component: 'SharedReportTable',
+      exportPath: '@link/shared-ui/forewarning-management/report-export/table',
+    },
+    {
+      file: 'components/ReportExport/StatGrid.vue',
+      component: 'SharedStatGrid',
+      exportPath: '@link/shared-ui/forewarning-management/report-export/stat-grid',
+    },
   ]
-  const businessBody = /generate(?:ActualList|ReportText|StatsList)|process(?:AlarmLevelRank|AlarmTypeRank|CameraAlarmRank|TrendTableData)|init(?:AlarmTrend|AlarmTypeRank|CameraAlarmRank|AlarmLevelRank)|\b(?:trendColumns|typeRankColumns|deviceRankColumns|levelRankColumns)\s*\(/
+  const businessBody = /generate(?:ActualList|ReportText|StatsList)|process(?:AlarmLevelRank|AlarmTypeRank|CameraAlarmRank|TrendTableData)|init(?:AlarmTrend|AlarmTypeRank|CameraAlarmRank|AlarmLevelRank)|\b(?:trendColumns|typeRankColumns|deviceRankColumns|levelRankColumns|getScreenData)\s*\(|\b(?:screenData|axisLabel|setOption)\b/
 
   for (const app of apps) {
-    for (const file of wrappers) {
-      const value = await source(`apps/${app}/src/views/ForewarningManagement/${file}`)
-      assert.match(value, /\$attrs/)
-      assert.match(value, /\$listeners/)
-      assert.doesNotMatch(value, businessBody)
+    const page = await source(`apps/${app}/src/views/ForewarningManagement/reportExport.vue`)
+    assert.ok(
+      /^\s*import\s+SharedReportExportPage\s+from\s+['"]@link\/shared-ui\/forewarning-management\/report-export['"]/m.test(page),
+      `${app} 页面应导入公共页面`,
+    )
+    assert.ok(
+      /^\s*import\s+reportExportHost\s+from\s+['"]\.\/reportExportHost(?:\.js)?['"]/m.test(page),
+      `${app} 页面应导入 host`,
+    )
+    assert.match(page, /\bcomponents\s*:\s*\{[\s\S]*?\bSharedReportExportPage\b/)
+    const pageTag = componentOpeningTag(page, 'SharedReportExportPage', `${app} 页面`)
+    assert.match(pageTag, /v-bind\s*=\s*['"]\$attrs['"]/)
+    assert.match(pageTag, /v-on\s*=\s*['"]\$listeners['"]/)
+    assert.match(pageTag, /:host\s*=\s*['"]reportExportHost['"]/, `${app} 页面应传入 host`)
+    assert.doesNotMatch(page, businessBody, `${app} 页面不得保留业务主体`)
+
+    for (const wrapper of wrappers) {
+      const value = await source(
+        `apps/${app}/src/views/ForewarningManagement/${wrapper.file}`,
+      )
+      assert.ok(
+        new RegExp(`^\\s*import\\s+${wrapper.component}\\s+from\\s+['"]${wrapper.exportPath}['"]`, 'm').test(value),
+        `${app}/${wrapper.file} 应导入对应公共组件`,
+      )
+      assert.match(
+        value,
+        new RegExp(`\\bcomponents\\s*:\\s*\\{[\\s\\S]*?\\b${wrapper.component}\\b`),
+        `${app}/${wrapper.file} 应注册对应公共组件`,
+      )
+      const tag = componentOpeningTag(value, wrapper.component, `${app}/${wrapper.file}`)
+      assert.match(tag, /v-bind\s*=\s*['"]\$attrs['"]/)
+      assert.match(tag, /v-on\s*=\s*['"]\$listeners['"]/)
+      assert.doesNotMatch(value, businessBody, `${app}/${wrapper.file} 不得保留业务主体`)
     }
+  }
+})
+
+test('两端菜单继续指向原报表页面路径', async () => {
+  for (const app of apps) {
+    const menu = await source(`apps/${app}/src/utils/menuData.js`)
+    assert.match(
+      menu,
+      /\bvalue\s*:\s*['"]views\/ForewarningManagement\/reportExport['"]/,
+      `${app} 菜单应保留 reportExport 路径`,
+    )
   }
 })
 
