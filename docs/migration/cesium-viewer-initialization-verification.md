@@ -12,7 +12,7 @@
 ## Repository verification
 
 - `pnpm test`: PASS (37 migration/audit tests and 20 warning-feature tests passed)
-- `pnpm run build`: FAIL (`link-front` stopped with `cross-env: command not found`; pnpm also reported missing worktree `node_modules`, so `link-warning` was not built)
+- `pnpm run build`: PASS on merged `main` (`link-front` and `link-warning` both completed their production Rsbuild builds)
 - `git diff --check HEAD~2`: PASS
 
 ## Local applications
