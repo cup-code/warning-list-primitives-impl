@@ -585,6 +585,15 @@ test('三个公共 consumer 在 data host 调用前真实执行开发测试能�
       `${consumer} 必须在 data 初始化 host 消费前校验`,
     )
   }
+
+  const validator = await readFile(
+    path.join(sharedRoot, 'reportHostCapabilities.js'),
+    'utf8',
+  )
+  assert.match(validator, /environment\s*=\s*process\.env\.NODE_ENV/)
+  assert.match(validator, /Object\.prototype\.hasOwnProperty\.call\(/)
+  assert.doesNotMatch(validator, /globalThis\.process/)
+  assert.doesNotMatch(validator, /Object\.hasOwn\s*\(/)
 })
 
 test('两端菜单继续指向原报表页面路径', async () => {

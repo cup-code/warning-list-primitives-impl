@@ -82,10 +82,22 @@ test('存在值能力拒绝 null 并标明组件路径', () => {
   )
 })
 
-test('production 跳过校验而测试环境执行校验', () => {
-  assert.equal(validateHostCapabilities({}, 'ReportForm', reportFormHostRequirements, 'production'), undefined)
-  assert.throws(
-    () => validateHostCapabilities({}, 'ReportForm', reportFormHostRequirements, 'test'),
-    /ReportForm.*ImageSelect/,
-  )
+test('默认环境路径在 production 跳过而 test 执行校验', () => {
+  const originalEnvironment = process.env.NODE_ENV
+  try {
+    process.env.NODE_ENV = 'production'
+    assert.equal(validateHostCapabilities({}, 'ReportForm', reportFormHostRequirements), undefined)
+
+    process.env.NODE_ENV = 'test'
+    assert.throws(
+      () => validateHostCapabilities({}, 'ReportForm', reportFormHostRequirements),
+      /ReportForm.*ImageSelect/,
+    )
+  }
+  finally {
+    if (originalEnvironment === undefined)
+      delete process.env.NODE_ENV
+    else
+      process.env.NODE_ENV = originalEnvironment
+  }
 })

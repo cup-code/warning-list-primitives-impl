@@ -43,7 +43,11 @@ export const reportPreviewHostRequirements = Object.freeze([
 function readPath(value, path) {
   let current = value
   for (const segment of path.split('.')) {
-    if (current === null || current === undefined || !Object.hasOwn(current, segment)) {
+    if (
+      current === null
+      || current === undefined
+      || !Object.prototype.hasOwnProperty.call(current, segment)
+    ) {
       return { found: false, value: undefined }
     }
     current = current[segment]
@@ -79,7 +83,7 @@ export function validateHostCapabilities(
   host,
   consumer,
   requirements,
-  environment = globalThis.process?.env?.NODE_ENV,
+  environment = process.env.NODE_ENV,
 ) {
   if (environment === 'production')
     return undefined
