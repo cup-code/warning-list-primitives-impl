@@ -32,6 +32,25 @@ const originalFiles = [
   'test/reportData.js',
 ]
 
+const requiredHostCapabilities = [
+  'getSpecifiedModule',
+  'getScreenData',
+  'getWarningTypeList',
+  'machineList',
+  'exportToPDF',
+  'ImageSelect',
+  'uploadImage',
+  'getStorage',
+  'setStorage',
+  'removeStorage',
+  'reportDate',
+  'reportData',
+  'getFilePrefix',
+  'getCurrentCompanyId',
+  'showAlarmTypeAxisLabels',
+  'useFixedWeekTitle',
+]
+
 async function source(relativePath) {
   return readFile(path.join(root, relativePath), 'utf8')
 }
@@ -216,11 +235,11 @@ test('两个应用保留全部原路径并只包含适配逻辑', async () => {
       assert.ok(value.length > 0, `${app}/${file} 应继续存在`)
     }
     const host = await source(`apps/${app}/src/views/ForewarningManagement/reportExportHost.js`)
-    assert.match(host, /^\s*export\s+default\s+\{/m, `${app} host 应默认导出对象`)
-    assert.match(host, /\bgetCurrentCompanyId\s*[(,:]/, `${app} host companyId 能力`)
-    assert.match(host, /\bgetFilePrefix\s*[(,:]/, `${app} host filePrefix 能力`)
-    assert.match(host, /\bremoveStorage\s*[(,:]/, `${app} host removeStorage 能力`)
-    assert.match(host, /\breportData\s*[:,]/, `${app} host reportData 能力`)
+    assert.match(host, /\bexport\s+const\s+reportCapabilities\b/)
+    assert.match(host, /\bexport\s+const\s+reportExportHost\b/)
+    for (const capability of requiredHostCapabilities) {
+      assert.match(host, new RegExp(`\\b${capability}\\b`), `${app} host ${capability} 能力`)
+    }
   }
 })
 
@@ -231,6 +250,14 @@ test('两端能力明确保留标题和趋势图差异', async () => {
   assert.match(warning, /useFixedWeekTitle:\s*false/)
   assert.match(front, /showAlarmTypeAxisLabels:\s*true/)
   assert.match(front, /useFixedWeekTitle:\s*true/)
+  assert.equal(
+    warning,
+    front
+      .replace('showAlarmTypeAxisLabels: true', 'showAlarmTypeAxisLabels: false')
+      .replace('useFixedWeekTitle: true', 'useFixedWeekTitle: false'),
+    '两个 host 的导入和对象结构只能有两个能力布尔值不同',
+  )
+  assert.match(warning, /removeStorage\s*\(key\)\s*\{\s*localStorage\.removeItem\(key\)/)
 
   const statGrid = await readFile(path.join(sharedRoot, 'StatGrid.vue'), 'utf8')
   assert.match(statGrid, /['"]本周报告预警实况['"]/, 'StatGrid 应保留固定周标题')
@@ -440,8 +467,8 @@ test('页面实际注入 host 且各组件原路径只透传到对应公共导�
     },
     {
       file: 'components/ReportExport/ReportTable.vue',
-      component: 'SharedReportTable',
       exportPath: '@link/shared-ui/forewarning-management/report-export/table',
+      reexport: true,
     },
     {
       file: 'components/ReportExport/StatGrid.vue',
@@ -458,7 +485,7 @@ test('页面实际注入 host 且各组件原路径只透传到对应公共导�
       `${app} 页面应导入公共页面`,
     )
     assert.ok(
-      /^\s*import\s+reportExportHost\s+from\s+['"]\.\/reportExportHost(?:\.js)?['"]/m.test(page),
+      /^\s*import\s+\{\s*reportExportHost\s*\}\s+from\s+['"]\.\/reportExportHost\.js['"]/m.test(page),
       `${app} 页面应导入 host`,
     )
     assert.match(page, /\bcomponents\s*:\s*\{[\s\S]*?\bSharedReportExportPage\b/)
@@ -472,6 +499,15 @@ test('页面实际注入 host 且各组件原路径只透传到对应公共导�
       const value = await source(
         `apps/${app}/src/views/ForewarningManagement/${wrapper.file}`,
       )
+      if (wrapper.reexport) {
+        assert.match(
+          value,
+          new RegExp(`export\\s+\\{\\s*default\\s*\\}\\s+from\\s+['"]${wrapper.exportPath}['"]`),
+          `${app}/${wrapper.file} 应直接重导出公共组件`,
+        )
+        assert.doesNotMatch(value, businessBody, `${app}/${wrapper.file} 不得保留业务主体`)
+        continue
+      }
       assert.ok(
         new RegExp(`^\\s*import\\s+${wrapper.component}\\s+from\\s+['"]${wrapper.exportPath}['"]`, 'm').test(value),
         `${app}/${wrapper.file} 应导入对应公共组件`,
@@ -484,9 +520,53 @@ test('页面实际注入 host 且各组件原路径只透传到对应公共导�
       const tag = componentOpeningTag(value, wrapper.component, `${app}/${wrapper.file}`)
       assert.match(tag, /v-bind\s*=\s*['"]\$attrs['"]/)
       assert.match(tag, /v-on\s*=\s*['"]\$listeners['"]/)
+      if (wrapper.component === 'SharedStatGrid') {
+        assert.match(tag, /:use-fixed-week-title\s*=\s*['"]reportCapabilities\.useFixedWeekTitle['"]/)
+      } else {
+        assert.match(tag, /:host\s*=\s*['"]reportExportHost['"]/)
+      }
       assert.doesNotMatch(value, businessBody, `${app}/${wrapper.file} 不得保留业务主体`)
     }
   }
+})
+
+test('公共页面通过完整 host 保留基线调用顺序和组件注入', async () => {
+  const page = await readFile(path.join(sharedRoot, 'ReportExportPage.vue'), 'utf8')
+  assertComponentContract(page, 'ReportExport', {
+    host: { type: 'Object', required: true },
+  })
+  assert.match(page, /this\.host\.getSpecifiedModule\(/)
+  assert.match(page, /this\.host\.getScreenData\(/)
+  assert.match(page, /this\.host\.getWarningTypeList\(/)
+  assert.match(page, /this\.host\.machineList\(/)
+  assert.match(page, /this\.host\.exportToPDF\(/)
+  assert.match(page, /this\.host\.getCurrentCompanyId\(\)/)
+  for (const name of [
+    'getWeekRange',
+    'getCurrentWeekNumber',
+    'getCurrentYear',
+    'getWeekDateStr',
+    'getCurrentTitle',
+    'getDefaultReportTitle',
+  ]) {
+    assert.match(page, new RegExp(`this\\.host\\.reportDate\\.${name}\\(`))
+  }
+  for (const name of [
+    'generateActualList',
+    'generateReportText',
+    'generateStatsList',
+    'processAlarmLevelRank',
+    'processAlarmTypeRank',
+    'processCameraAlarmRank',
+    'processTrendTableData',
+  ]) {
+    assert.match(page, new RegExp(`this\\.host\\.reportData\\.${name}\\(`))
+  }
+  assert.match(componentOpeningTag(page, 'ReportForm', '公共页面'), /:host="host"/)
+  assert.match(componentOpeningTag(page, 'ReportPreview', '公共页面'), /:host="host"/)
+  assert.ok(page.indexOf('this.getReportConfig();') < page.indexOf('this.getCameraNumber();'))
+  assert.ok(page.indexOf('this.getCameraNumber();') < page.indexOf('this.getSkillList();'))
+  assert.ok(page.indexOf('this.getSkillList();') < page.indexOf('this.getScreenData();'))
 })
 
 test('两端菜单继续指向原报表页面路径', async () => {
@@ -509,4 +589,29 @@ test('两端 SkillTable 保持逐字一致并导向现有公共导出', async ()
   )
   assert.equal(warning, front)
   assert.match(warning, /@link\/shared-ui\/forewarning-management\/skill-table/)
+})
+
+test('两端所有薄 wrapper、chart shim 和 Task 1 reportData 逐字一致', async () => {
+  for (const file of [
+    'reportExport.vue',
+    'components/ReportExport/ReportForm.vue',
+    'components/ReportExport/ReportPreview.vue',
+    'components/ReportExport/ReportTable.vue',
+    'components/ReportExport/StatGrid.vue',
+    'test/reportChart.js',
+    'test/reportData.js',
+  ]) {
+    assert.equal(
+      await source(`apps/link-warning/src/views/ForewarningManagement/${file}`),
+      await source(`apps/link-front/src/views/ForewarningManagement/${file}`),
+      `${file} 两端应逐字一致`,
+    )
+  }
+  const chartShim = await source(
+    'apps/link-warning/src/views/ForewarningManagement/test/reportChart.js',
+  )
+  assert.match(
+    chartShim,
+    /createReportChartMixin\(\{\s*showAlarmTypeAxisLabels:\s*reportCapabilities\.showAlarmTypeAxisLabels,?\s*\}\)/,
+  )
 })
