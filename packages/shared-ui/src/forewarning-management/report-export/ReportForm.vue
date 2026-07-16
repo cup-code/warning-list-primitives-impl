@@ -101,7 +101,7 @@ export default {
     },
     // 清除表单缓存
     clearFormCache() {
-      this.host.setStorage(CACHE_KEY, null, -1);
+      this.host.removeStorage(CACHE_KEY);
     },
     updateField(field, value) {
       this.$emit("update-field", { field, value });

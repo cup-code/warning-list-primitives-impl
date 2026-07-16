@@ -219,6 +219,7 @@ test('两个应用保留全部原路径并只包含适配逻辑', async () => {
     assert.match(host, /^\s*export\s+default\s+\{/m, `${app} host 应默认导出对象`)
     assert.match(host, /\bgetCurrentCompanyId\s*[(,:]/, `${app} host companyId 能力`)
     assert.match(host, /\bgetFilePrefix\s*[(,:]/, `${app} host filePrefix 能力`)
+    assert.match(host, /\bremoveStorage\s*[(,:]/, `${app} host removeStorage 能力`)
     assert.match(host, /\breportData\s*[:,]/, `${app} host reportData 能力`)
   }
 })
@@ -273,6 +274,18 @@ test('公共组件保留原有 Props 和事件契约', async () => {
   for (const event of ['update-field', 'search', 'reset', 'export-pdf']) {
     assert.match(form, new RegExp(`\\$emit\\(\\s*['"]${event}['"]`))
   }
+  const clearFormCache = form.match(/\bclearFormCache\s*\(\)\s*\{[\s\S]*?\n\s*\},/)?.[0]
+  assert.ok(clearFormCache, 'ReportForm 应保留 clearFormCache')
+  assert.match(
+    clearFormCache,
+    /this\.host\.removeStorage\(\s*CACHE_KEY\s*\)/,
+    'ReportForm 清缓存应调用 host.removeStorage',
+  )
+  assert.doesNotMatch(
+    clearFormCache,
+    /(?:this\.host\.)?setStorage\(\s*CACHE_KEY\s*,\s*null\s*,\s*-1\s*\)/,
+    'ReportForm 不得用过期占位记录代替真实删除',
+  )
 
   const preview = await readFile(path.join(sharedRoot, 'ReportPreview.vue'), 'utf8')
   assertComponentContract(preview, 'ReportPreview', {
