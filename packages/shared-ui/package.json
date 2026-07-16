@@ -26,6 +26,7 @@
     "./forewarning-management/skill-table": "./src/forewarning-management/SkillTable.vue",
     "./forewarning-management/warning-list/list": "./src/forewarning-management/warning-list/ForewarningList.vue",
     "./forewarning-management/warning-list/table-config": "./src/forewarning-management/warning-list/tableListConfig.js",
+    "./forewarning-management/warning-list/warning-table-config": "./src/forewarning-management/warning-list/pages/warningListTableConfig.js",
     "./forewarning-management/warning-list/warning-info": "./src/forewarning-management/warning-list/WarningInfo.vue",
     "./forewarning-management/warning-list/check-group": "./src/forewarning-management/warning-list/CheckGroup.vue"
   },
