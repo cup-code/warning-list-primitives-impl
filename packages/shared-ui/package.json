@@ -8,6 +8,8 @@
     "./forewarning-management/chart-card": "./src/forewarning-management/ChartCard.vue",
     "./forewarning-management/chart-container": "./src/forewarning-management/ChartContainer.vue",
     "./forewarning-management/deal-dialog": "./src/forewarning-management/DealDialog.vue",
+    "./forewarning-management/report-export/form": "./src/forewarning-management/report-export/ReportForm.vue",
+    "./forewarning-management/report-export/preview": "./src/forewarning-management/report-export/ReportPreview.vue",
     "./forewarning-management/report-export/table": "./src/forewarning-management/report-export/ReportTable.vue",
     "./forewarning-management/report-export/stat-grid": "./src/forewarning-management/report-export/StatGrid.vue",
     "./forewarning-management/report-export/chart-mixin": "./src/forewarning-management/report-export/reportChartMixin.js",

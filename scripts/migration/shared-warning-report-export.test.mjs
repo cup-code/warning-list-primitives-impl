@@ -256,6 +256,7 @@ test('两端能力明确保留标题和趋势图差异', async () => {
 test('公共组件保留原有 Props 和事件契约', async () => {
   const form = await readFile(path.join(sharedRoot, 'ReportForm.vue'), 'utf8')
   const formProps = assertComponentContract(form, 'ReportForm', {
+    host: { type: 'Object', required: true },
     formData: {
       type: 'Object',
       required: true,
@@ -275,6 +276,7 @@ test('公共组件保留原有 Props 和事件契约', async () => {
 
   const preview = await readFile(path.join(sharedRoot, 'ReportPreview.vue'), 'utf8')
   assertComponentContract(preview, 'ReportPreview', {
+    host: { type: 'Object', required: true },
     reportTitle: {
       type: 'String',
       required: false,

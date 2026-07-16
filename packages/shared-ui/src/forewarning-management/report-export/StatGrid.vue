@@ -9,6 +9,7 @@ export default {
     },
     timeTitle: {
       type: String,
+      required: true,
       default: '',
     },
     useFixedWeekTitle: {
