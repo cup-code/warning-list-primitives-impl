@@ -25,7 +25,8 @@
     "./forewarning-management/select-machine": "./src/forewarning-management/SelectMachine.vue",
     "./forewarning-management/skill-table": "./src/forewarning-management/SkillTable.vue",
     "./forewarning-management/warning-list/table-config": "./src/forewarning-management/warning-list/tableListConfig.js",
-    "./forewarning-management/warning-list/warning-info": "./src/forewarning-management/warning-list/WarningInfo.vue"
+    "./forewarning-management/warning-list/warning-info": "./src/forewarning-management/warning-list/WarningInfo.vue",
+    "./forewarning-management/warning-list/check-group": "./src/forewarning-management/warning-list/CheckGroup.vue"
   },
   "dependencies": {
     "@link/warning-feature": "workspace:*",
