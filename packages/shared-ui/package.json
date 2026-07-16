@@ -23,7 +23,8 @@
     "./forewarning-management/static-analysis/charts/warning-trend-chart": "./src/forewarning-management/static-analysis/charts/WarningTrendChart.vue",
     "./forewarning-management/static-analysis/charts/warning-type-chart": "./src/forewarning-management/static-analysis/charts/WarningTypeChart.vue",
     "./forewarning-management/select-machine": "./src/forewarning-management/SelectMachine.vue",
-    "./forewarning-management/skill-table": "./src/forewarning-management/SkillTable.vue"
+    "./forewarning-management/skill-table": "./src/forewarning-management/SkillTable.vue",
+    "./forewarning-management/warning-list/table-config": "./src/forewarning-management/warning-list/tableListConfig.js"
   },
   "dependencies": {
     "@link/warning-feature": "workspace:*",
