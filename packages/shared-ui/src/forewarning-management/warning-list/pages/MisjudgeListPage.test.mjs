@@ -1,39 +1,38 @@
 import assert from 'node:assert/strict'
+import { createHash } from 'node:crypto'
 import { readFile } from 'node:fs/promises'
 import test from 'node:test'
 
 const sharedPageUrl = new URL('./MisjudgeListPage.vue', import.meta.url)
-const legacyPageUrl = new URL(
-  '../../../../../../apps/link-warning/src/views/ForewarningManagement/misjudgeList.vue',
-  import.meta.url,
-)
 const packageUrl = new URL('../../../../package.json', import.meta.url)
+
+// Derived from commit 2d1ba55's normalized pre-extraction link-warning route
+// page: strip imports and the legacy beforeRouteLeave boundary, replace its
+// router push
+// with __PUSH_WARNING_DETAIL__, trim line endings/space, then SHA-256 the full
+// remaining script, template, and scoped style. The shared transform below
+// reverses only the approved extraction adaptations into that same form.
+const preExtractionSemanticSha256
+  = '6d0e1efca7af66fb581cda88a3f18969dadc6f71f81976f22421c98a77836ce9'
 
 const read = url => readFile(url, 'utf8')
 
-function normalizeSemanticSource(source, { shared = false } = {}) {
+function normalizeSharedPageToLegacySemantics(source) {
   let normalized = source.replace(/\r\n/g, '\n')
 
   normalized = normalized.replace(/^import[\s\S]*?from\s+['"][^'"]+['"]\n/gm, '')
 
-  if (shared) {
-    normalized = normalized
-      .replace(/\n  props: \{\n    host: \{\n      type: Object,\n      required: true,\n    \},\n  \},/, '')
-      .replace(/setup\(props\) \{\n    const \{ proxy \} = getCurrentInstance\(\)\n    const \{ host \} = props\n    validateMisjudgeListHost\(host, 'MisjudgeListPage'\)/, 'setup() {\n    const { proxy } = getCurrentInstance()')
-      .replace(/\n    handleRouteLeave\(to, from, next\) \{[\s\S]*?\n    \},\n    handleBatchProcess/, '\n    handleBatchProcess')
-      .replace(/host\.(tenantControlList|getDepartListSimple|getUserListByRoleFn|allWarningList|getStorageItem|setStorageItem|delStorageItem)/g, '$1')
-      .replace(/host\.warningListHost\.pushWarningDetail\(item\)/g, '__PUSH_WARNING_DETAIL__')
-      .replace(/host\.warningListHost\.getDictList/g, '$dictUtils.getDictList')
-      .replace(/moment\((value\[[01]\])\)\.format\('YYYY-MM-DD HH:mm:ss'\)/g, 'proxy.$formatDate($1)')
-      .replace(/batchSelection/g, 'batchInfo')
-      .replace(/List: ForewarningList/g, 'List')
-      .replace(/\n\s*:(?:host|all-machine-list-api|machine-list-api|batch-attention-alarm|batch-attention-alarm-internal)="[^"]+"/g, '')
-  }
-  else {
-    normalized = normalized
-      .replace(/\n  beforeRouteLeave\(to, from, next\) \{[\s\S]*?\n  \},\n  setup\(\) \{/, '\n  setup() {')
-      .replace(/proxy\.\$router\.push\(\{[\s\S]*?\n      \}\)/, '__PUSH_WARNING_DETAIL__')
-  }
+  normalized = normalized
+    .replace(/\n  props: \{\n    host: \{\n      type: Object,\n      required: true,\n    \},\n  \},/, '')
+    .replace(/setup\(props\) \{\n    const \{ proxy \} = getCurrentInstance\(\)\n    const \{ host \} = props\n    validateMisjudgeListHost\(host, 'MisjudgeListPage'\)/, 'setup() {\n    const { proxy } = getCurrentInstance()')
+    .replace(/\n    handleRouteLeave\(to, from, next\) \{[\s\S]*?\n    \},\n    handleBatchProcess/, '\n    handleBatchProcess')
+    .replace(/host\.(tenantControlList|getDepartListSimple|getUserListByRoleFn|allWarningList|getStorageItem|setStorageItem|delStorageItem)/g, '$1')
+    .replace(/host\.warningListHost\.pushWarningDetail\(item\)/g, '__PUSH_WARNING_DETAIL__')
+    .replace(/host\.warningListHost\.getDictList/g, '$dictUtils.getDictList')
+    .replace(/moment\((value\[[01]\])\)\.format\('YYYY-MM-DD HH:mm:ss'\)/g, 'proxy.$formatDate($1)')
+    .replace(/batchSelection/g, 'batchInfo')
+    .replace(/List: ForewarningList/g, 'List')
+    .replace(/\n\s*:(?:host|all-machine-list-api|machine-list-api|batch-attention-alarm|batch-attention-alarm-internal)="[^"]+"/g, '')
 
   return normalized.replace(/[ \t]+$/gm, '').replace(/\s+/g, ' ').trim()
 }
@@ -85,7 +84,7 @@ test('routes queries, storage, navigation, dictionaries, and child APIs through 
   assert.match(source, /<SelectMachine[\s\S]*:all-machine-list-api="host\.allMachineList"[\s\S]*:machine-list-api="host\.machineList"/)
   assert.match(source, /<BatchDeal[\s\S]*:batch-attention-alarm="host\.batchAttentionAlarm"[\s\S]*:batch-attention-alarm-internal="host\.batchAttentionAlarmInternal"/)
   for (const tag of ['CheckGroup', 'WarningInfo', 'List']) {
-    assert.match(source, new RegExp(`<${tag}[\\s\\S]*?:host="host\\.warningListHost"`))
+    assert.match(source, new RegExp(`<${tag}\\b[^>]*:host="host\\.warningListHost"[^>]*>`))
   }
   assert.match(source, /host\.warningListHost\.pushWarningDetail\(item\)/)
   assert.match(source, /host\.warningListHost\.getDictList\('InternalStatus'\)/)
@@ -125,16 +124,12 @@ test('exposes route-leave handling through the pure helper', async () => {
   assert.doesNotMatch(source, /beforeRouteLeave\s*\(/)
 })
 
-test('differs from the normalized legacy page only at approved integration boundaries', async () => {
-  const [legacySource, sharedSource] = await Promise.all([
-    read(legacyPageUrl),
-    read(sharedPageUrl),
-  ])
+test('matches the immutable full-semantics snapshot of the pre-extraction common page', async () => {
+  const sharedSource = await read(sharedPageUrl)
+  const normalized = normalizeSharedPageToLegacySemantics(sharedSource)
+  const actualSha256 = createHash('sha256').update(normalized).digest('hex')
 
-  assert.equal(
-    normalizeSemanticSource(sharedSource, { shared: true }),
-    normalizeSemanticSource(legacySource),
-  )
+  assert.equal(actualSha256, preExtractionSemanticSha256)
   assert.match(sharedSource, /<template>[\s\S]*<KyTreeTable[\s\S]*<\/template>/)
   assert.match(sharedSource, /<style lang="scss" scoped>[\s\S]*\.warning-checkbox-wrapper[\s\S]*::v-deep\.el-checkbox/)
 })
