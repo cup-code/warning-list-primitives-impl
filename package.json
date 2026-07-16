@@ -15,7 +15,7 @@
     "lint": "pnpm --filter './apps/*' lint",
     "test:migration": "node --test scripts/migration/*.test.mjs scripts/audit/*.test.mjs",
     "test:warning-feature": "node --test packages/warning-feature/src/video-warning/*.test.mjs packages/warning-feature/src/state/*.test.mjs packages/warning-feature/src/report/*.test.mjs packages/warning-feature/src/batch-deal/*.test.mjs",
-    "test:shared-ui": "node --test packages/shared-ui/src/forewarning-management/report-export/*.test.mjs packages/shared-ui/src/forewarning-management/static-analysis/*.test.mjs",
+    "test:shared-ui": "node --test packages/shared-ui/src/forewarning-management/report-export/*.test.mjs packages/shared-ui/src/forewarning-management/static-analysis/*.test.mjs packages/shared-ui/src/forewarning-management/warning-list/*.test.mjs",
     "test": "pnpm test:migration && pnpm test:warning-feature && pnpm test:shared-ui",
     "audit:shared": "node scripts/audit/shared-source-audit.mjs apps/link-warning/src apps/link-front/src docs/migration/shared-source-audit.json",
     "verify:sources": "node scripts/migration/compare-manifests.mjs docs/migration/source-before.json docs/migration/source-after.json"
