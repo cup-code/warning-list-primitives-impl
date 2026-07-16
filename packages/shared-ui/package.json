@@ -14,11 +14,21 @@
     "./forewarning-management/report-export/table": "./src/forewarning-management/report-export/ReportTable.vue",
     "./forewarning-management/report-export/stat-grid": "./src/forewarning-management/report-export/StatGrid.vue",
     "./forewarning-management/report-export/chart-mixin": "./src/forewarning-management/report-export/reportChartMixin.js",
+    "./forewarning-management/static-analysis": "./src/forewarning-management/static-analysis/StaticAnalysisPage.vue",
+    "./forewarning-management/static-analysis/search-form": "./src/forewarning-management/static-analysis/SearchForm.vue",
+    "./forewarning-management/static-analysis/charts/org-warning-table": "./src/forewarning-management/static-analysis/charts/OrgWarningTable.vue",
+    "./forewarning-management/static-analysis/charts/point-warning-table": "./src/forewarning-management/static-analysis/charts/PointWarningTable.vue",
+    "./forewarning-management/static-analysis/charts/warning-level-chart": "./src/forewarning-management/static-analysis/charts/WarningLevelChart.vue",
+    "./forewarning-management/static-analysis/charts/warning-process-chart": "./src/forewarning-management/static-analysis/charts/WarningProcessChart.vue",
+    "./forewarning-management/static-analysis/charts/warning-trend-chart": "./src/forewarning-management/static-analysis/charts/WarningTrendChart.vue",
+    "./forewarning-management/static-analysis/charts/warning-type-chart": "./src/forewarning-management/static-analysis/charts/WarningTypeChart.vue",
     "./forewarning-management/select-machine": "./src/forewarning-management/SelectMachine.vue",
     "./forewarning-management/skill-table": "./src/forewarning-management/SkillTable.vue"
   },
   "dependencies": {
-    "@link/warning-feature": "workspace:*"
+    "@link/warning-feature": "workspace:*",
+    "html2canvas": "^1.4.1",
+    "moment": "^2.30.1"
   },
   "peerDependencies": {
     "@tanstack/vue-query": "^4.33.0",
