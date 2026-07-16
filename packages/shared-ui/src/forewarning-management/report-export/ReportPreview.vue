@@ -3,6 +3,10 @@ import { createReportChartMixin } from "./reportChartMixin.js";
 import ReportTable from "./ReportTable.vue";
 import SkillTable from "@link/shared-ui/forewarning-management/skill-table";
 import StatGrid from "./StatGrid.vue";
+import {
+  reportPreviewHostRequirements,
+  validateHostCapabilities,
+} from "./reportHostCapabilities.js";
 
 export default {
   name: "ReportPreview",
@@ -107,6 +111,7 @@ export default {
     },
   },
   data() {
+    validateHostCapabilities(this.host, "ReportPreview", reportPreviewHostRequirements);
     return {
       filePrefix: "",
       showAlarmTypeAxisLabels: this.host.showAlarmTypeAxisLabels,

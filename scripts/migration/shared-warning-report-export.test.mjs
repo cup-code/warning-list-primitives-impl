@@ -19,6 +19,7 @@ const sharedFiles = [
   'ReportTable.vue',
   'StatGrid.vue',
   'reportChartMixin.js',
+  'reportHostCapabilities.js',
 ]
 
 const originalFiles = [
@@ -567,6 +568,23 @@ test('公共页面通过完整 host 保留基线调用顺序和组件注入', as
   assert.ok(page.indexOf('this.getReportConfig();') < page.indexOf('this.getCameraNumber();'))
   assert.ok(page.indexOf('this.getCameraNumber();') < page.indexOf('this.getSkillList();'))
   assert.ok(page.indexOf('this.getSkillList();') < page.indexOf('this.getScreenData();'))
+})
+
+test('三个公共 consumer 在 data host 调用前真实执行开发测试能力校验', async () => {
+  for (const [file, consumer, requirements] of [
+    ['ReportExportPage.vue', 'ReportExportPage', 'reportExportPageHostRequirements'],
+    ['ReportForm.vue', 'ReportForm', 'reportFormHostRequirements'],
+    ['ReportPreview.vue', 'ReportPreview', 'reportPreviewHostRequirements'],
+  ]) {
+    const value = await readFile(path.join(sharedRoot, file), 'utf8')
+    assert.match(value, /import\s*\{[\s\S]*?validateHostCapabilities[\s\S]*?\}\s*from\s*["']\.\/reportHostCapabilities\.js["']/)
+    const call = `validateHostCapabilities(this.host, "${consumer}", ${requirements});`
+    assert.match(value, new RegExp(call.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')))
+    assert.ok(
+      value.indexOf(call) < value.indexOf('return {', value.indexOf('data()')),
+      `${consumer} 必须在 data 初始化 host 消费前校验`,
+    )
+  }
 })
 
 test('两端菜单继续指向原报表页面路径', async () => {

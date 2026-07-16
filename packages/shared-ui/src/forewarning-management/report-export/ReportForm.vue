@@ -1,4 +1,9 @@
 <script>
+import {
+  reportFormHostRequirements,
+  validateHostCapabilities,
+} from "./reportHostCapabilities.js";
+
 const CACHE_KEY = "reportFormCache";
 const CACHE_EXPIRE_TIME = 7 * 24 * 60 * 60; // 7天过期时间（秒）
 
@@ -24,6 +29,7 @@ export default {
     },
   },
   data() {
+    validateHostCapabilities(this.host, "ReportForm", reportFormHostRequirements);
     return {
       timeType: 1,
       dateRange: [],

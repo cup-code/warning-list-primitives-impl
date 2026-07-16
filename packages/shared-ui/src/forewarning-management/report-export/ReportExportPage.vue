@@ -1,6 +1,10 @@
 <script>
 import ReportForm from "./ReportForm.vue";
 import ReportPreview from "./ReportPreview.vue";
+import {
+  reportExportPageHostRequirements,
+  validateHostCapabilities,
+} from "./reportHostCapabilities.js";
 
 export default {
   name: "ReportExport",
@@ -15,6 +19,7 @@ export default {
     },
   },
   data() {
+    validateHostCapabilities(this.host, "ReportExportPage", reportExportPageHostRequirements);
     return {
       screenData: {},
       formData: {
