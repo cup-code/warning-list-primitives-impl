@@ -66,6 +66,37 @@ test('uses shared imports and exposes the package page subpath', async () => {
   )
 })
 
+test('locks the approved mixin, component, date, and storage adaptations', async () => {
+  const source = await read(sharedPageUrl)
+
+  assert.match(source, /mixins:\s*\[batchSelection\],/)
+  assert.doesNotMatch(source, /\bbatchInfo\b/)
+  assert.match(source, /components:\s*\{[\s\S]*?\bList:\s*ForewarningList,[\s\S]*?\}/)
+  assert.doesNotMatch(source, /components:\s*\{[\s\S]*?\n\s*List,\s*\n[\s\S]*?\}/)
+
+  assert.match(
+    source,
+    /form\.value\.alarmDateStart\s*=\s*moment\(value\[0\]\)\.format\('YYYY-MM-DD HH:mm:ss'\)/,
+  )
+  assert.match(
+    source,
+    /form\.value\.alarmDateEnd\s*=\s*moment\(value\[1\]\)\.format\('YYYY-MM-DD HH:mm:ss'\)/,
+  )
+  assert.doesNotMatch(source, /\$formatDate/)
+
+  const storageCalls = [
+    ...source.matchAll(/(?:(\b[\w$]+)\.)?(getStorageItem|setStorageItem|delStorageItem)\s*\(/g),
+  ]
+  assert.ok(storageCalls.length > 0)
+  for (const [, qualifier, capability] of storageCalls) {
+    assert.equal(qualifier, 'host', `${capability} must be called through host`)
+  }
+  assert.doesNotMatch(
+    source,
+    /(?<!host\.)\b(?:getStorageItem|setStorageItem|delStorageItem)\s*\(/,
+  )
+})
+
 test('routes queries, storage, navigation, dictionaries, and child APIs through host', async () => {
   const source = await read(sharedPageUrl)
 
