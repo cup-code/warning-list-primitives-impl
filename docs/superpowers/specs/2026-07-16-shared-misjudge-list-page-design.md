@@ -176,6 +176,7 @@ router 动态导入原路径 misjudgeList.vue
 - 不捕获或改写现有 HTTP 错误，继续交由 Vue Query 和现有 UI 行为处理。
 - 不吞掉 storage JSON 解析错误，保持当前工具函数语义。
 - `handleRouteLeave` 必须保证 `next()` 只调用一次。
+- `to.path` 缺失或不是字符串时保持现有 `String.prototype.includes` 调用的失败语义：直接抛错，不清理缓存，也不调用 `next()`。
 - 包装器找不到公共页面 ref 时，在 development/test 抛出明确错误；production 中仍调用 `next()`，避免导航被永久阻塞。
 - 不改变任何查询 key、响应字段读取或计时器周期。
 
@@ -205,4 +206,3 @@ router 动态导入原路径 misjudgeList.vue
 - 公共源码不反向依赖应用源码。
 - 所有测试、审计、来源校验和双端构建通过。
 - 验证文档准确记录测试数量、构建结果、审计变化和运行时测试限制。
-

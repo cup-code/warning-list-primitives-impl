@@ -242,7 +242,7 @@ Cover:
 - an unrelated path clears once;
 - `next` is called exactly once in every case;
 - `clearCache` exceptions propagate and do not call `next`, matching the current synchronous guard behavior;
-- missing/non-string paths are treated as unrelated and clear.
+- missing/non-string paths preserve the current failure behavior: throw without calling `clearCache` or `next`.
 
 **Step 2: Confirm RED**
 
@@ -479,4 +479,3 @@ git commit -m "docs: verify shared misjudge list page"
 - [ ] Shared source has no application reverse dependency.
 - [ ] Full tests, audit, source verification, frozen install, and both clean builds pass.
 - [ ] Independent review reports zero Critical and zero Important findings.
-
