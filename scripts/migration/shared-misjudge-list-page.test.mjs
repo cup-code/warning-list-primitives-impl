@@ -32,6 +32,15 @@ const hostKeys = [
   'batchAttentionAlarmInternal',
   'warningListHost',
 ]
+const expectedRouteGuardBody = `const page = this.$refs.page
+    if (!page) {
+      if (process.env.NODE_ENV !== 'production') {
+        throw new Error('[MisjudgeListRoute] shared page ref is unavailable')
+      }
+      next()
+      return undefined
+    }
+    return page.handleRouteLeave(to, from, next)`
 
 async function source(relativePath) {
   try {
@@ -49,14 +58,28 @@ function assertSource(value, label) {
 }
 
 function exportedObjectKeys(value, label) {
-  const object = value.match(
-    /(?:const\s+misjudgeListHost\s*=|export\s+default)\s*{([\s\S]*?)\n}/,
-  )
-  assert.ok(object, `${label} should export a misjudgeListHost object`)
+  const object = value.match(/const\s+misjudgeListHost\s*=\s*{([\s\S]*?)\n}/)
+  assert.ok(object, `${label} should define the named misjudgeListHost object`)
   return object[1]
     .split('\n')
     .map(line => line.match(/^\s{2}([A-Za-z_$][\w$]*)\s*(?::|,)/)?.[1])
     .filter(Boolean)
+}
+
+function methodBody(value, signature, label) {
+  const start = value.indexOf(signature)
+  assert.notEqual(start, -1, `${label} should exist`)
+  const openingBrace = value.indexOf('{', start + signature.length)
+  assert.notEqual(openingBrace, -1, `${label} should have a body`)
+
+  let depth = 0
+  for (let index = openingBrace; index < value.length; index += 1) {
+    if (value[index] === '{') depth += 1
+    if (value[index] === '}') depth -= 1
+    if (depth === 0) return value.slice(openingBrace + 1, index).trim()
+  }
+
+  assert.fail(`${label} body should be closed`)
 }
 
 test('shared-ui exports the shared misjudge page and warning table config', async () => {
@@ -104,10 +127,14 @@ test('both original routes are identical thin shared-page wrappers', async () =>
     assert.match(value, /ref=['"]page['"]/, `${label} should expose the page ref`)
     assert.match(value, /v-bind=['"]\$attrs['"]/, `${label} should forward attrs`)
     assert.match(value, /v-on=['"]\$listeners['"]/, `${label} should forward listeners`)
-    assert.match(
-      value,
-      /beforeRouteLeave\s*\(to, from, next\)\s*{[\s\S]*?const page = this\.\$refs\.page[\s\S]*?return page\.handleRouteLeave\(to, from, next\)/,
-      `${label} should delegate its route guard exactly`,
+    assert.equal(
+      methodBody(
+        value,
+        'beforeRouteLeave(to, from, next)',
+        `${label} beforeRouteLeave`,
+      ),
+      expectedRouteGuardBody,
+      `${label} should preserve the complete approved route guard`,
     )
     wrappers.push(value)
   }
@@ -123,35 +150,52 @@ test('both applications expose the identical exact twelve-key host', async () =>
       label,
     )
     assert.deepEqual(exportedObjectKeys(value, label), hostKeys, `${label} keys`)
+    assert.match(
+      value,
+      /^export default misjudgeListHost\s*$/m,
+      `${label} should default-export the named host object`,
+    )
     hosts.push(value)
   }
   assert.equal(hosts[0], hosts[1], 'application hosts should be byte-identical')
 })
 
-test('application configs re-export shared WarningListConfig and keep local symbols', async () => {
-  const expectedSymbols = {
-    'link-warning': ['cameraListConfig', 'machineListConfig', 'tableListConfig'],
-    'link-front': [
-      'cameraListConfig',
-      'machineListConfig',
-      'tableListConfig',
-      'cardSirenColumns',
-    ],
-  }
+test('application configs preserve exact shared and local ownership', async () => {
   for (const app of apps) {
-    const value = await source(`apps/${app}/${pageRoot}/config.js`)
+    const value = assertSource(
+      await source(`apps/${app}/${pageRoot}/config.js`),
+      `${app}/config.js`,
+    )
     assert.match(
       value,
       /import\s*{\s*WarningListConfig\s*}\s*from\s*['"]@link\/shared-ui\/forewarning-management\/warning-list\/warning-table-config['"]/,
       `${app} config should import shared WarningListConfig`,
     )
+    assert.match(
+      value,
+      /import\s*{\s*tableListConfig\s*}\s*from\s*['"]@link\/shared-ui\/forewarning-management\/warning-list\/table-config['"]/,
+      `${app} config should keep the established shared tableListConfig import`,
+    )
     assert.doesNotMatch(value, /const\s+WarningListConfig\s*=/)
-    for (const symbol of ['WarningListConfig', ...expectedSymbols[app]]) {
-      assert.match(value, new RegExp(`\\b${symbol}\\b`), `${app} should retain ${symbol}`)
+    assert.match(value, /const\s+cameraListConfig\s*=/, `${app} camera config ownership`)
+    assert.match(value, /const\s+machineListConfig\s*=/, `${app} machine config ownership`)
+    if (app === 'link-front') {
+      assert.match(value, /const\s+cardSirenColumns\s*=/, 'front card siren ownership')
     }
+    else {
+      assert.doesNotMatch(value, /\bcardSirenColumns\b/, 'warning must not own card siren columns')
+    }
+
     const exportBlock = value.match(/export\s*{([\s\S]*?)}/)
     assert.ok(exportBlock, `${app} config should retain named exports`)
-    for (const symbol of ['WarningListConfig', ...expectedSymbols[app]]) {
+    const expectedExports = [
+      'WarningListConfig',
+      'cameraListConfig',
+      'machineListConfig',
+      'tableListConfig',
+      ...(app === 'link-front' ? ['cardSirenColumns'] : []),
+    ]
+    for (const symbol of expectedExports) {
       assert.match(exportBlock[1], new RegExp(`\\b${symbol}\\b`), `${app} should export ${symbol}`)
     }
   }
