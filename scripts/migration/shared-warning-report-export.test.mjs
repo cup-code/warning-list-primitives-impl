@@ -52,6 +52,44 @@ function extractObject(value, marker, label) {
   assert.fail(`${label} 对象未闭合`)
 }
 
+function topLevelScalarProperty(objectBlock, name) {
+  const propertyLines = objectBlock
+    .split('\n')
+    .map((line) => line.match(/^(\s*)([A-Za-z_$][\w$]*)\s*:\s*([^,]+),?\s*$/))
+    .filter(Boolean)
+  const topLevelIndent = Math.min(...propertyLines.map((match) => match[1].length))
+  const property = propertyLines.find(
+    (match) => match[1].length === topLevelIndent && match[2] === name,
+  )
+  return property?.[3].trim()
+}
+
+function assertFormDataDefault(defaultObject) {
+  assert.equal(
+    (defaultObject.match(/[{}]/g) || []).length,
+    2,
+    'formData 默认对象不得嵌套其他对象',
+  )
+  const bodyLines = defaultObject
+    .slice(1, -1)
+    .split('\n')
+    .filter((line) => line.trim())
+  assert.equal(bodyLines.length, 6, 'formData 默认对象应恰好包含六个字段')
+  const entries = bodyLines
+    .map((line) => line.match(/^\s*([A-Za-z_$][\w$]*)\s*:\s*(false|['"]['"]),?\s*$/))
+    .filter(Boolean)
+    .map((match) => [match[1], match[2] === 'false' ? false : ''])
+  assert.equal(entries.length, 6, 'formData 默认对象应恰好包含六个标量字段')
+  assert.deepEqual(Object.fromEntries(entries), {
+    reportTitle: '',
+    reportSummary: '',
+    showTable: false,
+    wechat: '',
+    phone: '',
+    machineCount: '',
+  })
+}
+
 function assertProp(propsBlock, name, contract) {
   const prop = extractObject(
     propsBlock,
@@ -59,12 +97,21 @@ function assertProp(propsBlock, name, contract) {
     `Prop ${name}`,
   )
   assert.match(prop, new RegExp(`\\btype\\s*:\\s*${contract.type}\\b`), `${name} type`)
-  if (contract.required) {
-    assert.match(prop, /\brequired\s*:\s*true\b/, `${name} required`)
-  }
+  assert.equal(
+    typeof contract.required,
+    'boolean',
+    `${name} 契约必须显式声明 required`,
+  )
+  assert.equal(
+    topLevelScalarProperty(prop, 'required') === 'true',
+    contract.required,
+    `${name} required 应为 ${contract.required}`,
+  )
   if (contract.default) {
     assert.match(prop, contract.default, `${name} default`)
   }
+
+  return prop
 }
 
 function assertComponentContract(value, componentName, contracts) {
@@ -82,6 +129,8 @@ function assertComponentContract(value, componentName, contracts) {
   for (const [name, contract] of Object.entries(contracts)) {
     assertProp(propsBlock, name, contract)
   }
+
+  return propsBlock
 }
 
 function componentOpeningTag(value, componentName, label) {
@@ -89,6 +138,52 @@ function componentOpeningTag(value, componentName, label) {
   assert.ok(match, `${label} 应渲染 ${componentName}`)
   return match[0]
 }
+
+test('契约 helper 只接受顶层 required 和精确 formData 默认对象', () => {
+  const misleadingProp = `{
+    type: Object,
+    required: false,
+    default: () => ({ required: true }),
+  }`
+  assert.throws(
+    () => assertProp(`{ formData: ${misleadingProp} }`, 'formData', {
+      type: 'Object',
+      required: true,
+    }),
+    /formData required 应为 true/,
+  )
+  assert.doesNotThrow(() => assertFormDataDefault(`{
+    reportTitle: '',
+    reportSummary: '',
+    showTable: false,
+    wechat: '',
+    phone: '',
+    machineCount: '',
+  }`))
+  assert.throws(
+    () => assertFormDataDefault(`{
+      reportTitle: '',
+      reportSummary: '',
+      showTable: false,
+      wechat: '',
+      phone: '',
+      extra: '',
+    }`),
+  )
+  assert.throws(
+    () => assertFormDataDefault(`{
+      defaults: {
+        reportTitle: '',
+        reportSummary: '',
+        showTable: false,
+        wechat: '',
+        phone: '',
+        machineCount: '',
+      },
+    }`),
+    /不得嵌套/,
+  )
+})
 
 test('shared-ui 显式导出报表页面、组件和图表 mixin', async () => {
   const manifest = JSON.parse(await source('packages/shared-ui/package.json'))
@@ -160,26 +255,46 @@ test('两端能力明确保留标题和趋势图差异', async () => {
 
 test('公共组件保留原有 Props 和事件契约', async () => {
   const form = await readFile(path.join(sharedRoot, 'ReportForm.vue'), 'utf8')
-  assertComponentContract(form, 'ReportForm', {
+  const formProps = assertComponentContract(form, 'ReportForm', {
     formData: {
       type: 'Object',
       required: true,
       default: /\bdefault\s*:\s*\(\)\s*=>\s*\(\s*\{/,
     },
   })
+  const formDataProp = extractObject(formProps, /\bformData\s*:/, 'Prop formData')
+  const formDataDefault = extractObject(
+    formDataProp,
+    /\bdefault\s*:\s*\(\)\s*=>\s*\(/,
+    'formData default',
+  )
+  assertFormDataDefault(formDataDefault)
   for (const event of ['update-field', 'search', 'reset', 'export-pdf']) {
     assert.match(form, new RegExp(`\\$emit\\(\\s*['"]${event}['"]`))
   }
 
   const preview = await readFile(path.join(sharedRoot, 'ReportPreview.vue'), 'utf8')
   assertComponentContract(preview, 'ReportPreview', {
-    reportTitle: { type: 'String', default: /\bdefault\s*:\s*['"]['"]/ },
+    reportTitle: {
+      type: 'String',
+      required: false,
+      default: /\bdefault\s*:\s*['"]['"]/,
+    },
     defaultReportTitle: {
       type: 'String',
+      required: false,
       default: /\bdefault\s*:\s*['"]视频智能运营平台管理周报['"]/,
     },
-    reportSummary: { type: 'String', default: /\bdefault\s*:\s*['"]['"]/ },
-    showTable: { type: 'Boolean', default: /\bdefault\s*:\s*false\b/ },
+    reportSummary: {
+      type: 'String',
+      required: false,
+      default: /\bdefault\s*:\s*['"]['"]/,
+    },
+    showTable: {
+      type: 'Boolean',
+      required: false,
+      default: /\bdefault\s*:\s*false\b/,
+    },
     currentYear: { type: 'Number', required: true },
     currentWeekNumber: { type: 'Number', required: true },
     weekDateStr: { type: 'String', required: true },
@@ -190,10 +305,26 @@ test('公共组件保留原有 Props 和事件契约', async () => {
     alarmTypeRank: { type: 'Array', required: true },
     cameraAlarmRank: { type: 'Array', required: true },
     alarmLevelRank: { type: 'Array', required: true },
-    getText: { type: 'String', default: /\bdefault\s*:\s*['"]['"]/ },
-    showAdvert: { type: 'Boolean', default: /\bdefault\s*:\s*true\b/ },
-    headerLogo: { type: 'String', default: /\bdefault\s*:\s*['"]['"]/ },
-    headerText: { type: 'String', default: /\bdefault\s*:\s*['"]['"]/ },
+    getText: {
+      type: 'String',
+      required: false,
+      default: /\bdefault\s*:\s*['"]['"]/,
+    },
+    showAdvert: {
+      type: 'Boolean',
+      required: false,
+      default: /\bdefault\s*:\s*true\b/,
+    },
+    headerLogo: {
+      type: 'String',
+      required: false,
+      default: /\bdefault\s*:\s*['"]['"]/,
+    },
+    headerText: {
+      type: 'String',
+      required: false,
+      default: /\bdefault\s*:\s*['"]['"]/,
+    },
     chartData: { type: 'Object', required: true },
     wechat: { type: 'String', required: true },
     phone: { type: 'String', required: true },
@@ -202,8 +333,16 @@ test('公共组件保留原有 Props 和事件契约', async () => {
 
   const table = await readFile(path.join(sharedRoot, 'ReportTable.vue'), 'utf8')
   assertComponentContract(table, 'ReportTable', {
-    title: { type: 'String', default: /\bdefault\s*:\s*['"]['"]/ },
-    subtitle: { type: 'String', default: /\bdefault\s*:\s*['"]['"]/ },
+    title: {
+      type: 'String',
+      required: false,
+      default: /\bdefault\s*:\s*['"]['"]/,
+    },
+    subtitle: {
+      type: 'String',
+      required: false,
+      default: /\bdefault\s*:\s*['"]['"]/,
+    },
     columns: {
       type: 'Array',
       required: true,
@@ -214,14 +353,46 @@ test('公共组件保留原有 Props 和事件契约', async () => {
       required: true,
       default: /\bdefault\s*:\s*\(\)\s*=>\s*\[\s*\]/,
     },
-    showTable: { type: 'Boolean', default: /\bdefault\s*:\s*true\b/ },
-    width: { type: 'String', default: /\bdefault\s*:\s*['"]100%['"]/ },
-    headerBgColor: { type: 'String', default: /\bdefault\s*:\s*['"]#2986c7['"]/ },
-    headerTextColor: { type: 'String', default: /\bdefault\s*:\s*['"]#fff['"]/ },
-    subtitleBgColor: { type: 'String', default: /\bdefault\s*:\s*['"]#f5f6fa['"]/ },
-    subtitleTextColor: { type: 'String', default: /\bdefault\s*:\s*['"]#333['"]/ },
-    columnHeaderBgColor: { type: 'String', default: /\bdefault\s*:\s*['"]#e5e6eb['"]/ },
-    columnHeaderTextColor: { type: 'String', default: /\bdefault\s*:\s*['"]#333['"]/ },
+    showTable: {
+      type: 'Boolean',
+      required: false,
+      default: /\bdefault\s*:\s*true\b/,
+    },
+    width: {
+      type: 'String',
+      required: false,
+      default: /\bdefault\s*:\s*['"]100%['"]/,
+    },
+    headerBgColor: {
+      type: 'String',
+      required: false,
+      default: /\bdefault\s*:\s*['"]#2986c7['"]/,
+    },
+    headerTextColor: {
+      type: 'String',
+      required: false,
+      default: /\bdefault\s*:\s*['"]#fff['"]/,
+    },
+    subtitleBgColor: {
+      type: 'String',
+      required: false,
+      default: /\bdefault\s*:\s*['"]#f5f6fa['"]/,
+    },
+    subtitleTextColor: {
+      type: 'String',
+      required: false,
+      default: /\bdefault\s*:\s*['"]#333['"]/,
+    },
+    columnHeaderBgColor: {
+      type: 'String',
+      required: false,
+      default: /\bdefault\s*:\s*['"]#e5e6eb['"]/,
+    },
+    columnHeaderTextColor: {
+      type: 'String',
+      required: false,
+      default: /\bdefault\s*:\s*['"]#333['"]/,
+    },
   })
 
   const statGrid = await readFile(path.join(sharedRoot, 'StatGrid.vue'), 'utf8')
@@ -232,7 +403,11 @@ test('公共组件保留原有 Props 和事件契约', async () => {
       default: /\bdefault\s*:\s*\(\)\s*=>\s*\[\s*\]/,
     },
     timeTitle: { type: 'String', required: true },
-    useFixedWeekTitle: { type: 'Boolean', default: /\bdefault\s*:\s*false\b/ },
+    useFixedWeekTitle: {
+      type: 'Boolean',
+      required: false,
+      default: /\bdefault\s*:\s*false\b/,
+    },
   })
 })
 
