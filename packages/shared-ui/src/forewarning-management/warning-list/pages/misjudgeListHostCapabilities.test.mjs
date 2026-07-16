@@ -98,3 +98,29 @@ test('production skips validation while test and development validate', () => {
     )
   }
 })
+
+test('defaults validation behavior from process.env.NODE_ENV', () => {
+  const originalEnvironment = process.env.NODE_ENV
+
+  try {
+    process.env.NODE_ENV = 'production'
+    assert.equal(
+      validateMisjudgeListHost(undefined, 'MisjudgeListPage'),
+      undefined,
+    )
+
+    process.env.NODE_ENV = 'test'
+    assert.throws(
+      () => validateMisjudgeListHost({}, 'MisjudgeListPage'),
+      /MisjudgeListPage.*tenantControlList.*received missing/i,
+    )
+  }
+  finally {
+    if (originalEnvironment === undefined) {
+      delete process.env.NODE_ENV
+    }
+    else {
+      process.env.NODE_ENV = originalEnvironment
+    }
+  }
+})
