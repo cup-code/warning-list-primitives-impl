@@ -24,6 +24,7 @@
     "./forewarning-management/static-analysis/charts/warning-type-chart": "./src/forewarning-management/static-analysis/charts/WarningTypeChart.vue",
     "./forewarning-management/select-machine": "./src/forewarning-management/SelectMachine.vue",
     "./forewarning-management/skill-table": "./src/forewarning-management/SkillTable.vue",
+    "./forewarning-management/warning-list/list": "./src/forewarning-management/warning-list/ForewarningList.vue",
     "./forewarning-management/warning-list/table-config": "./src/forewarning-management/warning-list/tableListConfig.js",
     "./forewarning-management/warning-list/warning-info": "./src/forewarning-management/warning-list/WarningInfo.vue",
     "./forewarning-management/warning-list/check-group": "./src/forewarning-management/warning-list/CheckGroup.vue"
