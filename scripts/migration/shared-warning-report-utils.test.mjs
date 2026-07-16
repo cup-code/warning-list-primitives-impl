@@ -60,17 +60,19 @@ test('两个应用的报告工具 shim 逐字一致并仅保留固定宿主依�
   assert.equal(pdfSources[0].match(/^export\s/gm)?.length, 1)
 })
 
-test('报告包精确导出两个子路径且共享工厂不引用宿主实现', async () => {
+test('报告包精确导出三个子路径且共享工厂不引用宿主实现', async () => {
   const packageJson = JSON.parse(await readWorkspaceFile('packages/warning-feature/package.json'))
   const reportExports = Object.fromEntries(
     Object.entries(packageJson.exports).filter(([name]) => name.startsWith('./report-')),
   )
   assert.deepEqual(reportExports, {
+    './report-data': './src/report/createReportDataModel.js',
     './report-date-utils': './src/report/createReportDateUtils.js',
     './report-pdf-export': './src/report/createReportPdfExporter.js',
   })
 
   const factorySources = await Promise.all([
+    readWorkspaceFile('packages/warning-feature/src/report/createReportDataModel.js'),
     readWorkspaceFile('packages/warning-feature/src/report/createReportDateUtils.js'),
     readWorkspaceFile('packages/warning-feature/src/report/createReportPdfExporter.js'),
   ])
