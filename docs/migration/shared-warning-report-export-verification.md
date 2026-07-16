@@ -1,8 +1,10 @@
 # 预警报表导出共享验证
 
-## 验证环境与范围
+## 验证环境、提交归属与范围
 
-- 验证提交：`623bd291ab49aca50b1a37933256c39add917c1c`
+- 被验证的 Task 5 实现提交：`623bd291ab49aca50b1a37933256c39add917c1c`；该提交包含公共报表实现和两端宿主适配，是安装、测试、构建和来源审计所针对的生产代码 head。
+- 初始永久证据提交：`f4429e0412b5cd3e80bc6e256048d09d98b5ef8a`；该 docs-only 提交只刷新 `shared-source-audit.json` 并新增本文档，不包含生产代码或 `dist/`。
+- 本次澄清是后续 docs-only 修订，只修改本文档；其提交哈希可从紧随 `f4429e0` 的 Git 历史追溯。文档不在提交前自引用未知哈希。
 - 验证日期：2026-07-16（Asia/Shanghai）
 - Node.js：v18.20.3
 - pnpm：10.14.0
@@ -64,12 +66,14 @@
 
 - 七个报表数据函数的业务主体只存在于 `packages/warning-feature/src/report/createReportDataModel.js`；应用 `reportData.js` 只注入 `moment` 和 `getWeekday`。
 - 页面、ReportForm、ReportPreview、ReportTable、StatGrid 和图表主体只存在于 `packages/shared-ui/src/forewarning-management/report-export`；应用原路径只做公共导出、attrs/listeners 透传或宿主能力注入。
-- 公共源码边界测试确认六个公共文件不引用 `@/`、`apps/`、router、store 或浏览器存储；Props、事件、缓存真实删除、菜单路径、组件注入、请求启动顺序和 PDF 错误处理契约均通过。
+- 公共源码边界测试确认六个公共文件不引用 `@/`、`apps/`、router、store 或浏览器存储。迁移测试以静态源码文本和调用顺序断言检查 Props、事件、菜单路径、组件注入、mounted 中四个调用的书写顺序、PDF 的 try/catch 源码以及缓存删除源码契约；其中 `removeStorage` 必须调用 `localStorage.removeItem`。
 - 标题差异：warning 的 `useFixedWeekTitle=false` 使用动态 `${timeTitle}报告预警实况`；front 的 `useFixedWeekTitle=true` 保留固定“本周报告预警实况”。
 - 趋势图差异：warning 的 `showAlarmTypeAxisLabels=false` 不增加预警类型横轴标签配置；front 的值为 `true`，保留 `interval: 0`、最小/最大标签显示。2/2 图表行为测试通过。
-- 两端 host 的导入和对象结构除上述两个布尔值外逐字一致；迁移契约验证 mounted 请求启动顺序仍为配置、设备、技能、报表数据，并保留原 async/error 处理。
+- 两端 host 的导入和对象结构除上述两个布尔值外逐字一致。这里的 mounted 调用顺序、async/error 处理和缓存删除结论均是静态源码契约：测试没有挂载 Vue 组件，没有执行真实请求调度、请求拒绝路径、生命周期或浏览器存储交互。
 
 公共主体扫描与迁移契约共同确认，公共业务主体只命中 `packages/warning-feature/src/report` 和 `packages/shared-ui/src/forewarning-management/report-export`；应用目录没有第二份报表数据、页面或图表主体。
+
+两个生产构建只证明 `link-warning` 与 `link-front` 能够成功编译打包并生成上述产物，不证明页面在浏览器中的 mounted、请求时序、拒绝路径或交互行为已经运行。
 
 ## 来源基线与既有警告
 
@@ -84,6 +88,6 @@
 
 ## 结论
 
-冻结安装、83 项全量测试、两个独立生产构建、fresh 共享审计和来源基线均通过。八个原路径保持兼容且收敛为一致 shim，公共业务主体只有一份；两处宿主行为差异得到显式能力和行为测试保护。
+冻结安装、83 项全量测试、两个独立生产构建、fresh 共享审计和来源基线均通过。八个原路径收敛为一致 shim，公共业务主体只有一份；两处宿主差异由显式能力配置、静态迁移契约和 2 项图表单元测试保护。浏览器运行时行为不在本次验证证据范围内。
 
 文档完成后的最终门禁再次执行了全量测试、两个独立生产构建、共享审计、来源比较和 `git diff --check`：83/83 测试再次通过，warning/front 构建再次以 0 退出（Rsbuild 分别为 6.51 秒和 37.6 秒），审计七项计数保持不变，来源比较仍输出 `来源目录未发生变化`，diff check 无输出。
