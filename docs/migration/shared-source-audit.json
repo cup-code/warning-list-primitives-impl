@@ -1,10 +1,10 @@
 {
   "counts": {
-    "smaller": 480,
-    "larger": 1869,
-    "common": 473,
-    "identical": 342,
-    "different": 131,
+    "smaller": 481,
+    "larger": 1870,
+    "common": 474,
+    "identical": 344,
+    "different": 130,
     "smallerOnly": 7,
     "largerOnly": 1396
   },
@@ -312,6 +312,8 @@
     "views/ForewarningManagement/components/list.vue",
     "views/ForewarningManagement/components/selectMachine.vue",
     "views/ForewarningManagement/components/warningInfo.vue",
+    "views/ForewarningManagement/misjudgeList.vue",
+    "views/ForewarningManagement/misjudgeListHost.js",
     "views/ForewarningManagement/reportExport.vue",
     "views/ForewarningManagement/static/headIcon.png",
     "views/ForewarningManagement/static/topLabel.png",
@@ -435,7 +437,6 @@
     "views/ForewarningManagement/config.js",
     "views/ForewarningManagement/customMisjudgeList.vue",
     "views/ForewarningManagement/machineList.vue",
-    "views/ForewarningManagement/misjudgeList.vue",
     "views/ForewarningManagement/reportExportHost.js",
     "views/ForewarningManagement/staticAnalysisHost.js",
     "views/ForewarningManagement/videoSiren.vue",
