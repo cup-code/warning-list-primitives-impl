@@ -25,9 +25,8 @@ const wrappers = [
   ['warningInfo.vue', 'warning-info'],
 ]
 
-const consumingPages = [
+const remainingConsumingPages = [
   'warningList.vue',
-  'misjudgeList.vue',
   'customMisjudgeList.vue',
   'clientWarningList.vue',
   'attentionList.vue',
@@ -85,7 +84,7 @@ test('两个列表包装保留 setSelections 命令式代理', async () => {
   }
 })
 
-test('两端配置只共享 tableListConfig 并保留本地符号', async () => {
+test('两端配置共享表格配置并保留本地符号', async () => {
   for (const app of apps) {
     const value = await source(appViewPath(app, 'config.js'))
     const exportBlock = value.match(/export\s*{(?<symbols>[^}]*)}/s)
@@ -103,7 +102,15 @@ test('两端配置只共享 tableListConfig 并保留本地符号', async () => 
     assert.doesNotMatch(value, /const\s+tableListConfig\s*=/, app)
     assert.ok(exportedSymbols.includes('tableListConfig'), `${app}/tableListConfig`)
 
-    for (const localSymbol of ['cameraListConfig', 'machineListConfig', 'WarningListConfig']) {
+    assert.match(
+      value,
+      /import\s+{\s*WarningListConfig\s*}\s+from\s+['"]@link\/shared-ui\/forewarning-management\/warning-list\/warning-table-config['"]/,
+      app,
+    )
+    assert.doesNotMatch(value, /const\s+WarningListConfig\s*=/, app)
+    assert.ok(exportedSymbols.includes('WarningListConfig'), `${app}/WarningListConfig`)
+
+    for (const localSymbol of ['cameraListConfig', 'machineListConfig']) {
       assert.match(value, new RegExp(`const\\s+${localSymbol}\\s*=`), `${app}/${localSymbol}`)
       assert.ok(exportedSymbols.includes(localSymbol), `${app}/${localSymbol}`)
     }
@@ -141,8 +148,8 @@ test('两端 warningListHost 只在详情参数模式上不同', async () => {
   )
 })
 
-test('六个消费页面继续通过应用原路径引用组件', async () => {
-  for (const page of consumingPages) {
+test('其余五个消费页面继续通过应用原路径引用组件', async () => {
+  for (const page of remainingConsumingPages) {
     for (const app of apps) {
       const value = await source(appViewPath(app, page))
       assert.doesNotMatch(value, /@link\/shared-ui/, `${app}/${page}`)
